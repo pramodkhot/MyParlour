@@ -69,5 +69,8 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
   shows an alert.
 - **Seed product sales**: four past bills include a product (Hair Serum ×2, Face Wash, Shampoo).
   Opening purchases 31 days ago are sized so stock ends at the spec's figures.
+- **`path_provider_android` is pinned to 2.2.22.** Version 2.3.x switched to JNI and compiles
+  native code with the Android NDK during the APK build; on GitHub Actions that step ran past the
+  30-minute limit. 2.2.22 does the same job over a plain platform channel. Revisit when upgrading.
 - **Seed partial payments**: the three most recent past bills big enough to fit are left with
   balances of ₹1,000, ₹700 and ₹450 (₹2,150 total).
