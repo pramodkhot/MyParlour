@@ -15,6 +15,7 @@ class MetricCard extends StatelessWidget {
     required this.icon,
     this.caption,
     this.captionColor = AppColors.textMuted,
+    this.captionIcon,
     this.onTap,
   });
 
@@ -23,6 +24,9 @@ class MetricCard extends StatelessWidget {
   final IconData icon;
   final String? caption;
   final Color captionColor;
+
+  /// Small icon before the caption, e.g. an up/down arrow.
+  final IconData? captionIcon;
   final VoidCallback? onTap;
 
   @override
@@ -56,14 +60,23 @@ class MetricCard extends StatelessWidget {
           ),
           if (caption != null) ...[
             Gap.h4,
-            Text(
-              caption!,
-              style: AppText.caption.copyWith(
-                color: captionColor,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (captionIcon != null)
+                  Icon(captionIcon, size: 16, color: captionColor),
+                Expanded(
+                  child: Text(
+                    caption!,
+                    style: AppText.caption.copyWith(
+                      color: captionColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ],
         ],

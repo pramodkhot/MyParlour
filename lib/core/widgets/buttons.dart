@@ -9,17 +9,20 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.icon,
     this.loading = false,
+    this.autofocus = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
   final bool loading;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: loading ? null : onPressed,
+      autofocus: autofocus,
       child: _ButtonContent(
         label: label,
         icon: icon,

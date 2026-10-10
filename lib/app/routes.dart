@@ -1,6 +1,8 @@
 /// Route paths used across the app. Screens opened from More live under
 /// `/more/...` so the More tab stays highlighted.
 abstract final class Routes {
+  static const welcome = '/';
+
   static const dashboard = '/dashboard';
   static const appointments = '/appointments';
   static const billing = '/billing';

@@ -72,5 +72,28 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
 - **`path_provider_android` is pinned to 2.2.22.** Version 2.3.x switched to JNI and compiles
   native code with the Android NDK during the APK build; on GitHub Actions that step ran past the
   30-minute limit. 2.2.22 does the same job over a plain platform channel. Revisit when upgrading.
-- **Seed partial payments**: the three most recent past bills big enough to fit are left with
-  balances of ₹1,000, ₹700 and ₹450 (₹2,150 total).
+- **Seed partial payments**: the three most recent bills from 3+ days ago that are big enough
+  are left with balances of ₹1,000, ₹700 and ₹450 (₹2,150 total). Bills from the last two days
+  are fully paid, so "vs yesterday" on the dashboard looks like a normal day.
+
+## Phase 3
+
+- **Illustrations** (`assets/illustrations/`) are original SVGs drawn for this app: the leaf mark,
+  the woman's profile with a leaf crown, and the salon tools row. `tool/render_svgs_test.dart`
+  renders them to PNG for checking and regenerates the iOS launch images.
+- **Native splash**: Android uses a vector leaf mark on blush, both before Android 12
+  (`launch_background.xml`) and with the Android 12 splash API (`values-v31`). Night mode uses the
+  same blush splash because the app is light-only. The window behind Flutter is blush too, so
+  there is no white flash. iOS uses the same leaf as 1×/2×/3× PNGs on a blush launch screen.
+- **First launch** means "the data file was just created". Only then does the Welcome screen fade
+  in (illustration, then text, 400 ms each). Later launches show it at once with the button focused.
+- **Short screens**: on phones under about 760 px tall the Welcome artwork scales down, so the
+  "Explore MyParlour" button is visible without scrolling (checked on 360 × 640).
+- **Dashboard avatar** uses the first letters of the first two words of the parlour name ("BB").
+- **"vs yesterday"** uses an arrow icon rather than a ▲ character, which Manrope does not include.
+- **Sheets** (parlour, alerts) open above the bottom navigation bar.
+- **Dashboard links to sections built later** (Reports, Customers, Billing open bills, Inventory
+  low stock, and the quick actions) already open those sections. For now some of those are still
+  the phase placeholder screens; each phase replaces its own.
+- **`tool/screenshots_test.dart`** captures phone-sized screenshots with the real fonts for
+  design checks. It is not part of the normal `flutter test` run.

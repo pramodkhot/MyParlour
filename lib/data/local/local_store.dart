@@ -28,6 +28,7 @@ class LocalStore {
   final DateTime Function() clock;
 
   StoreData? _data;
+  bool _seededOnLoad = false;
   Future<void> _queue = Future.value();
   final _changes = StreamController<void>.broadcast();
 
@@ -36,6 +37,10 @@ class LocalStore {
 
   /// Emits after every successful change.
   Stream<void> get changes => _changes.stream;
+
+  /// True when [load] found no saved data and created it, i.e. the first
+  /// launch after install.
+  bool get seededOnLoad => _seededOnLoad;
 
   StoreData get data {
     final data = _data;
@@ -60,6 +65,7 @@ class LocalStore {
     final seeded = seeder(clock());
     await _write(seeded);
     _data = seeded;
+    _seededOnLoad = true;
   }
 
   /// Runs [change] on a copy of the data, saves it, then makes it current.

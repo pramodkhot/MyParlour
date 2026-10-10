@@ -22,6 +22,11 @@ final localStoreProvider = Provider<LocalStore>(
   (ref) => throw UnimplementedError('localStoreProvider must be overridden'),
 );
 
+/// True on the first launch after install (the demo data was just created).
+final isFirstLaunchProvider = Provider<bool>(
+  (ref) => ref.watch(localStoreProvider).seededOnLoad,
+);
+
 /// Current time; overridable in tests.
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
@@ -31,10 +36,12 @@ final idGeneratorProvider = Provider<String Function()>((ref) {
   return uuid.v4;
 });
 
-/// Bumps on every data change so screens can refresh.
-final dataChangesProvider = StreamProvider<void>(
-  (ref) => ref.watch(localStoreProvider).changes,
-);
+/// Counts data changes. Screen providers watch it so they reload after any
+/// save. (A counter rather than `void`, so each change is a new value.)
+final dataVersionProvider = StreamProvider<int>((ref) {
+  var version = 0;
+  return ref.watch(localStoreProvider).changes.map((_) => ++version);
+});
 
 final parlourRepositoryProvider = Provider<ParlourRepository>(
   (ref) => LocalParlourRepository(ref.watch(localStoreProvider)),

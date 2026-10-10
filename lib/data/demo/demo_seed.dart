@@ -518,12 +518,15 @@ class DemoSeed {
       invoices.add(_bill(store, billed[i], i, discount, productsOnBill[i]));
     }
 
-    // Three recent past bills left partly paid: balances ₹1,000 + ₹700 +
-    // ₹450 = ₹2,150 pending. Today's two bills are fully paid.
+    // Three bills from 3+ days ago left partly paid: balances ₹1,000 +
+    // ₹700 + ₹450 = ₹2,150 pending. Recent days (and today) are fully
+    // paid, so "vs yesterday" on the dashboard looks like a normal day.
     final targets = [100000, 70000, 45000];
     final partial = <String, int>{};
-    for (final invoice in invoices.sublist(0, invoices.length - 2).reversed) {
+    final cutoff = _day(-2);
+    for (final invoice in invoices.reversed) {
       if (partial.length == targets.length) break;
+      if (!invoice.finalisedAt!.isBefore(cutoff)) continue;
       final target = targets[partial.length];
       if (invoice.totalPaise >= target + 30000) partial[invoice.id] = target;
     }

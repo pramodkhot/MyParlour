@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ splash icon: 288dp canvas, leaf mark inside the central
+     192dp safe area (48 of 72 viewport units). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <group
+        android:translateX="12"
+        android:translateY="12">
+        <path
+            android:pathData="M15,40 C19,31 25,22 35,11"
+            android:strokeColor="#A92750"
+            android:strokeWidth="2.4"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M23,28 C14,28 9,21 10,13 C18,13 24,20 23,28 Z"
+            android:fillColor="#D75D85" />
+        <path
+            android:pathData="M27,21 C28,13 34,8 42,7 C42,15 36,21 27,21 Z"
+            android:fillColor="#A92750" />
+    </group>
+</vector>

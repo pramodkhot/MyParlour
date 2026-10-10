@@ -4,14 +4,16 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/more/more_screen.dart';
+import '../features/welcome/welcome_screen.dart';
 import 'placeholder_screen.dart';
 import 'routes.dart';
 import 'shell_scaffold.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
-    initialLocation: Routes.dashboard,
+    initialLocation: Routes.welcome,
     routes: [
+      GoRoute(path: Routes.welcome, builder: (_, _) => const WelcomeScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => ShellScaffold(shell: shell),
         branches: [

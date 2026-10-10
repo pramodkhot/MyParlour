@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -14 240 224" width="240" height="224">
+  <!-- Original line art for MyParlour: a woman's profile with closed eyes
+       and a crown of leaves flowing from her hair. -->
+  <g fill="none" stroke="#A92750" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Profile: forehead, nose, lips, chin, jaw -->
+    <path d="M104 58 C92 64 84 76 84 90 C84 95 82 98 79 102 C76 107 72 112 70 116 C69 118 70 120 74 120 C76 120 77 122 76 124 C74 126 73 127 75 129 C77 130 77 131 75 132 C73 134 74 137 77 138 C77 141 76 144 77 147 C78 153 84 157 92 156 C99 155 105 151 110 146"/>
+    <!-- Closed eye, lashes and brow -->
+    <path d="M86 101 C89 104 95 104 99 100"/>
+    <path d="M89 103.5 L87.5 107 M93 104.2 L92.6 108 M97 102.5 L97.6 106.4"/>
+    <path d="M86 92 C90 89 96 89 100 91"/>
+    <!-- Ear -->
+    <path d="M128 106 C134 104 138 110 134 116 C131 120 128 118 128 114"/>
+    <!-- Hair: flowing back from the forehead and down behind the neck -->
+    <path d="M104 58 C116 44 146 40 164 54 C184 70 190 100 182 126 C176 146 180 168 194 186"/>
+    <path d="M110 64 C126 58 146 64 154 82"/>
+    <path d="M118 74 C134 72 148 86 150 104 C151 116 146 126 138 132"/>
+    <path d="M160 64 C174 80 176 104 168 124 C162 140 166 158 178 172"/>
+    <path d="M150 104 C156 118 154 134 150 146"/>
+    <!-- Neck and shoulders -->
+    <path d="M96 156 C98 168 97 178 93 190 C84 197 72 201 58 204"/>
+    <path d="M138 134 C138 154 142 170 152 184 C166 194 182 199 200 202"/>
+    <!-- Branches flowing from the crown -->
+    <path d="M140 48 C150 30 166 16 190 10"/>
+    <path d="M156 58 C172 44 190 38 214 40"/>
+    <path d="M124 46 C126 30 134 16 146 6"/>
+  </g>
+
+  <!-- Outlined burgundy leaves -->
+  <g fill="none" stroke="#A92750" stroke-width="1.5" stroke-linejoin="round">
+    <path transform="translate(148 36) rotate(-87)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(166 22) rotate(-87)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+
+    <path transform="translate(180 44) rotate(23)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(194 40) rotate(-67)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(213 40) rotate(-17)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+
+    <path transform="translate(126 34) rotate(-131)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(139 13) rotate(-131)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(145 7) rotate(-61)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+  </g>
+
+  <!-- Filled rose leaves -->
+  <g fill="#D75D85">
+    <path transform="translate(176 16) rotate(20)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(189 10) rotate(-37)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(168 49) rotate(-67)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(202 39) rotate(50)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+    <path transform="translate(132 22) rotate(-11)" d="M0 0 C5 -6 14 -7 20 0 C14 7 5 6 0 0 Z"/>
+  </g>
+
+  <!-- Leaf midribs on the outlined leaves -->
+  <g fill="none" stroke="#A92750" stroke-width="1" stroke-linecap="round">
+    <path transform="translate(148 36) rotate(-87)" d="M2 0 L17 0"/>
+    <path transform="translate(166 22) rotate(-87)" d="M2 0 L17 0"/>
+    <path transform="translate(180 44) rotate(23)" d="M2 0 L17 0"/>
+    <path transform="translate(194 40) rotate(-67)" d="M2 0 L17 0"/>
+    <path transform="translate(213 40) rotate(-17)" d="M2 0 L17 0"/>
+    <path transform="translate(126 34) rotate(-131)" d="M2 0 L17 0"/>
+    <path transform="translate(139 13) rotate(-131)" d="M2 0 L17 0"/>
+    <path transform="translate(145 7) rotate(-61)" d="M2 0 L17 0"/>
+  </g>
+</svg>
