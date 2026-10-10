@@ -84,4 +84,56 @@ void main() {
     await tester.pumpAndSettle();
     await _shot(tester, '04_alerts');
   });
+
+  Future<void> open(WidgetTester tester, String section) async {
+    usePhoneScreen(tester);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    await pumpDemoApp(tester);
+    await enterApp(tester);
+    await openMoreSection(tester, section);
+  }
+
+  Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
+    await tester.tap(finder);
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 5),
+    );
+  }
+
+  testWidgets('customers', (tester) async {
+    await open(tester, 'Customers');
+    await _shot(tester, '10_customers');
+    await tapAndSettle(tester, find.text('Priya Sharma'));
+    await _shot(tester, '11_customer_history');
+    await tapAndSettle(tester, find.text('Details'));
+    await _shot(tester, '12_customer_details');
+  });
+
+  testWidgets('customer form', (tester) async {
+    await open(tester, 'Customers');
+    await tapAndSettle(tester, find.byTooltip('Add customer').first);
+    await typeInto(tester, 'Mobile number', '9876543210');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+    await _shot(tester, '13_customer_form');
+  });
+
+  testWidgets('services', (tester) async {
+    await open(tester, 'Services');
+    await _shot(tester, '20_services');
+    await tapAndSettle(tester, find.text('Hair Spa'));
+    await _shot(tester, '21_service_form');
+  });
+
+  testWidgets('staff', (tester) async {
+    await open(tester, 'Staff');
+    await _shot(tester, '30_staff');
+    await tapAndSettle(tester, find.text('Anita'));
+    await _shot(tester, '31_staff_detail');
+    await tapAndSettle(tester, find.byTooltip('Edit staff'));
+    await _shot(tester, '32_staff_form');
+  });
 }

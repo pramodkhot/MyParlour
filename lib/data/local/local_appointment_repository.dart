@@ -22,6 +22,17 @@ class LocalAppointmentRepository implements AppointmentRepository {
   ).reversed.toList();
 
   @override
+  Future<Map<String, int>> completedVisitCounts() async {
+    final counts = <String, int>{};
+    for (final a in _store.data.appointments) {
+      if (a.status == AppointmentStatus.completed && a.customerId != null) {
+        counts[a.customerId!] = (counts[a.customerId!] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }
+
+  @override
   Future<Appointment?> getById(String id) async =>
       findById(_store.data.appointments, id, (a) => a.id);
 

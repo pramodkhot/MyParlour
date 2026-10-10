@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:myparlour/data/local/local_store.dart';
 import 'package:myparlour/data/local/store_data.dart';
+import 'package:myparlour/data/local/store_file.dart';
 import 'package:myparlour/domain/errors.dart';
 
 import '../helpers/test_data.dart';
@@ -15,7 +16,7 @@ void main() {
   tearDown(() => deleteTestStore(store));
 
   test('first load seeds and writes the file', () async {
-    expect(await store.file.exists(), isTrue);
+    expect(await storeFile(store).exists(), isTrue);
     expect(store.data.parlour.name, 'Test Parlour');
     expect(store.data.customers.single.name, 'Priya Sharma');
   });
@@ -28,7 +29,7 @@ void main() {
     final before = jsonEncode(store.data.toJson());
 
     final reopened = LocalStore(
-      directory: store.directory,
+      storage: DiskStoreFile(storeDirectory(store)),
       seeder: (_) => throw StateError('should not seed again'),
     );
     await reopened.load();
@@ -46,7 +47,7 @@ void main() {
   });
 
   test('a failed change leaves memory and file untouched', () async {
-    final fileBefore = await store.file.readAsString();
+    final fileBefore = await storeFile(store).readAsString();
     await expectLater(
       store.transact((data) {
         data.customers.clear();
@@ -55,15 +56,15 @@ void main() {
       throwsA(isA<ValidationException>()),
     );
     expect(store.data.customers, hasLength(1));
-    expect(await store.file.readAsString(), fileBefore);
+    expect(await storeFile(store).readAsString(), fileBefore);
   });
 
   test('writes leave no temp file behind', () async {
     await store.transact((data) => data.invoiceSerials['x'] = 1);
-    final names = store.directory.listSync().map(
-      (e) => e.uri.pathSegments.last,
-    );
-    expect(names, [LocalStore.fileName]);
+    final names = storeDirectory(
+      store,
+    ).listSync().map((e) => e.uri.pathSegments.last);
+    expect(names, [DiskStoreFile.fileName]);
   });
 
   test('changes stream fires after a successful change', () async {
@@ -87,8 +88,11 @@ void main() {
 
   test('a damaged file is set aside and the seed is used', () async {
     final dir = await Directory.systemTemp.createTemp('myparlour_broken_');
-    await File('${dir.path}/${LocalStore.fileName}').writeAsString('{oops');
-    final broken = LocalStore(directory: dir, seeder: (_) => smallData());
+    await File('${dir.path}/${DiskStoreFile.fileName}').writeAsString('{oops');
+    final broken = LocalStore(
+      storage: DiskStoreFile(dir),
+      seeder: (_) => smallData(),
+    );
     await broken.load();
     expect(broken.data.parlour.name, 'Test Parlour');
     expect(dir.listSync().any((e) => e.path.contains('.broken-')), isTrue);

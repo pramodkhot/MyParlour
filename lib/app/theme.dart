@@ -187,6 +187,36 @@ ThemeData buildAppTheme() {
       contentTextStyle: AppText.body.copyWith(color: Colors.white),
       shape: const RoundedRectangleBorder(borderRadius: Radii.controlAll),
     ),
+    tabBarTheme: TabBarThemeData(
+      labelColor: AppColors.primary,
+      unselectedLabelColor: AppColors.textMuted,
+      indicatorColor: AppColors.primary,
+      indicatorSize: TabBarIndicatorSize.label,
+      dividerColor: AppColors.divider,
+      labelStyle: AppText.label.copyWith(fontWeight: FontWeight.w700),
+      unselectedLabelStyle: AppText.label,
+    ),
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? AppColors.primary
+            : Colors.transparent,
+      ),
+      side: const BorderSide(color: AppColors.textMuted, width: 1.5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? Colors.white
+            : AppColors.textMuted,
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? AppColors.primary
+            : AppColors.divider,
+      ),
+    ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: AppColors.primary,
     ),

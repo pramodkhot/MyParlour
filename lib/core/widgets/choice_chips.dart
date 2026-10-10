@@ -58,6 +58,41 @@ class ChoiceChips<T> extends StatelessWidget {
   }
 }
 
+/// Multi-select pill chips (e.g. working days), wrapping onto new lines.
+class MultiChoiceChips<T> extends StatelessWidget {
+  const MultiChoiceChips({
+    super.key,
+    required this.options,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final List<ChoiceOption<T>> options;
+  final Set<T> selected;
+  final ValueChanged<Set<T>> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: Space.sm,
+      runSpacing: Space.sm,
+      children: [
+        for (final option in options)
+          _Chip(
+            label: option.label,
+            icon: option.icon,
+            isSelected: selected.contains(option.value),
+            onTap: () {
+              final next = {...selected};
+              if (!next.remove(option.value)) next.add(option.value);
+              onChanged(next);
+            },
+          ),
+      ],
+    );
+  }
+}
+
 class _Chip extends StatelessWidget {
   const _Chip({
     required this.label,

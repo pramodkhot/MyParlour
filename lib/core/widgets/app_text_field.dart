@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../design/typography.dart';
+import 'field_label.dart';
 
 /// Form field with the label above, optional left icon and inline error.
 ///
@@ -56,24 +57,8 @@ class AppTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text.rich(
-          TextSpan(
-            text: label,
-            children: [
-              if (isRequired)
-                const TextSpan(
-                  text: ' *',
-                  style: TextStyle(color: AppColors.primary),
-                )
-              else
-                TextSpan(
-                  text: '  (optional)',
-                  style: AppText.caption.copyWith(fontWeight: FontWeight.w500),
-                ),
-            ],
-          ),
-          style: AppText.label.copyWith(color: AppColors.text),
-        ),
+        FieldLabel(label, required: isRequired),
+
         Gap.h8,
         TextFormField(
           controller: controller,

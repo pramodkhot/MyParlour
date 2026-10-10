@@ -14,7 +14,12 @@ class QuickActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = [
       (Icons.add_rounded, 'New appointment', Routes.appointments, true),
-      (Icons.person_add_alt_outlined, 'Add customer', Routes.customers, false),
+      (
+        Icons.person_add_alt_outlined,
+        'Add customer',
+        Routes.newCustomer,
+        false,
+      ),
       (Icons.receipt_long_outlined, 'Create bill', Routes.billing, false),
       (
         Icons.account_balance_wallet_outlined,

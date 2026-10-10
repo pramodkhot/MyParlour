@@ -15,6 +15,13 @@ abstract final class PhoneNumber {
     return null;
   }
 
+  /// Digits to search for in a search box entry, ignoring a typed `+91`
+  /// or leading `0` ("+91 9123" → "9123"). Empty when there are no digits.
+  static String searchDigits(String query) {
+    final q = query.trim().replaceFirst(RegExp(r'^\+\s*91'), '');
+    return q.replaceAll(RegExp(r'\D'), '').replaceFirst(RegExp(r'^0+'), '');
+  }
+
   /// True for numbers that normalise to 10 digits starting with 6–9.
   static bool isValidMobile(String input) {
     final normalised = normalise(input);

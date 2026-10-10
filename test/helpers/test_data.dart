@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:myparlour/data/local/local_store.dart';
 import 'package:myparlour/data/local/store_data.dart';
+import 'package:myparlour/data/local/store_file.dart';
 import 'package:myparlour/domain/models/appointment.dart';
 import 'package:myparlour/domain/models/customer.dart';
 import 'package:myparlour/domain/models/invoice.dart';
@@ -127,14 +128,14 @@ BillLine productLine(Product p, {int qty = 1}) => BillLine(
   taxRateBp: 1800,
 );
 
-/// A loaded [LocalStore] in a fresh temp folder.
+/// A loaded [LocalStore] on a real file in a fresh temp folder.
 Future<LocalStore> openTestStore({
   StoreData Function(DateTime now)? seeder,
   DateTime Function()? clock,
 }) async {
   final dir = await Directory.systemTemp.createTemp('myparlour_test_');
   final store = LocalStore(
-    directory: dir,
+    storage: DiskStoreFile(dir),
     seeder: seeder ?? (_) => smallData(),
     clock: clock ?? () => testNow,
   );
@@ -142,9 +143,15 @@ Future<LocalStore> openTestStore({
   return store;
 }
 
+/// The temp folder behind a store from [openTestStore].
+Directory storeDirectory(LocalStore store) =>
+    (store.storage as DiskStoreFile).directory;
+
+/// The data file behind a store from [openTestStore].
+File storeFile(LocalStore store) => (store.storage as DiskStoreFile).file;
+
 Future<void> deleteTestStore(LocalStore store) async {
   await store.dispose();
-  if (await store.directory.exists()) {
-    await store.directory.delete(recursive: true);
-  }
+  final dir = storeDirectory(store);
+  if (await dir.exists()) await dir.delete(recursive: true);
 }

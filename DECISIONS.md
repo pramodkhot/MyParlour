@@ -97,3 +97,30 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
   the phase placeholder screens; each phase replaces its own.
 - **`tool/screenshots_test.dart`** captures phone-sized screenshots with the real fonts for
   design checks. It is not part of the normal `flutter test` run.
+
+## Phase 4
+
+- **Deactivating** customers, services and staff hides them from lists used for new bookings and
+  bills; their history stays. Customers: More → Deactivate on the customer screen, and an
+  "Inactive (n)" chip on the list shows them. Services: link at the bottom of the edit form.
+  Staff: button at the bottom of the staff screen. Each can be reactivated.
+- **Customer "More"** opens a small sheet: Share contact, Edit customer, Deactivate/Reactivate.
+- **Mobile numbers** are typed after a fixed `+91` and saved as `98765 43210`. Search accepts
+  name, part of the number, or a number typed with `+91` / a leading 0.
+- **Visits** = completed appointments. **Total spent** = money actually paid (non-void payments on
+  non-void bills). **History** shows each appointment once with its bill total if billed, plus
+  bills made without an appointment; void bills are hidden.
+- **Staff "this month"**: services done and amount billed come from service lines credited to that
+  stylist on bills finalised this calendar month.
+- **"New appointment" / "Save & book appointment"** open the Appointments tab for now; Phase 5
+  connects them to the booking form with the customer filled in.
+- **Service GST rate** defaults to the parlour's default rate (18%) and is only used when GST is on.
+- **Duration "Custom"** takes any number of minutes.
+- **New staff** default to all active services, the parlour's open days and hours.
+- **Messages** (snackbars) show for 3 seconds.
+- **Storage is behind a small `StoreFile` interface**: the app uses the real file
+  (`DiskStoreFile`); widget tests use an in-memory one, because real file writes cannot complete
+  on the widget test's fake clock. A separate test saves to a real file, opens a fresh store from
+  the same folder and checks everything survived (an app restart).
+- **Contact actions** (call, SMS, WhatsApp, share) go through one `ContactActions` service, so
+  tests can use a fake. If no app can open the link, a message says so.

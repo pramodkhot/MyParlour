@@ -1,29 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'store_data.dart';
+import 'store_file.dart';
 
 /// Builds a fresh data set, e.g. the demo seed for "now".
 typedef StoreSeeder = StoreData Function(DateTime now);
 
-/// Keeps all app data in memory and in one JSON file
-/// (`myparlour_demo.json`) inside [directory].
+/// Keeps all app data in memory and saves it as one JSON document in
+/// [storage] (on the phone: `myparlour_demo.json`, see [DiskStoreFile]).
 ///
-/// Writes are atomic: the JSON goes to a temp file which is then renamed
-/// over the real file. Each [transact] call changes a copy of the data,
-/// saves once, and only then makes the copy current, so a change either
-/// fully happens or not at all.
+/// Each [transact] call changes a copy of the data, saves once, and only
+/// then makes the copy current, so a change either fully happens or not
+/// at all. Changes run one after another, never interleaved.
 class LocalStore {
   LocalStore({
-    required this.directory,
+    required this.storage,
     required this.seeder,
     DateTime Function()? clock,
   }) : clock = clock ?? DateTime.now;
 
-  static const fileName = 'myparlour_demo.json';
-
-  final Directory directory;
+  final StoreFile storage;
   final StoreSeeder seeder;
   final DateTime Function() clock;
 
@@ -31,9 +28,6 @@ class LocalStore {
   bool _seededOnLoad = false;
   Future<void> _queue = Future.value();
   final _changes = StreamController<void>.broadcast();
-
-  File get file => File('${directory.path}${Platform.pathSeparator}$fileName');
-  File get _tempFile => File('${file.path}.tmp');
 
   /// Emits after every successful change.
   Stream<void> get changes => _changes.stream;
@@ -48,18 +42,16 @@ class LocalStore {
     return data;
   }
 
-  /// Reads the file, or seeds and saves when there is none. A damaged
-  /// file is kept as `.broken` and the seed is used instead.
+  /// Reads the saved data, or seeds and saves when there is none. Damaged
+  /// data is set aside as `.broken-<time>` and the seed is used instead.
   Future<void> load() async {
-    if (await file.exists()) {
+    final text = await storage.read();
+    if (text != null) {
       try {
-        final text = await file.readAsString();
         _data = StoreData.fromJson(jsonDecode(text) as Map<String, Object?>);
         return;
       } on Object {
-        await file.rename(
-          '${file.path}.broken-${clock().millisecondsSinceEpoch}',
-        );
+        await storage.setAside('broken-${clock().millisecondsSinceEpoch}');
       }
     }
     final seeded = seeder(clock());
@@ -95,10 +87,6 @@ class LocalStore {
     return result;
   }
 
-  Future<void> _write(StoreData data) async {
-    await directory.create(recursive: true);
-    final temp = _tempFile;
-    await temp.writeAsString(jsonEncode(data.toJson()), flush: true);
-    await temp.rename(file.path);
-  }
+  Future<void> _write(StoreData data) =>
+      storage.write(jsonEncode(data.toJson()));
 }

@@ -28,7 +28,7 @@ void main() {
     await tester.tap(find.text('Customers'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Customers will be ready'), findsOneWidget);
+    expect(find.text('Search name or phone'), findsOneWidget);
     expect(selectedTab(tester), 3);
 
     await tester.pageBack();

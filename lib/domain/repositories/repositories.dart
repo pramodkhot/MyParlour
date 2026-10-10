@@ -55,6 +55,9 @@ abstract interface class AppointmentRepository {
   Future<List<Appointment>> listForCustomer(String customerId);
   Future<Appointment?> getById(String id);
 
+  /// Completed appointments per customer id (for "x visits").
+  Future<Map<String, int>> completedVisitCounts();
+
   /// Creates or reschedules. Overlaps are allowed here; the screen warns.
   Future<Appointment> save(Appointment appointment);
 

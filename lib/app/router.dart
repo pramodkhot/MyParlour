@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/customers/customer_detail_screen.dart';
+import '../features/customers/customer_form_screen.dart';
+import '../features/customers/customers_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/more/more_screen.dart';
+import '../features/services/service_form_screen.dart';
+import '../features/services/services_screen.dart';
+import '../features/staff/staff_detail_screen.dart';
+import '../features/staff/staff_form_screen.dart';
+import '../features/staff/staff_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import 'placeholder_screen.dart';
 import 'routes.dart';
@@ -55,18 +63,69 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: Routes.more,
                 builder: (_, _) => const MoreScreen(),
                 routes: [
-                  _placeholder(
-                    'customers',
-                    'Customers',
-                    Icons.people_alt_outlined,
-                    4,
+                  GoRoute(
+                    path: 'customers',
+                    builder: (_, _) => const CustomersScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (_, _) => const CustomerFormScreen(),
+                      ),
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => CustomerDetailScreen(
+                          customerId: state.pathParameters['id']!,
+                        ),
+                        routes: [
+                          GoRoute(
+                            path: 'edit',
+                            builder: (_, state) => CustomerFormScreen(
+                              customerId: state.pathParameters['id'],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  _placeholder('staff', 'Staff', Icons.badge_outlined, 4),
-                  _placeholder(
-                    'services',
-                    'Services',
-                    Icons.content_cut_rounded,
-                    4,
+                  GoRoute(
+                    path: 'staff',
+                    builder: (_, _) => const StaffScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (_, _) => const StaffFormScreen(),
+                      ),
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => StaffDetailScreen(
+                          staffId: state.pathParameters['id']!,
+                        ),
+                        routes: [
+                          GoRoute(
+                            path: 'edit',
+                            builder: (_, state) => StaffFormScreen(
+                              staffId: state.pathParameters['id'],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'services',
+                    builder: (_, _) => const ServicesScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (_, _) => const ServiceFormScreen(),
+                      ),
+                      GoRoute(
+                        path: ':id/edit',
+                        builder: (_, state) => ServiceFormScreen(
+                          serviceId: state.pathParameters['id'],
+                        ),
+                      ),
+                    ],
                   ),
                   _placeholder(
                     'inventory',

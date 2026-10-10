@@ -20,6 +20,8 @@ dependencies:
   # 2.3.x builds native JNI code with the NDK, which stalls the CI APK build.
   # 2.2.22 is the last plain platform-channel version. See DECISIONS.md.
   path_provider_android: 2.2.22
+  share_plus: ^13.3.1
+  url_launcher: ^6.3.2
   uuid: ^4.6.0
 
 dev_dependencies:
