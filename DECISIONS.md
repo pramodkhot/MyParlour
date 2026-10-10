@@ -28,3 +28,46 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
   (written by CI from repository secrets) and otherwise signs release builds with the debug key.
 - **No local Android build**: APKs are built only by GitHub Actions. Local checks are
   `flutter analyze` and `flutter test`.
+
+## Phase 2
+
+- **Repository interfaces** live in one file, `domain/repositories/repositories.dart`, together with
+  the small input types screens submit (`BillDraft`, `BillLine`, `PaymentInput`). Providers for all
+  of them are in `data/providers.dart`; swapping to Supabase means changing only that file.
+- **Ids are created by the caller** (UUID v4 via `idGeneratorProvider`). This is what makes a
+  double tap harmless: submitting the same bill id or payment id twice records nothing extra.
+- **Drafts have no invoice number.** The number is assigned on finalise, so abandoned drafts never
+  use up a serial.
+- **Invoice serials restart each financial year** (`BBP/2026-27/0001`, then `BBP/2027-28/0001`)
+  and only go up within a year, so a number is never reused. "Reset demo data" starts the counters
+  again together with the data.
+- **Voiding a bill also voids its payments** and puts sold stock back (`voidReversal`). Sales
+  reports therefore drop the voided money. A void bill shows paid ₹0 and balance ₹0.
+- **One bill per appointment**: a second bill for the same appointment is refused unless the first
+  one was voided.
+- **"Prices include GST"** (a Settings option in S18) is supported by the calculator: tax is backed
+  out of the price instead of added on top. Default stays "prices exclude tax".
+- **Tax on a bill is a snapshot**: each invoice stores whether GST was on when it was calculated,
+  so changing the setting later does not change old bills.
+- **Percent discounts** are stored in basis points (10% = 1000) and rounded half-up to the paisa.
+- **Dashboard "still to come"** counts today's appointments that are still *booked*. Checked-in
+  customers are already in the parlour, so they are not counted. "Appointments" counts today's
+  appointments except cancelled ones.
+- **Next appointments** on the dashboard are checked-in ones plus booked ones that have not ended
+  yet, earliest first.
+- **Top services** are ranked by revenue (line totals of service lines in bills finalised in the
+  range). Share % is of all service revenue in that range.
+- **Weeks start on Monday** for the "This week" report.
+- **Expenses can be deleted** because no other record refers to them.
+- **"Start empty"** keeps the parlour profile (name, hours, billing settings) and clears
+  everything else, including services and staff.
+- **A damaged data file** is renamed to `myparlour_demo.json.broken-<time>` and the demo seed is
+  loaded, so the app always opens.
+- **Seed content is fixed** (no randomness); only the ids change per reset. Past visits fall on
+  Monday–Saturday. Today's six appointments are always created, even on a Sunday, so the demo
+  always has something to show. One customer (Pooja Mehta) has a birthday today, so the bell
+  shows an alert.
+- **Seed product sales**: four past bills include a product (Hair Serum ×2, Face Wash, Shampoo).
+  Opening purchases 31 days ago are sized so stock ends at the spec's figures.
+- **Seed partial payments**: the three most recent past bills big enough to fit are left with
+  balances of ₹1,000, ₹700 and ₹450 (₹2,150 total).

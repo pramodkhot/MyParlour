@@ -4,10 +4,18 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 import 'app/app.dart';
+import 'data/local/open_local_store.dart';
+import 'data/providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Intl.defaultLocale = 'en_IN';
   await initializeDateFormatting('en_IN');
-  runApp(const ProviderScope(child: MyParlourApp()));
+  final store = await openLocalStore();
+  runApp(
+    ProviderScope(
+      overrides: [localStoreProvider.overrideWithValue(store)],
+      child: const MyParlourApp(),
+    ),
+  );
 }
