@@ -6,6 +6,7 @@ import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/header_band.dart';
 import 'dashboard_controller.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/dashboard_metrics.dart';
@@ -62,14 +63,19 @@ class _Body extends StatelessWidget {
       children: [
         DashboardHeader(
           data: data,
-          bottomPadding: DashboardScreen._overlap + Space.lg,
+          bottomPadding: Space.lg,
+          roundedBottom: false,
         ),
-        // Pull the cards up over the header. Transform keeps taps working;
-        // the space it leaves at the end doubles as bottom padding.
-        Transform.translate(
-          offset: const Offset(0, -DashboardScreen._overlap),
+        // The band continues behind the top of the metric cards.
+        HeaderBandOverlap(
+          overlap: DashboardScreen._overlap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Space.screen),
+            padding: const EdgeInsets.fromLTRB(
+              Space.screen,
+              0,
+              Space.screen,
+              Space.xxl,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

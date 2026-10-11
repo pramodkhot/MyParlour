@@ -61,7 +61,20 @@ abstract final class Routes {
   static String editService(String id) => '/more/services/$id/edit';
 
   static const inventory = '/more/inventory';
+  static const lowStock = '/more/inventory?tab=low';
+  static const newProduct = '/more/inventory/new';
+  static String product(String id) => '/more/inventory/$id';
+  static String editProduct(String id) => '/more/inventory/$id/edit';
+
   static const expenses = '/more/expenses';
+  static const newExpense = '/more/expenses/new';
+  static String editExpense(String id) => '/more/expenses/$id/edit';
+
   static const reports = '/more/reports';
+  static const reportsToday = '/more/reports?period=today';
+
   static const settings = '/more/settings';
+  static const settingsProfile = '/more/settings/profile';
+  static const settingsHours = '/more/settings/hours';
+  static const settingsBilling = '/more/settings/billing';
 }

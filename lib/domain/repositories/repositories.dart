@@ -186,6 +186,7 @@ abstract interface class ProductRepository {
 abstract interface class ExpenseRepository {
   /// Expenses dated inside [range], newest first.
   Future<List<Expense>> listInRange(DateRange range);
+  Future<Expense?> getById(String id);
   Future<Expense> save(Expense expense);
   Future<void> delete(String id);
 }

@@ -188,6 +188,47 @@ void main() {
     await _shot(tester, '53_success');
   });
 
+  testWidgets('phase 7', (tester) async {
+    usePhoneScreen(tester);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    await pumpDemoApp(tester);
+    await enterApp(tester);
+    await _shot(tester, '60_dashboard');
+
+    await tapAndSettle(tester, navItem('More'));
+    await _shot(tester, '61_more');
+    await tapAndSettle(tester, find.text('Inventory'));
+    await _shot(tester, '62_inventory');
+    await tapAndSettle(tester, find.text('Hair Serum'));
+    await _shot(tester, '63_product');
+    await tapAndSettle(tester, find.text('Adjust stock'));
+    await _shot(tester, '64_adjust');
+    await tester.tapAt(const Offset(200, 100));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.text('Expenses'));
+    await _shot(tester, '65_expenses');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.text('Reports'));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 100)),
+    );
+    await tester.pumpAndSettle();
+    await _shot(tester, '66_reports_top');
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -500));
+    await tester.pumpAndSettle();
+    await _shot(tester, '67_reports_bottom');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.text('Settings'));
+    await _shot(tester, '68_settings');
+  });
+
   testWidgets('staff', (tester) async {
     await open(tester, 'Staff');
     await _shot(tester, '30_staff');

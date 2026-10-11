@@ -23,7 +23,7 @@ class LowStockCard extends StatelessWidget {
         SectionHeader(
           title: 'Low stock',
           actionLabel: 'Restock',
-          onAction: () => context.go('${Routes.inventory}?tab=low'),
+          onAction: () => context.go(Routes.lowStock),
         ),
         AppCard(
           padding: EdgeInsets.zero,

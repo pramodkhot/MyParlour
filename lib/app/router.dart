@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,14 +14,23 @@ import '../features/customers/customer_detail_screen.dart';
 import '../features/customers/customer_form_screen.dart';
 import '../features/customers/customers_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
+import '../domain/services/report_service.dart';
+import '../features/expenses/expense_form_screen.dart';
+import '../features/expenses/expenses_screen.dart';
+import '../features/inventory/inventory_controller.dart';
+import '../features/inventory/inventory_screen.dart';
+import '../features/inventory/product_detail_screen.dart';
+import '../features/inventory/product_form_screen.dart';
 import '../features/more/more_screen.dart';
+import '../features/reports/reports_screen.dart';
+import '../features/settings/settings_forms.dart';
+import '../features/settings/settings_screen.dart';
 import '../features/services/service_form_screen.dart';
 import '../features/services/services_screen.dart';
 import '../features/staff/staff_detail_screen.dart';
 import '../features/staff/staff_form_screen.dart';
 import '../features/staff/staff_screen.dart';
 import '../features/welcome/welcome_screen.dart';
-import 'placeholder_screen.dart';
 import 'routes.dart';
 import 'shell_scaffold.dart';
 
@@ -199,29 +207,74 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ),
                     ],
                   ),
-                  _placeholder(
-                    'inventory',
-                    'Inventory',
-                    Icons.inventory_2_outlined,
-                    7,
+                  GoRoute(
+                    path: 'inventory',
+                    builder: (_, state) => InventoryScreen(
+                      initialTab: InventoryTab.fromQuery(
+                        state.uri.queryParameters['tab'],
+                      ),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (_, _) => const ProductFormScreen(),
+                      ),
+                      GoRoute(
+                        path: ':id',
+                        builder: (_, state) => ProductDetailScreen(
+                          productId: state.pathParameters['id']!,
+                        ),
+                        routes: [
+                          GoRoute(
+                            path: 'edit',
+                            builder: (_, state) => ProductFormScreen(
+                              productId: state.pathParameters['id'],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  _placeholder(
-                    'expenses',
-                    'Expenses',
-                    Icons.account_balance_wallet_outlined,
-                    7,
+                  GoRoute(
+                    path: 'expenses',
+                    builder: (_, _) => const ExpensesScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (_, _) => const ExpenseFormScreen(),
+                      ),
+                      GoRoute(
+                        path: ':id/edit',
+                        builder: (_, state) => ExpenseFormScreen(
+                          expenseId: state.pathParameters['id'],
+                        ),
+                      ),
+                    ],
                   ),
-                  _placeholder(
-                    'reports',
-                    'Reports',
-                    Icons.insights_outlined,
-                    7,
+                  GoRoute(
+                    path: 'reports',
+                    builder: (_, state) => ReportsScreen(
+                      initialPeriod:
+                          state.uri.queryParameters['period'] == 'today'
+                          ? ReportPeriod.today
+                          : ReportPeriod.thisMonth,
+                    ),
                   ),
-                  _placeholder(
-                    'settings',
-                    'Settings',
-                    Icons.settings_outlined,
-                    7,
+                  GoRoute(
+                    path: 'settings',
+                    builder: (_, _) => const SettingsScreen(),
+                    routes: [
+                      for (final (path, section) in const [
+                        ('profile', SettingsSection.profile),
+                        ('hours', SettingsSection.hours),
+                        ('billing', SettingsSection.billing),
+                      ])
+                        GoRoute(
+                          path: path,
+                          builder: (_, _) =>
+                              SettingsFormScreen(section: section),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -234,11 +287,3 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
-
-GoRoute _placeholder(String path, String title, IconData icon, int phase) {
-  return GoRoute(
-    path: path,
-    builder: (_, _) =>
-        PlaceholderScreen(title: title, icon: icon, phase: phase),
-  );
-}

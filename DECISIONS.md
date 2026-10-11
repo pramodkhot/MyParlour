@@ -187,3 +187,36 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
   an `archive` method added later, so it fails to compile. `pdf` 3.13.1 fixes this but needs
   Dart 3.12, newer than the Flutter on the build PC. Revisit when upgrading Flutter.
 - **Walk-in bills with no name** show as "Walk-in customer".
+
+## Phase 7
+
+- **Inventory tabs**: Low stock = at or below the alert level but not zero; Out of stock = zero.
+  Inactive products appear only on "All items" (dimmed). The Dashboard's "Restock" opens Low stock.
+- **Adjust stock**: Stock in adds, Used in service and Damaged/expired remove, and Count correction
+  takes the number actually counted and records the difference. The sheet shows the new stock
+  before saving and refuses to go below zero.
+- **Product stock is only changed through Adjust stock or bills.** The edit form shows the current
+  stock but does not change it; a new product's opening stock is recorded as a "Stock in".
+- **Expenses** can be edited and deleted (nothing else refers to them). The month arrows do not
+  go past the current month. "Paid by" defaults to Cash.
+- **Reports**: the period menu offers Today, This week (Mon–Sun), This month and Custom range. For a
+  single day the chart shows hours (opening to closing time); otherwise days. The line stops at
+  today, so future days are not drawn as ₹0. Net profit is labelled "(estimate)" and turns red
+  when negative.
+- **Report check**: a test sums the raw sample data with plain loops and compares it with the
+  report (sales, expenses, profit, bills, payment methods, top service) on three different dates.
+- **More** shows live figures: customers, active staff, services, low-stock count (amber when not
+  zero) and this month's expenses.
+- **Settings**: Parlour profile, Business hours and Billing & tax open their own forms. The parlour
+  **logo** is not editable in this demo: it would need a photo-picker plugin, and the receipt does
+  not use a logo yet. GSTIN is checked for 15 letters/numbers. The receipt becomes a "Tax invoice"
+  only with GST on and a GSTIN set. Changing the invoice prefix affects new bills only.
+- **Start empty** keeps the parlour profile, hours and billing settings and removes everything
+  else. **Reset demo data** brings back the full sample data dated around today. Both ask first.
+- **App version** in About comes from the installed build (`package_info_plus`), e.g.
+  "0.1.0 (12)" where 12 is the GitHub build number.
+- **Seed expenses** (changed): rent ₹12,000 on the 1st of this month and salaries on the last day
+  of last month, so "This month" shows a believable profit. Both are still within the last 30 days.
+- **Dashboard header fix**: the burgundy band now continues *behind* the top metric cards instead
+  of the cards being shifted up over it. Before, the top 56 px of the "Today's sales" and
+  "Appointments" cards could not be tapped.

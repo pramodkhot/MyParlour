@@ -77,6 +77,20 @@ Future<void> clearMessages(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Scrolls the first scrollable until [finder] is built, then fully into
+/// view (lists build rows a little beyond the screen), and taps it.
+Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    200,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
 /// From anywhere in the app: More tab → [section] (e.g. "Customers").
 Future<void> openMoreSection(WidgetTester tester, String section) async {
   await tester.tap(navItem('More'));

@@ -100,6 +100,25 @@ abstract final class ReportService {
     }
   }
 
+  /// Sales per hour of [day] from [fromHour] up to (not including)
+  /// [toHour], for the "Today" chart. Payments outside those hours are
+  /// added to the first or last hour so the total still matches.
+  static List<(int hour, int paise)> hourlySales(
+    DateTime day,
+    Iterable<Payment> payments, {
+    int fromHour = 10,
+    int toHour = 20,
+  }) {
+    final range = DateRange.day(day);
+    final byHour = {for (var h = fromHour; h < toHour; h++) h: 0};
+    for (final p in payments) {
+      if (p.isVoid || !range.contains(p.receivedAt)) continue;
+      final h = p.receivedAt.toLocal().hour.clamp(fromHour, toHour - 1);
+      byHour[h] = byHour[h]! + p.amountPaise;
+    }
+    return [for (final e in byHour.entries) (e.key, e.value)];
+  }
+
   static int salesIn(DateRange range, Iterable<Payment> payments) => payments
       .where((p) => !p.isVoid && range.contains(p.receivedAt))
       .fold(0, (sum, p) => sum + p.amountPaise);

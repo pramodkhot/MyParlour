@@ -44,7 +44,7 @@ class DashboardMetrics extends StatelessWidget {
             caption: salesCaption,
             captionColor: salesColor,
             captionIcon: salesIcon,
-            onTap: () => context.go('${Routes.reports}?period=today'),
+            onTap: () => context.go(Routes.reportsToday),
           ),
           right: MetricCard(
             label: 'Appointments',

@@ -8,6 +8,7 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
+  fl_chart: ^1.2.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -20,6 +21,7 @@ dependencies:
   # Revisit when the Flutter SDK allows pdf 3.13.1+ (needs Dart 3.12).
   image: 4.9.2
   intl: ^0.20.2
+  package_info_plus: ^10.2.2
   path_provider: ^2.1.6
   # 2.3.x builds native JNI code with the NDK, which stalls the CI APK build.
   # 2.2.22 is the last plain platform-channel version. See DECISIONS.md.

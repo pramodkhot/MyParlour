@@ -16,6 +16,10 @@ class LocalExpenseRepository implements ExpenseRepository {
         ..sort((a, b) => b.spentOn.compareTo(a.spentOn));
 
   @override
+  Future<Expense?> getById(String id) async =>
+      findById(_store.data.expenses, id, (e) => e.id);
+
+  @override
   Future<Expense> save(Expense expense) => _store.transact((data) {
     if (expense.amountPaise <= 0) {
       throw const ValidationException('Enter an amount more than ₹0.');

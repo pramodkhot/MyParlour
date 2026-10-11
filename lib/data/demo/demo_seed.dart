@@ -323,11 +323,16 @@ class DemoSeed {
       method: method,
       note: note,
     );
+    // Rent is paid on the 1st of this month and salaries on the last day of
+    // last month, so "This month" in Reports shows a realistic picture.
+    // Both dates are always within the last 30 days.
+    final firstOfMonth = 1 - _today.day;
+    final endOfLastMonth = -_today.day;
     return [
-      e(-25, 'Rent', 15000, PaymentMethod.upi, 'Shop rent'),
-      e(-24, 'Salary', 12000, PaymentMethod.upi, 'Anita'),
-      e(-24, 'Salary', 9000, PaymentMethod.upi, 'Riya'),
-      e(-24, 'Salary', 9000, PaymentMethod.cash, 'Meena'),
+      e(firstOfMonth, 'Rent', 12000, PaymentMethod.upi, 'Shop rent'),
+      e(endOfLastMonth, 'Salary', 12000, PaymentMethod.upi, 'Anita'),
+      e(endOfLastMonth, 'Salary', 9000, PaymentMethod.upi, 'Riya'),
+      e(endOfLastMonth, 'Salary', 9000, PaymentMethod.cash, 'Meena'),
       e(-18, 'Electricity', 2400, PaymentMethod.upi, 'MSEB bill'),
       e(-20, 'Products', 4500, PaymentMethod.cash, 'Monthly product purchase'),
       e(-2, 'Tea/Snacks', 180, PaymentMethod.cash, null),

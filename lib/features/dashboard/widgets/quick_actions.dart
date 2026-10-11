@@ -24,7 +24,7 @@ class QuickActions extends StatelessWidget {
       (
         Icons.account_balance_wallet_outlined,
         'Add expense',
-        Routes.expenses,
+        Routes.newExpense,
         false,
       ),
     ];

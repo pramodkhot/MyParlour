@@ -15,16 +15,19 @@ class DashboardHeader extends StatelessWidget {
     super.key,
     required this.data,
     required this.bottomPadding,
+    this.roundedBottom = true,
   });
 
   final DashboardData data;
   final double bottomPadding;
+  final bool roundedBottom;
 
   @override
   Widget build(BuildContext context) {
     final parlour = data.parlour;
     return HeaderBand(
       bottomPadding: bottomPadding,
+      roundedBottom: roundedBottom,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
