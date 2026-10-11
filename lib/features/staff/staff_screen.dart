@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/avatar_initials.dart';
 import '../../core/widgets/empty_state.dart';
@@ -30,19 +31,20 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Staff',
+        title: l10n.staffTitle,
         actions: [
           IconButton(
-            tooltip: 'Add staff',
+            tooltip: l10n.staffAdd,
             onPressed: _add,
             icon: const Icon(Icons.person_add_alt_outlined),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add staff',
+        tooltip: l10n.staffAdd,
         onPressed: _add,
         child: const Icon(Icons.add_rounded),
       ),
@@ -56,7 +58,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
               Space.md,
             ),
             child: SearchField(
-              hint: 'Search name, role or phone',
+              hint: l10n.staffSearchHint,
               onChanged: (v) => setState(() => _query = v),
             ),
           ),
@@ -70,7 +72,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen> {
               AsyncValue(:final error?) => Center(
                 child: EmptyState(
                   icon: Icons.error_outline_rounded,
-                  message: 'Could not load staff. $error',
+                  message: l10n.staffLoadError('$error'),
                 ),
               ),
               _ => const Center(child: CircularProgressIndicator()),
@@ -95,14 +97,13 @@ class _List extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (staff.isEmpty) {
       return SingleChildScrollView(
         child: EmptyState(
           icon: Icons.badge_outlined,
-          message: hasQuery
-              ? 'No staff member matches your search.'
-              : 'No staff yet.',
-          actionLabel: 'Add staff',
+          message: hasQuery ? l10n.staffNoMatch : l10n.staffEmpty,
+          actionLabel: l10n.staffAdd,
           onAction: onAdd,
         ),
       );
@@ -113,9 +114,14 @@ class _List extends StatelessWidget {
       children: [
         for (var i = 0; i < staff.length; i++) ...[
           if (i == firstInactive)
-            const Padding(
-              padding: EdgeInsets.fromLTRB(Space.xs, Space.md, 0, Space.sm),
-              child: Text('Inactive', style: AppText.sectionTitle),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Space.xs,
+                Space.md,
+                0,
+                Space.sm,
+              ),
+              child: Text(l10n.commonInactive, style: AppText.sectionTitle),
             )
           else if (i > 0)
             Gap.h8,
@@ -133,13 +139,14 @@ class _StaffRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return ListRowCard(
       title: staff.name,
-      subtitle: staff.roleTitle,
+      subtitle: l10n.builtIn(staff.roleTitle),
       caption: PhoneNumber.display(staff.phone),
       leading: AvatarInitials(name: staff.name),
       trailing: StatusChip(
-        label: staff.isActive ? 'Active' : 'Inactive',
+        label: staff.isActive ? l10n.commonActive : l10n.commonInactive,
         tone: staff.isActive ? ChipTone.success : ChipTone.neutral,
       ),
       dimmed: !staff.isActive,

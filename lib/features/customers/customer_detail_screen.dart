@@ -7,6 +7,7 @@ import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/platform/contact_actions.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/avatar_initials.dart';
@@ -32,11 +33,9 @@ class CustomerDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (ref.watch(customerDetailProvider(customerId))) {
       AsyncValue(:final value?) => _Detail(detail: value),
-      AsyncValue(hasValue: true) => const _Message(
-        'This customer no longer exists.',
-      ),
+      AsyncValue(hasValue: true) => _Message(context.l10n.custNotFound),
       AsyncValue(:final error?) => _Message(
-        'Could not load this customer. $error',
+        context.l10n.custLoadOneError('$error'),
       ),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
@@ -57,13 +56,14 @@ class _Detail extends ConsumerWidget {
   ) async {
     final ok = await action();
     if (!ok && context.mounted) {
-      showMessage(context, 'No app on this phone can open $what.');
+      showMessage(context, context.l10n.commonNoAppFor(what));
     }
   }
 
   Future<void> _more(BuildContext context, WidgetRef ref) async {
     final contacts = ref.read(contactActionsProvider);
     final actions = ref.read(customerActionsProvider);
+    final l10n = context.l10n;
     final choice = await showModalBottomSheet<String>(
       context: context,
       useRootNavigator: true,
@@ -73,12 +73,12 @@ class _Detail extends ConsumerWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.share_outlined),
-              title: const Text('Share contact'),
+              title: Text(l10n.custShareContact),
               onTap: () => Navigator.of(context).pop('share'),
             ),
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('Edit customer'),
+              title: Text(l10n.custEdit),
               onTap: () => Navigator.of(context).pop('edit'),
             ),
             ListTile(
@@ -89,7 +89,7 @@ class _Detail extends ConsumerWidget {
                 color: c.isActive ? AppColors.error : AppColors.primary,
               ),
               title: Text(
-                c.isActive ? 'Deactivate customer' : 'Reactivate customer',
+                c.isActive ? l10n.custDeactivate : l10n.custReactivate,
                 style: TextStyle(
                   color: c.isActive ? AppColors.error : AppColors.text,
                 ),
@@ -110,7 +110,7 @@ class _Detail extends ConsumerWidget {
             '${c.name}\n+91 ${PhoneNumber.display(c.phone)}',
             subject: c.name,
           ),
-          'sharing',
+          l10n.commonAppSharing,
         );
       case 'edit':
         await context.push(Routes.editCustomer(c.id));
@@ -118,11 +118,9 @@ class _Detail extends ConsumerWidget {
         if (c.isActive) {
           final ok = await ConfirmDialog.show(
             context,
-            title: 'Deactivate ${c.name}?',
-            message:
-                'They will be hidden from the customer list and booking. '
-                'Their history is kept, and you can reactivate them later.',
-            confirmLabel: 'Deactivate',
+            title: l10n.custDeactivateTitle(c.name),
+            message: l10n.custDeactivateMessage,
+            confirmLabel: l10n.commonDeactivate,
             destructive: true,
           );
           if (!ok) return;
@@ -131,7 +129,7 @@ class _Detail extends ConsumerWidget {
         if (context.mounted) {
           showMessage(
             context,
-            c.isActive ? 'Customer deactivated' : 'Customer reactivated',
+            c.isActive ? l10n.custDeactivated : l10n.custReactivated,
           );
         }
     }
@@ -140,14 +138,15 @@ class _Detail extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contacts = ref.read(contactActionsProvider);
+    final l10n = context.l10n;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppTopBar(
-          title: 'Customer',
+          title: l10n.commonCustomer,
           actions: [
             IconButton(
-              tooltip: 'Edit customer',
+              tooltip: l10n.custEdit,
               onPressed: () => context.push(Routes.editCustomer(c.id)),
               icon: const Icon(Icons.edit_outlined),
             ),
@@ -179,8 +178,8 @@ class _Detail extends ConsumerWidget {
                     ),
                     if (!c.isActive) ...[
                       Gap.h8,
-                      const StatusChip(
-                        label: 'Inactive',
+                      StatusChip(
+                        label: l10n.commonInactive,
                         tone: ChipTone.neutral,
                       ),
                     ],
@@ -190,34 +189,34 @@ class _Detail extends ConsumerWidget {
                         for (final action in [
                           RoundAction(
                             icon: Icons.call_outlined,
-                            label: 'Call',
+                            label: l10n.commonCall,
                             onTap: () => _contact(
                               context,
                               () => contacts.call(c.phone),
-                              'calls',
+                              l10n.commonAppCalls,
                             ),
                           ),
                           RoundAction(
                             icon: Icons.chat_outlined,
-                            label: 'WhatsApp',
+                            label: l10n.commonWhatsApp,
                             onTap: () => _contact(
                               context,
                               () => contacts.whatsApp(c.phone),
-                              'WhatsApp links',
+                              l10n.commonAppWhatsApp,
                             ),
                           ),
                           RoundAction(
                             icon: Icons.sms_outlined,
-                            label: 'SMS',
+                            label: l10n.commonSms,
                             onTap: () => _contact(
                               context,
                               () => contacts.sms(c.phone),
-                              'messages',
+                              l10n.commonAppMessages,
                             ),
                           ),
                           RoundAction(
                             icon: Icons.more_horiz_rounded,
-                            label: 'More',
+                            label: l10n.custActionMore,
                             onTap: () => _more(context, ref),
                           ),
                         ])
@@ -229,12 +228,12 @@ class _Detail extends ConsumerWidget {
                 ),
               ),
             ),
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: TabBar(
                 tabs: [
-                  Tab(text: 'History'),
-                  Tab(text: 'Details'),
-                  Tab(text: 'Notes'),
+                  Tab(text: l10n.custTabHistory),
+                  Tab(text: l10n.custTabDetails),
+                  Tab(text: l10n.custNotes),
                 ],
               ),
             ),
@@ -257,7 +256,7 @@ class _Detail extends ConsumerWidget {
                     Space.lg,
                   ),
                   child: PrimaryButton(
-                    label: 'New appointment',
+                    label: l10n.custNewAppointment,
                     icon: Icons.add_rounded,
                     onPressed: () =>
                         context.go(Routes.newAppointment(customerId: c.id)),
@@ -278,7 +277,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Customer'),
+      appBar: AppTopBar(title: context.l10n.commonCustomer),
       body: Center(
         child: EmptyState(icon: Icons.person_off_outlined, message: message),
       ),

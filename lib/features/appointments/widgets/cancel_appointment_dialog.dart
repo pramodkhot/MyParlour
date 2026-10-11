@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/choice_chips.dart';
 
-const _quickReasons = [
-  'Customer cancelled',
-  'Customer unwell',
-  'Rescheduled by customer',
-  'Stylist unavailable',
+/// Quick reasons in the current language. The chosen one is saved as the
+/// cancel reason, like a typed one.
+List<String> _quickReasons(AppLocalizations l10n) => [
+  l10n.apptReasonCustomerCancelled,
+  l10n.apptReasonCustomerUnwell,
+  l10n.apptReasonRescheduledByCustomer,
+  l10n.apptReasonStylistUnavailable,
 ];
 
 /// Asks why the appointment is cancelled. Resolves to the reason (may be
@@ -39,17 +42,20 @@ class _CancelDialogState extends State<_CancelDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Cancel appointment?'),
+      title: Text(l10n.apptCancelTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Reason (optional)'),
+            Text(l10n.apptCancelReasonLabel),
             Gap.h12,
             ChoiceChips<String>(
-              options: [for (final r in _quickReasons) ChoiceOption(r, r)],
+              options: [
+                for (final r in _quickReasons(l10n)) ChoiceOption(r, r),
+              ],
               selected: _quick,
               onSelected: (r) => setState(() {
                 _quick = r;
@@ -60,7 +66,7 @@ class _CancelDialogState extends State<_CancelDialog> {
             TextField(
               controller: _controller,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(hintText: 'Or type a reason'),
+              decoration: InputDecoration(hintText: l10n.apptCancelReasonHint),
               onChanged: (_) => setState(() => _quick = null),
             ),
           ],
@@ -70,12 +76,12 @@ class _CancelDialogState extends State<_CancelDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(foregroundColor: AppColors.textMuted),
-          child: const Text('Keep it'),
+          child: Text(l10n.apptCancelKeep),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
           style: TextButton.styleFrom(foregroundColor: AppColors.error),
-          child: const Text('Cancel appointment'),
+          child: Text(l10n.apptCancelAppointment),
         ),
       ],
     );

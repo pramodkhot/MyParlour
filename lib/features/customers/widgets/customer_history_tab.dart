@@ -6,6 +6,7 @@ import '../../../app/routes.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/dates.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/money_text.dart';
@@ -22,10 +23,10 @@ class CustomerHistoryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
-      return const SingleChildScrollView(
+      return SingleChildScrollView(
         child: EmptyState(
           icon: Icons.history_rounded,
-          message: 'No visits or bills yet.',
+          message: context.l10n.custHistoryEmpty,
         ),
       );
     }

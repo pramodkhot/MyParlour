@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../core/design/spacing.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/avatar_initials.dart';
 import '../../core/widgets/choice_chips.dart';
@@ -31,19 +32,20 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   @override
   Widget build(BuildContext context) {
     final rows = ref.watch(customerRowsProvider);
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Customers',
+        title: l10n.custTitle,
         actions: [
           IconButton(
-            tooltip: 'Add customer',
+            tooltip: l10n.custAdd,
             onPressed: _add,
             icon: const Icon(Icons.person_add_alt_outlined),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add customer',
+        tooltip: l10n.custAdd,
         onPressed: _add,
         child: const Icon(Icons.add_rounded),
       ),
@@ -59,7 +61,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
             child: Column(
               children: [
                 SearchField(
-                  hint: 'Search name or phone',
+                  hint: l10n.custSearchHint,
                   onChanged: (v) => setState(() => _query = v),
                 ),
                 Gap.h12,
@@ -68,19 +70,22 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                   selected: _view,
                   onSelected: (v) => setState(() => _view = v),
                   options: [
-                    const ChoiceOption(
+                    ChoiceOption(
                       CustomerView.recentVisit,
-                      'Recent visit',
+                      l10n.custViewRecent,
                       icon: Icons.schedule_rounded,
                     ),
-                    const ChoiceOption(
+                    ChoiceOption(
                       CustomerView.az,
-                      'A–Z',
+                      l10n.custViewAz,
                       icon: Icons.sort_by_alpha_rounded,
                     ),
                     ChoiceOption(
                       CustomerView.inactive,
-                      'Inactive (${rows.value?.where((r) => !r.customer.isActive).length ?? 0})',
+                      l10n.custViewInactive(
+                        rows.value?.where((r) => !r.customer.isActive).length ??
+                            0,
+                      ),
                     ),
                   ],
                 ),
@@ -98,7 +103,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
               AsyncValue(:final error?) => Center(
                 child: EmptyState(
                   icon: Icons.error_outline_rounded,
-                  message: 'Could not load customers. $error',
+                  message: l10n.custLoadError('$error'),
                 ),
               ),
               _ => const Center(child: CircularProgressIndicator()),
@@ -125,24 +130,25 @@ class _List extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (rows.isEmpty) {
       return SingleChildScrollView(
         child: hasQuery
             ? EmptyState(
                 icon: Icons.person_search_outlined,
-                message: 'No customer matches your search.',
-                actionLabel: 'Add customer',
+                message: l10n.custNoMatch,
+                actionLabel: l10n.custAdd,
                 onAction: onAdd,
               )
             : view == CustomerView.inactive
-            ? const EmptyState(
+            ? EmptyState(
                 icon: Icons.people_alt_outlined,
-                message: 'No inactive customers.',
+                message: l10n.custNoInactive,
               )
             : EmptyState(
                 icon: Icons.people_alt_outlined,
-                message: 'No customers yet.',
-                actionLabel: 'Add customer',
+                message: l10n.custEmpty,
+                actionLabel: l10n.custAdd,
                 onAction: onAdd,
               ),
       );
@@ -159,14 +165,13 @@ class _List extends StatelessWidget {
       itemBuilder: (context, index) {
         final row = rows[index];
         final c = row.customer;
-        final visits = row.visits == 1 ? '1 visit' : '${row.visits} visits';
         final last = c.lastVisitAt == null
-            ? 'no visits yet'
-            : 'last ${Dates.dayMonth(c.lastVisitAt!)}';
+            ? l10n.custNoVisitsYet
+            : l10n.custLastVisit(Dates.dayMonth(c.lastVisitAt!));
         return ListRowCard(
           title: c.name,
           subtitle: PhoneNumber.display(c.phone),
-          caption: row.visits == 0 ? 'No visits yet' : '$visits · $last',
+          caption: l10n.custRowCaption(row.visits, last),
           leading: AvatarInitials(name: c.name),
           trailing: const RowChevron(),
           dimmed: !c.isActive,

@@ -10,6 +10,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:go_router/go_router.dart';
+import 'package:myparlour/app/routes.dart';
+import 'package:myparlour/core/l10n/app_language.dart';
+
 import '../test/helpers/pump_app.dart';
 
 const _out = String.fromEnvironment('OUT', defaultValue: 'build/screenshots');
@@ -30,6 +34,12 @@ Future<void> _loadFonts() async {
   ]);
   await family('PlayfairDisplay', [
     for (final w in [400, 600, 700]) 'assets/fonts/PlayfairDisplay-$w.ttf',
+  ]);
+  await family('NotoSansDevanagari', [
+    for (final w in [400, 600, 700]) 'assets/fonts/NotoSansDevanagari-$w.ttf',
+  ]);
+  await family('NotoSerifDevanagari', [
+    'assets/fonts/NotoSerifDevanagari-700.ttf',
   ]);
   final flutterRoot =
       Platform.environment['FLUTTER_ROOT'] ??
@@ -237,4 +247,41 @@ void main() {
     await tapAndSettle(tester, find.byTooltip('Edit staff'));
     await _shot(tester, '32_staff_form');
   });
+
+  for (final language in [AppLanguage.mr, AppLanguage.hi]) {
+    testWidgets('screens in ${language.name}', (tester) async {
+      usePhoneScreen(tester);
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(412, 915);
+      final store = await pumpDemoApp(tester, language: language);
+      await _shot(tester, '${language.name}_01_welcome');
+      await enterApp(tester);
+      final routes = {
+        '02_dashboard': Routes.dashboard,
+        '03_appointments': Routes.appointments,
+        '04_new_appointment': Routes.newAppointment(
+          customerId: store.data.customers.first.id,
+        ),
+        '05_billing': Routes.billing,
+        '06_bill': Routes.bill(
+          store.data.invoices.firstWhere((i) => i.isOpen).id,
+        ),
+        '07_payment': Routes.payBill(
+          store.data.invoices.firstWhere((i) => i.isOpen).id,
+        ),
+        '08_more': Routes.more,
+        '09_customer': Routes.customer(store.data.customers.first.id),
+        '10_inventory': Routes.inventory,
+        '11_reports': Routes.reports,
+        '12_expenses': Routes.expenses,
+        '13_settings': Routes.settings,
+        '14_staff': Routes.staffMember(store.data.staff.first.id),
+      };
+      for (final MapEntry(:key, :value) in routes.entries) {
+        GoRouter.of(tester.element(find.byType(NavigationBar))).go(value);
+        await tester.pumpAndSettle();
+        await _shot(tester, '${language.name}_$key');
+      }
+    });
+  }
 }

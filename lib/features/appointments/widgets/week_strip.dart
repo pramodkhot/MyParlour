@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/format/dates.dart';
+import '../../../core/l10n/l10n.dart';
 
 /// Month label, previous/next week arrows and seven day pills. The
 /// selected day is a burgundy pill; days with bookings get a dot.
@@ -41,18 +43,18 @@ class WeekStrip extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: Space.xs),
                 child: Text(
-                  DateFormat('MMMM y', 'en_IN').format(selected),
+                  Dates.monthYear(selected),
                   style: AppText.sectionTitle,
                 ),
               ),
             ),
             IconButton(
-              tooltip: 'Previous week',
+              tooltip: context.l10n.apptPreviousWeek,
               onPressed: onPreviousWeek,
               icon: const Icon(Icons.chevron_left_rounded),
             ),
             IconButton(
-              tooltip: 'Next week',
+              tooltip: context.l10n.apptNextWeek,
               onPressed: onNextWeek,
               icon: const Icon(Icons.chevron_right_rounded),
             ),
@@ -95,11 +97,11 @@ class _DayPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fg = isSelected ? Colors.white : AppColors.text;
-    final label = DateFormat('EEEE d MMMM', 'en_IN').format(day);
+    final label = DateFormat('EEEE d MMMM').format(day);
     return Semantics(
       button: true,
       selected: isSelected,
-      label: hasBookings ? '$label, has bookings' : label,
+      label: hasBookings ? context.l10n.apptDayHasBookings(label) : label,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -118,7 +120,7 @@ class _DayPill extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                DateFormat.E('en_IN').format(day),
+                Dates.weekdayShort(day),
                 style: AppText.caption.copyWith(
                   color: isSelected ? Colors.white : AppColors.textMuted,
                   fontSize: 11,

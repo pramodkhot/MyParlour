@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
+
 /// Asks for one line of text (e.g. a new category name). Resolves to the
 /// trimmed text, or null when cancelled or left empty.
 Future<String?> showTextPrompt(
@@ -56,7 +58,7 @@ class _TextPromptState extends State<_TextPrompt> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.commonCancel),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(_controller.text),

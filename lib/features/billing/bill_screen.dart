@@ -8,6 +8,7 @@ import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -32,10 +33,10 @@ class BillScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (ref.watch(billDetailProvider(billId))) {
       AsyncValue(:final value?) => _Bill(detail: value),
-      AsyncValue(hasValue: true) => const _Message(
-        'This bill no longer exists.',
+      AsyncValue(hasValue: true) => _Message(context.l10n.billingBillGone),
+      AsyncValue(:final error?) => _Message(
+        context.l10n.billingLoadBillError('$error'),
       ),
-      AsyncValue(:final error?) => _Message('Could not load this bill. $error'),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
   }
@@ -47,47 +48,53 @@ class _Bill extends ConsumerWidget {
   final BillDetail detail;
 
   Future<void> _void(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final ok = await ConfirmDialog.show(
       context,
-      title: 'Void this bill?',
-      message:
-          'The bill and its payments will be marked void and any products '
-          'sold go back into stock. The bill number is not reused.',
-      confirmLabel: 'Void bill',
+      title: l10n.billingVoidTitle,
+      message: l10n.billingVoidMessage,
+      confirmLabel: l10n.billingVoidBill,
       destructive: true,
     );
     if (!ok) return;
     try {
       await ref.read(billingActionsProvider).voidBill(detail.invoice.id);
-      if (context.mounted) showMessage(context, 'Bill voided');
+      if (context.mounted) showMessage(context, l10n.billingVoided);
     } on DomainException catch (e) {
-      if (context.mounted) showMessage(context, e.message);
+      if (context.mounted) showMessage(context, context.errorText(e));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final bill = detail.invoice;
     final sender = ReceiptSender(ref, context);
-    final receipt = detail.receipt;
+    final receipt = detail.receipt(l10n);
 
     return Scaffold(
       appBar: AppTopBar(
-        title: bill.invoiceNo ?? 'Draft bill',
+        title: bill.invoiceNo ?? l10n.billingDraftBill,
         actions: [
           if (!bill.isVoid && !bill.isDraft)
             PopupMenuButton<String>(
-              tooltip: 'More actions',
+              tooltip: l10n.billingMoreActions,
               icon: const Icon(Icons.more_horiz_rounded),
               onSelected: (v) => switch (v) {
                 'print' => sender.print(receipt),
                 'download' => sender.download(receipt),
                 _ => _void(context, ref),
               },
-              itemBuilder: (_) => const [
-                PopupMenuItem(value: 'print', child: Text('Print receipt')),
-                PopupMenuItem(value: 'download', child: Text('Download PDF')),
-                PopupMenuItem(value: 'void', child: Text('Void bill')),
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'print',
+                  child: Text(l10n.billingPrintReceipt),
+                ),
+                PopupMenuItem(
+                  value: 'download',
+                  child: Text(l10n.billingDownloadPdf),
+                ),
+                PopupMenuItem(value: 'void', child: Text(l10n.billingVoidBill)),
               ],
             ),
         ],
@@ -109,8 +116,7 @@ class _Bill extends ConsumerWidget {
                 borderRadius: Radii.controlAll,
               ),
               child: Text(
-                'This bill is void. Its payments are not counted and its '
-                'products went back into stock.',
+                l10n.billingVoidBanner,
                 style: AppText.body.copyWith(color: AppColors.error),
               ),
             ),
@@ -121,7 +127,7 @@ class _Bill extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(detail.clientName, style: AppText.bodyStrong),
+                      Text(detail.clientName(l10n), style: AppText.bodyStrong),
                       Text(
                         Dates.dayMonthTime(bill.finalisedAt ?? bill.createdAt),
                         style: AppText.caption,
@@ -178,13 +184,13 @@ class _Bill extends ConsumerWidget {
             totalPaise: bill.totalPaise,
             showTax: bill.taxEnabled,
             extraRows: [
-              ('Paid', bill.paidPaise, false),
-              ('Balance due', bill.balancePaise, true),
+              (l10n.billingPaidAmount, bill.paidPaise, false),
+              (l10n.billingBalanceDue, bill.balancePaise, true),
             ],
           ),
           if (detail.payments.isNotEmpty) ...[
             Gap.h20,
-            const Text('Payments', style: AppText.sectionTitle),
+            Text(l10n.billingPayments, style: AppText.sectionTitle),
             Gap.h8,
             AppCard(
               padding: EdgeInsets.zero,
@@ -194,7 +200,7 @@ class _Bill extends ConsumerWidget {
                     ListTile(
                       leading: Icon(pay.method.icon, color: AppColors.primary),
                       title: Text(
-                        '${pay.method.label}'
+                        '${l10n.paymentMethod(pay.method)}'
                         '${pay.reference == null ? '' : ' · ${pay.reference}'}',
                         style: pay.isVoid
                             ? const TextStyle(
@@ -204,7 +210,7 @@ class _Bill extends ConsumerWidget {
                       ),
                       subtitle: Text(
                         Dates.dayMonthTime(pay.receivedAt) +
-                            (pay.isVoid ? ' · void' : ''),
+                            (pay.isVoid ? ' · ${l10n.billingVoidTag}' : ''),
                       ),
                       trailing: MoneyText(pay.amountPaise),
                     ),
@@ -229,7 +235,7 @@ class _Bill extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: SecondaryButton(
-                              label: 'Share',
+                              label: l10n.billingShare,
                               icon: Icons.share_outlined,
                               onPressed: () => sender.share(receipt),
                             ),
@@ -238,7 +244,7 @@ class _Bill extends ConsumerWidget {
                           Expanded(
                             flex: 2,
                             child: PrimaryButton(
-                              label: 'Record payment',
+                              label: l10n.billingRecordPayment,
                               onPressed: () =>
                                   context.push(Routes.payBill(bill.id)),
                             ),
@@ -246,7 +252,7 @@ class _Bill extends ConsumerWidget {
                         ],
                       )
                     : PrimaryButton(
-                        label: 'Share receipt on WhatsApp',
+                        label: l10n.billingShareReceiptWhatsApp,
                         icon: Icons.share_outlined,
                         onPressed: () => sender.share(receipt),
                       ),
@@ -264,7 +270,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Bill'),
+      appBar: AppTopBar(title: context.l10n.billingBill),
       body: Center(
         child: EmptyState(icon: Icons.receipt_long_outlined, message: message),
       ),

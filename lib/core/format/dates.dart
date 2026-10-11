@@ -67,9 +67,9 @@ abstract final class Dates {
   static String clock(DateTime value) =>
       DateFormat('h:mm').format(value.toLocal());
 
-  /// "AM" or "PM" in the current language.
-  static String amPm(DateTime value) =>
-      DateFormat('a').format(value.toLocal()).toUpperCase();
+  /// "AM" or "PM" — in every language, as on Indian phones and receipts
+  /// (Marathi's own marker would otherwise print as a bare "a"/"p").
+  static String amPm(DateTime value) => value.toLocal().hour < 12 ? 'AM' : 'PM';
 
   /// "10:30 AM"
   static String time(DateTime value) => '${clock(value)} ${amPm(value)}';

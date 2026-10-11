@@ -4,6 +4,8 @@ import '../../data/providers.dart';
 import '../../domain/models/date_range.dart';
 import '../../domain/models/expense.dart';
 
+/// Built-in expense types. Stored as these English keys; shown with
+/// `l10n.builtIn`.
 const expenseCategories = [
   'Rent',
   'Salary',

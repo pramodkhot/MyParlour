@@ -6,6 +6,8 @@ showing the app to parlour owners and collecting feedback:
 - **No login.** The app opens on a welcome screen; one tap goes in.
 - **No server.** Everything is stored on the phone in one JSON file, preloaded with sample data
   for "Beauty Bliss Parlour", dated around today so the demo always looks current.
+- **Three languages.** English, मराठी and हिन्दी — chosen on the welcome screen or in Settings;
+  every screen, message and the PDF receipt switch at once.
 - **Real logic.** Bills, discounts, GST, payments, appointment statuses, stock and reports are
   worked out by tested Dart code, not typed into the screens.
 
@@ -23,7 +25,7 @@ Choices made along the way: [DECISIONS.md](DECISIONS.md)
 | Staff & services | Roles, services, working days and hours, this month's work; service menu by category |
 | Inventory | Low/out of stock, stock history, adjust stock, stock drops automatically when products are billed |
 | Expenses & reports | Monthly expenses; sales, expenses, profit estimate, chart, top services, payment methods |
-| Settings | Parlour profile, hours, billing & tax, **Reset demo data**, **Start empty** |
+| Settings | Language, parlour profile, hours, billing & tax, **Reset demo data**, **Start empty** |
 
 ## Run and test (on a computer)
 
@@ -39,14 +41,15 @@ flutter run            # on a connected phone or emulator
 
 The tests include the business rules, data storage, a check that report figures match a hand
 calculation of the sample data, full screen flows (book → bill → pay → receipt), every screen on a
-360 px phone with 130% text, and Flutter's accessibility checks (48 px tap targets, labels,
+360 px phone with 130% text in all three languages, translation-file completeness, language
+switching, and Flutter's accessibility checks (48 px tap targets, labels,
 contrast).
 
 Extra tools (not part of `flutter test`):
 
 ```
-flutter test tool/screenshots_test.dart --dart-define=OUT=<folder>   # phone screenshots
-flutter test tool/receipt_preview_test.dart --dart-define=OUT=<folder> # sample receipt PDF
+flutter test tool/screenshots_test.dart --dart-define=OUT=<folder>   # phone screenshots (also Marathi/Hindi)
+flutter test tool/receipt_preview_test.dart --dart-define=OUT=<folder> # sample receipt PDF per language
 flutter test tool/render_svgs_test.dart --plain-name icons            # regenerate launcher icons
 ```
 
@@ -85,10 +88,14 @@ lib/
   app/        app, router (bottom-nav shell), theme, routes
   core/       design tokens, shared widgets, formatting (money, dates, phone), platform actions
   domain/     models, repository interfaces, business rules (pure Dart, no Flutter)
+  l10n/       translation files app_en/mr/hi.arb (generated code in l10n/gen)
   data/       local JSON storage, Local* repositories, demo seed, Riverpod providers
   features/   one folder per area: screens, their controller (providers) and widgets
 test/         unit, data and widget tests      tool/  screenshot and asset tools
 ```
+
+All visible text lives in `lib/l10n/app_*.arb`; to add or change a text, edit `app_en.arb`
+(and the same key in `app_mr.arb` / `app_hi.arb`), then run `flutter gen-l10n`.
 
 Screens → controllers (Riverpod) → repository interfaces → local repositories. Screens never touch
 storage. Money is always integer paise; ids are UUIDs; every record carries `parlourId`.
@@ -103,7 +110,8 @@ record payment + update bill) are single repository methods, which map to databa
 ## Known limits of this demo
 
 - Data lives only on the phone; uninstalling the app removes it.
-- No logo upload, no thermal printer, English only, no iOS build yet.
+- No logo upload, no thermal printer, no iOS build yet.
+- Marathi and Hindi texts have not yet been checked by a native speaker.
 - "Download PDF" uses the phone's print screen ("Save as PDF").
 - Two packages are pinned for build compatibility (`path_provider_android`, `image`); see
   [DECISIONS.md](DECISIONS.md) before upgrading Flutter or packages.

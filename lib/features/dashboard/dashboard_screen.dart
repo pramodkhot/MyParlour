@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/header_band.dart';
 import 'dashboard_controller.dart';
@@ -38,8 +39,8 @@ class DashboardScreen extends ConsumerWidget {
           AsyncValue(:final error?) => Center(
             child: EmptyState(
               icon: Icons.cloud_off_outlined,
-              message: 'Could not load the dashboard. $error',
-              actionLabel: 'Try again',
+              message: context.l10n.dashLoadError('$error'),
+              actionLabel: context.l10n.commonTryAgain,
               onAction: () => ref.invalidate(dashboardProvider),
             ),
           ),
@@ -81,7 +82,10 @@ class _Body extends StatelessWidget {
               children: [
                 DashboardMetrics(summary: data.summary),
                 Gap.h20,
-                const Text('Quick actions', style: AppText.sectionTitle),
+                Text(
+                  context.l10n.dashQuickActions,
+                  style: AppText.sectionTitle,
+                ),
                 Gap.h12,
                 const QuickActions(),
                 Gap.h12,

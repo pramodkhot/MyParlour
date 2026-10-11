@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../design/colors.dart';
+import '../l10n/l10n.dart';
 
 /// White bottom bar with four tabs; the active icon sits in a pink pill.
 class BottomNav extends StatelessWidget {
@@ -13,26 +14,26 @@ class BottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelected;
 
-  static const destinations = [
+  static List<NavigationDestination> destinations(AppLocalizations l10n) => [
     NavigationDestination(
-      icon: Icon(Icons.space_dashboard_outlined),
-      selectedIcon: Icon(Icons.space_dashboard_rounded),
-      label: 'Dashboard',
+      icon: const Icon(Icons.space_dashboard_outlined),
+      selectedIcon: const Icon(Icons.space_dashboard_rounded),
+      label: l10n.navDashboard,
     ),
     NavigationDestination(
-      icon: Icon(Icons.event_note_outlined),
-      selectedIcon: Icon(Icons.event_note_rounded),
-      label: 'Appointments',
+      icon: const Icon(Icons.event_note_outlined),
+      selectedIcon: const Icon(Icons.event_note_rounded),
+      label: l10n.navAppointments,
     ),
     NavigationDestination(
-      icon: Icon(Icons.receipt_long_outlined),
-      selectedIcon: Icon(Icons.receipt_long_rounded),
-      label: 'Billing',
+      icon: const Icon(Icons.receipt_long_outlined),
+      selectedIcon: const Icon(Icons.receipt_long_rounded),
+      label: l10n.navBilling,
     ),
     NavigationDestination(
-      icon: Icon(Icons.menu_rounded),
-      selectedIcon: Icon(Icons.menu_open_rounded),
-      label: 'More',
+      icon: const Icon(Icons.menu_rounded),
+      selectedIcon: const Icon(Icons.menu_open_rounded),
+      label: l10n.navMore,
     ),
   ];
 
@@ -45,7 +46,7 @@ class BottomNav extends StatelessWidget {
       child: NavigationBar(
         selectedIndex: currentIndex,
         onDestinationSelected: onSelected,
-        destinations: destinations,
+        destinations: destinations(context.l10n),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../data/providers.dart';
 import '../../domain/models/appointment.dart';
 import '../../domain/models/date_range.dart';
@@ -60,9 +61,10 @@ class StaffDetail {
   final Map<String, String> customerNames;
   final Map<String, String> serviceNames;
 
-  String clientName(Appointment a) => a.customerId == null
-      ? 'Walk-in · ${a.walkInName ?? 'Guest'}'
-      : customerNames[a.customerId] ?? 'Customer';
+  String clientName(Appointment a, AppLocalizations l10n) =>
+      a.customerId == null
+      ? l10n.commonWalkInNamed(a.walkInName ?? l10n.commonGuest)
+      : customerNames[a.customerId] ?? l10n.commonCustomer;
 }
 
 final staffDetailProvider = FutureProvider.autoDispose

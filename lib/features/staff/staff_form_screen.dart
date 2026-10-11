@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
@@ -35,13 +35,13 @@ class StaffFormScreen extends ConsumerWidget {
     final id = staffId;
     final existing = id == null ? null : ref.watch(staffDetailProvider(id));
     if (form is AsyncError || existing is AsyncError) {
-      return const _Message('Could not load this form. Please try again.');
+      return _Message(context.l10n.staffFormLoadError);
     }
     if (!form.hasValue || (existing != null && !existing.hasValue)) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (existing != null && existing.value == null) {
-      return const _Message('This staff member no longer exists.');
+      return _Message(context.l10n.staffNotFound);
     }
     return _StaffForm(data: form.value!, initial: existing?.value?.staff);
   }
@@ -132,10 +132,11 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
   Future<void> _save() async {
     if (_saving) return;
     final fieldsOk = _formKey.currentState?.validate() ?? false;
+    final l10n = context.l10n;
     final error = _days.isEmpty
-        ? 'Choose at least one working day.'
+        ? l10n.staffNoWorkingDay
         : _end.compareTo(_start) <= 0
-        ? 'End time must be after start time.'
+        ? l10n.errAppointmentEndBeforeStart
         : null;
     setState(() => _error = error);
     if (!fieldsOk || error != null) return;
@@ -166,10 +167,10 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
         ),
       );
       if (!mounted) return;
-      showMessage(context, _isEdit ? 'Staff updated' : 'Staff added');
+      showMessage(context, _isEdit ? l10n.staffUpdated : l10n.staffAdded);
       Navigator.of(context).pop();
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -178,14 +179,14 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
   @override
   Widget build(BuildContext context) {
     final services = widget.data.services;
-    final weekday = DateFormat.E('en_IN');
+    final l10n = context.l10n;
     final day = widget.data.parlour.openTime.on(DateTime(2024));
     final allTicked = services.every((s) => _services.contains(s.id));
 
     return DiscardChangesScope(
       isDirty: _isDirty && !_saving,
       child: Scaffold(
-        appBar: AppTopBar(title: _isEdit ? 'Edit staff' : 'Add staff'),
+        appBar: AppTopBar(title: _isEdit ? l10n.staffEdit : l10n.staffAdd),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -197,19 +198,19 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
             ),
             children: [
               AppTextField(
-                label: 'Name',
+                label: l10n.staffFieldName,
                 isRequired: true,
                 controller: _name,
                 icon: Icons.person_outline_rounded,
                 textCapitalization: TextCapitalization.words,
                 autofocus: !_isEdit,
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Enter the staff member’s name.'
+                    ? l10n.errStaffNameRequired
                     : null,
               ),
               Gap.h16,
               AppTextField(
-                label: 'Mobile number',
+                label: l10n.staffFieldMobile,
                 isRequired: true,
                 controller: _phone,
                 icon: Icons.phone_outlined,
@@ -221,27 +222,31 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
                 ],
                 validator: (v) => PhoneNumber.isValidMobile(v ?? '')
                     ? null
-                    : 'Enter a 10-digit mobile number.',
+                    : l10n.staffMobileInvalid,
               ),
               Gap.h16,
-              const FieldLabel('Role'),
+              FieldLabel(l10n.staffRole),
               Gap.h8,
               ChoiceChips<String>(
-                options: [for (final r in staffRoles) ChoiceOption(r, r)],
+                options: [
+                  for (final r in staffRoles) ChoiceOption(r, l10n.builtIn(r)),
+                ],
                 selected: _role,
                 onSelected: (r) => setState(() => _role = r),
               ),
               Gap.h20,
               Row(
                 children: [
-                  const Expanded(child: FieldLabel('Services they do')),
+                  Expanded(child: FieldLabel(l10n.staffServicesTheyDo)),
                   TextButton(
                     onPressed: () => setState(
                       () => _services = allTicked
                           ? {}
                           : {for (final s in services) s.id},
                     ),
-                    child: Text(allTicked ? 'Clear all' : 'Tick all'),
+                    child: Text(
+                      allTicked ? l10n.staffClearAll : l10n.staffTickAll,
+                    ),
                   ),
                 ],
               ),
@@ -261,7 +266,10 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
                           }
                         }),
                         title: Text(s.name, style: AppText.body),
-                        subtitle: Text(s.category, style: AppText.caption),
+                        subtitle: Text(
+                          l10n.builtIn(s.category),
+                          style: AppText.caption,
+                        ),
                         controlAffinity: ListTileControlAffinity.leading,
                         dense: true,
                       ),
@@ -269,12 +277,12 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
                 ),
               ),
               Gap.h20,
-              const FieldLabel('Working days', required: true),
+              FieldLabel(l10n.staffWorkingDays, required: true),
               Gap.h8,
               MultiChoiceChips<int>(
                 options: [
                   for (var d = 1; d <= 7; d++)
-                    ChoiceOption(d, weekday.format(DateTime(2024, 1, d))),
+                    ChoiceOption(d, Dates.weekdayShort(DateTime(2024, 1, d))),
                 ],
                 selected: _days,
                 onChanged: (d) => setState(() => _days = d),
@@ -284,10 +292,10 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
                 children: [
                   Expanded(
                     child: PickerField(
-                      label: 'Starts',
+                      label: l10n.staffStarts,
                       isRequired: true,
                       icon: Icons.schedule_rounded,
-                      hint: 'Start',
+                      hint: l10n.staffStartHint,
                       value: Dates.time(_start.on(day)),
                       onTap: () => _pickTime(start: true),
                     ),
@@ -295,10 +303,10 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
                   Gap.w12,
                   Expanded(
                     child: PickerField(
-                      label: 'Ends',
+                      label: l10n.staffEnds,
                       isRequired: true,
                       icon: Icons.schedule_rounded,
-                      hint: 'End',
+                      hint: l10n.staffEndHint,
                       value: Dates.time(_end.on(day)),
                       onTap: () => _pickTime(start: false),
                     ),
@@ -324,7 +332,7 @@ class _StaffFormState extends ConsumerState<_StaffForm> {
               Space.lg,
             ),
             child: PrimaryButton(
-              label: _isEdit ? 'Save changes' : 'Save staff',
+              label: _isEdit ? l10n.commonSaveChanges : l10n.staffSave,
               loading: _saving,
               onPressed: _save,
             ),
@@ -343,7 +351,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Staff'),
+      appBar: AppTopBar(title: context.l10n.staffTitle),
       body: Center(
         child: EmptyState(icon: Icons.badge_outlined, message: message),
       ),

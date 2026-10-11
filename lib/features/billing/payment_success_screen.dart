@@ -8,12 +8,12 @@ import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/buttons.dart';
 import '../../core/widgets/empty_state.dart';
 import 'billing_controller.dart';
 import 'invoice_status_chip.dart';
-import 'payment_method_ui.dart';
 import 'widgets/receipt_buttons.dart';
 
 /// S11 — Payment recorded, with receipt actions.
@@ -29,6 +29,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final detail = ref.watch(billDetailProvider(billId));
     final payment = detail.value?.payments
         .where((p) => p.id == paymentId)
@@ -39,10 +40,10 @@ class PaymentSuccessScreen extends ConsumerWidget {
     if (detail.value == null || payment == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(
+        body: Center(
           child: EmptyState(
             icon: Icons.receipt_long_outlined,
-            message: 'This payment could not be found.',
+            message: l10n.paymentNotFound,
           ),
         ),
       );
@@ -50,11 +51,12 @@ class PaymentSuccessScreen extends ConsumerWidget {
     final d = detail.value!;
     final bill = d.invoice;
     final sender = ReceiptSender(ref, context);
+    final receipt = d.receipt(l10n);
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Close',
+          tooltip: l10n.commonClose,
           icon: const Icon(Icons.close_rounded),
           onPressed: () => context.go(Routes.bill(bill.id)),
         ),
@@ -83,14 +85,14 @@ class PaymentSuccessScreen extends ConsumerWidget {
             ),
           ),
           Gap.h16,
-          const Text(
-            'Payment recorded',
+          Text(
+            l10n.paymentRecorded,
             textAlign: TextAlign.center,
             style: AppText.screenTitle,
           ),
           Gap.h8,
           Text(
-            '${Money.format(payment.amountPaise)} by ${payment.method.label}'
+            '${l10n.paymentAmountByMethod(Money.format(payment.amountPaise), l10n.paymentMethod(payment.method))}'
             ' · ${Dates.dayMonthTime(payment.receivedAt)}',
             textAlign: TextAlign.center,
             style: AppText.body.copyWith(color: AppColors.textMuted),
@@ -103,7 +105,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        bill.invoiceNo ?? 'Bill',
+                        bill.invoiceNo ?? l10n.billingBill,
                         style: AppText.bodyStrong,
                       ),
                     ),
@@ -113,9 +115,11 @@ class PaymentSuccessScreen extends ConsumerWidget {
                 Gap.h8,
                 Row(
                   children: [
-                    Expanded(child: Text(d.clientName, style: AppText.caption)),
+                    Expanded(
+                      child: Text(d.clientName(l10n), style: AppText.caption),
+                    ),
                     Text(
-                      'Total ${Money.format(bill.totalPaise)}',
+                      l10n.paymentTotalAmount(Money.format(bill.totalPaise)),
                       style: AppText.caption,
                     ),
                   ],
@@ -123,8 +127,11 @@ class PaymentSuccessScreen extends ConsumerWidget {
                 const Divider(height: Space.xl),
                 Row(
                   children: [
-                    const Expanded(
-                      child: Text('Balance', style: AppText.bodyStrong),
+                    Expanded(
+                      child: Text(
+                        l10n.paymentBalance,
+                        style: AppText.bodyStrong,
+                      ),
                     ),
                     Text(
                       Money.format(bill.balancePaise),
@@ -141,21 +148,21 @@ class PaymentSuccessScreen extends ConsumerWidget {
           ),
           Gap.h24,
           PrimaryButton(
-            label: 'Share receipt on WhatsApp',
+            label: l10n.billingShareReceiptWhatsApp,
             icon: Icons.share_outlined,
-            onPressed: () => sender.share(d.receipt),
+            onPressed: () => sender.share(receipt),
           ),
           Gap.h12,
           SecondaryButton(
-            label: 'Print receipt',
+            label: l10n.billingPrintReceipt,
             icon: Icons.print_outlined,
-            onPressed: () => sender.print(d.receipt),
+            onPressed: () => sender.print(receipt),
           ),
           Gap.h12,
           SecondaryButton(
-            label: 'Download PDF',
+            label: l10n.billingDownloadPdf,
             icon: Icons.download_outlined,
-            onPressed: () => sender.download(d.receipt),
+            onPressed: () => sender.download(receipt),
           ),
           Gap.h16,
           Wrap(
@@ -166,11 +173,11 @@ class PaymentSuccessScreen extends ConsumerWidget {
                   onPressed: () => context.go(
                     Routes.newAppointment(customerId: bill.customerId),
                   ),
-                  child: const Text('Book next visit'),
+                  child: Text(l10n.paymentBookNextVisit),
                 ),
               TextButton(
                 onPressed: () => context.go(Routes.dashboard),
-                child: const Text('Back to dashboard'),
+                child: Text(l10n.paymentBackToDashboard),
               ),
             ],
           ),

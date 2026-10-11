@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/dates.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../domain/models/appointment.dart';
 
@@ -34,7 +35,7 @@ Future<bool> showOverlapSheet(
                 Gap.w8,
                 Expanded(
                   child: Text(
-                    '$stylistName is already booked',
+                    context.l10n.apptAlreadyBooked(stylistName),
                     style: AppText.barTitle,
                   ),
                 ),
@@ -68,12 +69,12 @@ Future<bool> showOverlapSheet(
               ),
             Gap.h8,
             PrimaryButton(
-              label: 'Pick another time',
+              label: context.l10n.apptPickAnotherTime,
               onPressed: () => Navigator.of(context).pop(false),
             ),
             Gap.h12,
             SecondaryButton(
-              label: 'Book anyway',
+              label: context.l10n.apptBookAnyway,
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],

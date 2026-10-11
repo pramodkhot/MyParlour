@@ -6,7 +6,7 @@ import '../../app/routes.dart';
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
-import '../../core/format/dates.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/empty_state.dart';
@@ -22,19 +22,20 @@ class ServicesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void add() => context.push(Routes.newService);
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Services',
+        title: l10n.servicesTitle,
         actions: [
           IconButton(
-            tooltip: 'Add service',
+            tooltip: l10n.servicesAdd,
             onPressed: add,
             icon: const Icon(Icons.add_rounded),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add service',
+        tooltip: l10n.servicesAdd,
         onPressed: add,
         child: const Icon(Icons.add_rounded),
       ),
@@ -42,8 +43,8 @@ class ServicesScreen extends ConsumerWidget {
         AsyncValue(:final value?) when value.isEmpty => SingleChildScrollView(
           child: EmptyState(
             icon: Icons.content_cut_rounded,
-            message: 'No services yet. Add what your parlour offers.',
-            actionLabel: 'Add service',
+            message: l10n.servicesEmpty,
+            actionLabel: l10n.servicesAdd,
             onAction: add,
           ),
         ),
@@ -51,7 +52,7 @@ class ServicesScreen extends ConsumerWidget {
         AsyncValue(:final error?) => Center(
           child: EmptyState(
             icon: Icons.error_outline_rounded,
-            message: 'Could not load services. $error',
+            message: l10n.servicesLoadError('$error'),
           ),
         ),
         _ => const Center(child: CircularProgressIndicator()),
@@ -78,7 +79,10 @@ class _Groups extends StatelessWidget {
         for (final (category, services) in groups) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(Space.xs, Space.md, 0, Space.sm),
-            child: Text(category, style: AppText.sectionTitle),
+            child: Text(
+              context.l10n.builtIn(category),
+              style: AppText.sectionTitle,
+            ),
           ),
           AppCard(
             padding: EdgeInsets.zero,
@@ -130,7 +134,7 @@ class _ServiceRow extends StatelessWidget {
                         ),
                         Gap.w4,
                         Text(
-                          Dates.duration(service.durationMin),
+                          context.l10n.duration(service.durationMin),
                           style: AppText.caption,
                         ),
                       ],
@@ -139,7 +143,10 @@ class _ServiceRow extends StatelessWidget {
                 ),
               ),
               if (!service.isActive) ...[
-                const StatusChip(label: 'Inactive', tone: ChipTone.neutral),
+                StatusChip(
+                  label: context.l10n.commonInactive,
+                  tone: ChipTone.neutral,
+                ),
                 Gap.w8,
               ],
               MoneyText(service.pricePaise),

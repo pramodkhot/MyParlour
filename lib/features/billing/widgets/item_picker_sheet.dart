@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
-import '../../../core/format/dates.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/search_field.dart';
 import '../../../domain/models/invoice.dart';
 import '../../../domain/models/product.dart';
@@ -65,6 +65,7 @@ class _PickerState extends State<_Picker> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final services = widget.services
         .where((s) => _matches(s.name, s.category))
         .toList();
@@ -75,24 +76,24 @@ class _PickerState extends State<_Picker> {
       length: 2,
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(Space.xl, 0, Space.xl, Space.sm),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(Space.xl, 0, Space.xl, Space.sm),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('Add to bill', style: AppText.barTitle),
+              child: Text(l10n.billingAddToBill, style: AppText.barTitle),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: Space.xl),
             child: SearchField(
-              hint: 'Search services or products',
+              hint: l10n.billingSearchItems,
               onChanged: (v) => setState(() => _query = v),
             ),
           ),
-          const TabBar(
+          TabBar(
             tabs: [
-              Tab(text: 'Services'),
-              Tab(text: 'Products'),
+              Tab(text: l10n.billingServicesTab),
+              Tab(text: l10n.billingProductsTab),
             ],
           ),
           Expanded(
@@ -104,7 +105,8 @@ class _PickerState extends State<_Picker> {
                       ListTile(
                         title: Text(s.name),
                         subtitle: Text(
-                          '${s.category} · ${Dates.duration(s.durationMin)}',
+                          '${l10n.builtIn(s.category)} · '
+                          '${l10n.duration(s.durationMin)}',
                         ),
                         trailing: Text(
                           Money.format(s.pricePaise),
@@ -140,6 +142,7 @@ class _PickerState extends State<_Picker> {
   }
 
   Widget _productTile(BuildContext context, Product p) {
+    final l10n = context.l10n;
     final price = p.sellingPricePaise;
     final out = p.stockQty <= 0;
     final enabled = !out && price != null;
@@ -148,10 +151,10 @@ class _PickerState extends State<_Picker> {
       title: Text(p.name),
       subtitle: Text(
         out
-            ? 'Out of stock'
+            ? l10n.stockOut
             : price == null
-            ? 'No selling price set'
-            : 'In stock: ${p.stockQty}',
+            ? l10n.billingNoSellingPrice
+            : l10n.billingInStockCount(p.stockQty),
         style: out ? const TextStyle(color: AppColors.error) : null,
       ),
       trailing: price == null
@@ -181,7 +184,7 @@ class _NoMatch extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(Space.xl),
       child: Text(
-        'Nothing matches your search.',
+        context.l10n.billingNoMatch,
         textAlign: TextAlign.center,
         style: AppText.body.copyWith(color: AppColors.textMuted),
       ),

@@ -8,6 +8,7 @@ import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -23,39 +24,32 @@ class ProductDetailScreen extends ConsumerWidget {
 
   final String productId;
 
-  static String reasonLabel(StockReason r) => switch (r) {
-    StockReason.purchase => 'Stock in',
-    StockReason.sale => 'Sold on bill',
-    StockReason.usedInService => 'Used in service',
-    StockReason.damaged => 'Damaged / expired',
-    StockReason.correction => 'Count correction',
-    StockReason.voidReversal => 'Bill voided (returned)',
-  };
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final detail = ref.watch(productDetailProvider(productId));
     final d = detail.value;
     if (d == null) {
       return Scaffold(
-        appBar: const AppTopBar(title: 'Product'),
+        appBar: AppTopBar(title: l10n.inventoryProduct),
         body: Center(
           child: detail.isLoading
               ? const CircularProgressIndicator()
-              : const EmptyState(
+              : EmptyState(
                   icon: Icons.inventory_2_outlined,
-                  message: 'This product no longer exists.',
+                  message: l10n.inventoryProductGone,
                 ),
         ),
       );
     }
     final p = d.product;
+    final unit = l10n.unit(p.unit);
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Product',
+        title: l10n.inventoryProduct,
         actions: [
           IconButton(
-            tooltip: 'Edit product',
+            tooltip: l10n.inventoryEditProduct,
             onPressed: () => context.push(Routes.editProduct(p.id)),
             icon: const Icon(Icons.edit_outlined),
           ),
@@ -80,7 +74,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     children: [
                       Text(p.name, style: AppText.barTitle),
                       if (p.category != null)
-                        Text(p.category!, style: AppText.caption),
+                        Text(l10n.builtIn(p.category!), style: AppText.caption),
                       Gap.h4,
                       StockLevelChip(product: p),
                     ],
@@ -94,31 +88,38 @@ class ProductDetailScreen extends ConsumerWidget {
             padding: EdgeInsets.zero,
             child: Column(
               children: [
-                _Row('In stock', '${p.stockQty} ${p.unit.name}', strong: true),
+                _Row(
+                  l10n.inventoryInStockLabel,
+                  '${p.stockQty} $unit',
+                  strong: true,
+                ),
                 const Divider(indent: Space.lg, endIndent: Space.lg),
-                _Row('Low-stock alert at', '${p.lowStockAt} ${p.unit.name}'),
+                _Row(l10n.inventoryLowStockAlertAt, '${p.lowStockAt} $unit'),
                 const Divider(indent: Space.lg, endIndent: Space.lg),
                 _Row(
-                  'Selling price',
+                  l10n.inventorySellingPrice,
                   p.sellingPricePaise == null
-                      ? 'Not set'
+                      ? l10n.inventoryNotSet
                       : Money.format(p.sellingPricePaise!),
                 ),
                 if (p.costPricePaise != null) ...[
                   const Divider(indent: Space.lg, endIndent: Space.lg),
-                  _Row('Cost price', Money.format(p.costPricePaise!)),
+                  _Row(
+                    l10n.inventoryCostPrice,
+                    Money.format(p.costPricePaise!),
+                  ),
                 ],
               ],
             ),
           ),
           Gap.h20,
-          const Text('Stock history', style: AppText.sectionTitle),
+          Text(l10n.inventoryStockHistory, style: AppText.sectionTitle),
           Gap.h8,
           if (d.movements.isEmpty)
-            const AppCard(
+            AppCard(
               child: Text(
-                'No stock changes yet.',
-                style: TextStyle(color: AppColors.textMuted),
+                l10n.inventoryNoStockChanges,
+                style: const TextStyle(color: AppColors.textMuted),
               ),
             )
           else
@@ -146,7 +147,7 @@ class ProductDetailScreen extends ConsumerWidget {
                   Space.lg,
                 ),
                 child: PrimaryButton(
-                  label: 'Adjust stock',
+                  label: l10n.inventoryAdjustStock,
                   icon: Icons.tune_rounded,
                   onPressed: () => showAdjustStockSheet(context, p),
                 ),
@@ -204,7 +205,7 @@ class _MovementRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  ProductDetailScreen.reasonLabel(m.reason),
+                  context.l10n.stockReason(m.reason),
                   style: AppText.bodyStrong,
                 ),
                 Text(

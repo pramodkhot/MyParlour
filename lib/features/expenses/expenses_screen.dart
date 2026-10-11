@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
+import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/money_text.dart';
 import '../../data/providers.dart';
 import '../../domain/models/expense.dart';
-import '../billing/payment_method_ui.dart';
 import 'expenses_controller.dart';
 
 /// S17 — Expenses for a month, grouped by date.
@@ -43,20 +43,21 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     final total = list.fold(0, (sum, e) => sum + e.amountPaise);
     final now = ref.watch(clockProvider)();
     final isCurrentMonth = _month.year == now.year && _month.month == now.month;
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Expenses',
+        title: l10n.expensesTitle,
         actions: [
           IconButton(
-            tooltip: 'Add expense',
+            tooltip: l10n.expensesAdd,
             onPressed: _add,
             icon: const Icon(Icons.add_rounded),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add expense',
+        tooltip: l10n.expensesAdd,
         onPressed: _add,
         child: const Icon(Icons.add_rounded),
       ),
@@ -71,19 +72,19 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           Row(
             children: [
               IconButton(
-                tooltip: 'Previous month',
+                tooltip: l10n.expensesPreviousMonth,
                 onPressed: () => _shift(-1),
                 icon: const Icon(Icons.chevron_left_rounded),
               ),
               Expanded(
                 child: Text(
-                  DateFormat('MMMM y', 'en_IN').format(_month),
+                  Dates.monthYear(_month),
                   textAlign: TextAlign.center,
                   style: AppText.sectionTitle,
                 ),
               ),
               IconButton(
-                tooltip: 'Next month',
+                tooltip: l10n.expensesNextMonth,
                 onPressed: isCurrentMonth ? null : () => _shift(1),
                 icon: const Icon(Icons.chevron_right_rounded),
               ),
@@ -100,7 +101,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    'Total spent',
+                    l10n.expensesTotalSpent,
                     style: AppText.body.copyWith(color: Colors.white),
                   ),
                 ),
@@ -117,8 +118,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           else if (list.isEmpty)
             EmptyState(
               icon: Icons.account_balance_wallet_outlined,
-              message: 'No expenses in this month.',
-              actionLabel: 'Add expense',
+              message: l10n.expensesEmpty,
+              actionLabel: l10n.expensesAdd,
               onAction: _add,
             )
           else
@@ -130,10 +131,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                   0,
                   Space.sm,
                 ),
-                child: Text(
-                  DateFormat('EEEE, d MMMM', 'en_IN').format(day),
-                  style: AppText.label,
-                ),
+                child: Text(Dates.weekdayDayMonth(day), style: AppText.label),
               ),
               AppCard(
                 padding: EdgeInsets.zero,
@@ -161,6 +159,7 @@ class _ExpenseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final e = expense;
     return InkWell(
       onTap: () => context.push(Routes.editExpense(e.id)),
@@ -175,9 +174,12 @@ class _ExpenseRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(e.category, style: AppText.bodyStrong),
+                  Text(l10n.builtIn(e.category), style: AppText.bodyStrong),
                   Text(
-                    [?e.method?.label, ?e.note].join(' · '),
+                    [
+                      if (e.method case final m?) l10n.paymentMethod(m),
+                      ?e.note,
+                    ].join(' · '),
                     style: AppText.caption,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

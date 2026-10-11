@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/phone.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/avatar_initials.dart';
 import '../../../core/widgets/search_field.dart';
 import '../../../domain/models/customer.dart';
@@ -75,6 +76,7 @@ class _CustomerListState extends State<_CustomerList> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final matches = _matches;
     return Column(
       children: [
@@ -82,13 +84,13 @@ class _CustomerListState extends State<_CustomerList> {
           padding: const EdgeInsets.fromLTRB(Space.xl, 0, Space.md, Space.sm),
           child: Row(
             children: [
-              const Expanded(
-                child: Text('Choose customer', style: AppText.barTitle),
+              Expanded(
+                child: Text(l10n.apptChooseCustomer, style: AppText.barTitle),
               ),
               TextButton.icon(
                 onPressed: _addNew,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('New'),
+                label: Text(l10n.apptNewCustomerShort),
               ),
             ],
           ),
@@ -96,7 +98,7 @@ class _CustomerListState extends State<_CustomerList> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Space.xl),
           child: SearchField(
-            hint: 'Search name or phone',
+            hint: l10n.apptSearchCustomer,
             onChanged: (v) => setState(() => _query = v),
           ),
         ),
@@ -108,7 +110,7 @@ class _CustomerListState extends State<_CustomerList> {
                   child: Column(
                     children: [
                       Text(
-                        'No customer matches your search.',
+                        l10n.apptNoCustomerMatch,
                         style: AppText.body.copyWith(
                           color: AppColors.textMuted,
                         ),
@@ -117,7 +119,7 @@ class _CustomerListState extends State<_CustomerList> {
                       TextButton.icon(
                         onPressed: _addNew,
                         icon: const Icon(Icons.person_add_alt_outlined),
-                        label: const Text('Add new customer'),
+                        label: Text(l10n.apptAddNewCustomer),
                       ),
                     ],
                   ),

@@ -5,6 +5,7 @@ import '../../../app/routes.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../domain/models/product.dart';
@@ -21,8 +22,8 @@ class LowStockCard extends StatelessWidget {
     return Column(
       children: [
         SectionHeader(
-          title: 'Low stock',
-          actionLabel: 'Restock',
+          title: context.l10n.stockLow,
+          actionLabel: context.l10n.dashRestock,
           onAction: () => context.go(Routes.lowStock),
         ),
         AppCard(
@@ -39,7 +40,7 @@ class LowStockCard extends StatelessWidget {
                       Gap.w12,
                       Expanded(
                         child: Text(
-                          'All products are well stocked.',
+                          context.l10n.dashAllWellStocked,
                           style: AppText.body.copyWith(
                             color: AppColors.textMuted,
                           ),

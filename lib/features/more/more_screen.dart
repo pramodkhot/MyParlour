@@ -7,6 +7,7 @@ import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/list_row_card.dart';
 import 'more_controller.dart';
@@ -17,54 +18,61 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final s = ref.watch(moreSummaryProvider).value;
-    String? count(int? n, String one, String many) =>
-        n == null ? null : (n == 1 ? '1 $one' : '$n $many');
 
     final items = [
       (
-        'Customers',
+        l10n.moreCustomers,
         Icons.people_alt_outlined,
         Routes.customers,
-        count(s?.customers, 'customer', 'customers'),
+        s == null ? null : l10n.moreCustomerCount(s.customers),
         false,
       ),
       (
-        'Staff',
+        l10n.moreStaff,
         Icons.badge_outlined,
         Routes.staff,
-        s == null ? null : '${s.activeStaff} active',
+        s == null ? null : l10n.moreActiveStaff(s.activeStaff),
         false,
       ),
       (
-        'Services',
+        l10n.moreServices,
         Icons.content_cut_rounded,
         Routes.services,
-        count(s?.services, 'service', 'services'),
+        s == null ? null : l10n.moreServiceCount(s.services),
         false,
       ),
       (
-        'Inventory',
+        l10n.moreInventory,
         Icons.inventory_2_outlined,
         Routes.inventory,
-        s == null ? null : '${s.lowStock} low',
+        s == null ? null : l10n.moreLowCount(s.lowStock),
         (s?.lowStock ?? 0) > 0,
       ),
       (
-        'Expenses',
+        l10n.expensesTitle,
         Icons.account_balance_wallet_outlined,
         Routes.expenses,
-        s == null ? null : '${Money.format(s.monthExpensesPaise)} this month',
+        s == null
+            ? null
+            : l10n.moreExpensesThisMonth(Money.format(s.monthExpensesPaise)),
         false,
       ),
-      ('Reports', Icons.insights_outlined, Routes.reports, null, false),
-      ('Settings', Icons.settings_outlined, Routes.settings, null, false),
+      (l10n.moreReports, Icons.insights_outlined, Routes.reports, null, false),
+      (
+        l10n.settingsTitle,
+        Icons.settings_outlined,
+        Routes.settings,
+        null,
+        false,
+      ),
     ];
 
     return Scaffold(
       appBar: AppTopBar(
-        title: 'More',
-        subtitle: s == null ? null : '${s.parlourName} · Owner',
+        title: l10n.navMore,
+        subtitle: s == null ? null : l10n.moreOwnerSubtitle(s.parlourName),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(

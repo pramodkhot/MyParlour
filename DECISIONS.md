@@ -238,3 +238,94 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
 - **Start-up errors**: if the data file cannot be opened (e.g. storage full), a friendly screen
   explains it with a "Try again" button instead of the app crashing. In release builds, an
   unexpected error inside a screen shows a short message instead of Flutter's grey error box.
+
+## Languages (English · मराठी · हिन्दी)
+
+- **How it works**: Flutter's standard translation files, `lib/l10n/app_en.arb` (English, with a
+  note for translators on unclear texts), `app_mr.arb` and `app_hi.arb`, ~660 texts each. Code
+  uses `context.l10n.<key>`; `flutter gen-l10n` (run by `flutter pub get`) makes the Dart code.
+  A test fails if a Marathi or Hindi text is missing, empty, or drops a `{placeholder}`.
+- **Choosing**: a picker on Welcome and at the top of Settings (each language written in its own
+  script). It changes every screen at once and is saved in a separate small file
+  (`myparlour_prefs.json`), so **Reset demo data** and **Start empty** keep it. Default English.
+- **Sample data**: built-in names are stored in English (categories Hair/Skin…, expense types,
+  staff roles, statuses, payment methods) and shown translated, so switching language never
+  changes saved data. Sample service/product names and notes are created in the chosen language:
+  picking a language on Welcome (or in Settings) while the sample data is still untouched creates
+  it again in that language; later, **Reset demo data** uses the current language. Anything the
+  owner types stays as typed. Customer and staff names stay in English letters.
+- **Digits**: 0–9 everywhere (prices, dates, times, phone numbers), as on UPI apps and bills;
+  Marathi's default ०–९ is switched off. AM/PM is shown as "AM"/"PM" in all three languages
+  (Marathi's own marker printed as a bare "a"/"p").
+- **Errors**: business rules report an error code plus details; the screen shows the message in
+  the current language (English text kept in the code for logs).
+- **Fonts**: Noto Sans Devanagari (400/600/700) and Noto Serif Devanagari (700) are bundled (OFL)
+  as fallbacks behind Manrope / Playfair Display, so Latin text looks as before and Devanagari is
+  the same on every phone.
+- **Receipt PDF in the chosen language**: the PDF library cannot join Devanagari letters
+  correctly, so the receipt is drawn by Flutter (`ReceiptView`) at 3× print resolution and
+  placed in the PDF as one image (A5 width; a long bill makes a taller page instead of cutting
+  items). Same path for all languages. Trade-off: the PDF text cannot be selected or searched.
+  The parlour's receipt footer is printed as the owner typed it.
+- **Small screens**: the 360 px / 130% text check now runs every screen in all three languages
+  (108 checks); accessibility checks run in English and Marathi. Found and fixed: Marathi "Call"
+  shortened to "कॉल"; durations ("1 तास 30") no longer break across lines; "Share" shortened.
+- **Translations** were written for this demo in simple spoken Marathi/Hindi, keeping the English
+  words parlour owners use (बिल, स्टॉक, अपॉइंटमेंट, UPI, GST). **Please have a native speaker read
+  through both before showing owners.** Terms worth a second look: Hindi greetings (सुप्रभात /
+  नमस्ते / शुभ संध्या), Marathi status "Checked in" = आल्या and "No-show" = आल्या नाहीत, "Open bills"
+  = बाकी बिल, "Receipt footer" = पावतीखालची ओळ / रसीद के नीचे की लाइन, "Custom range" = तारखा निवडा /
+  अपनी तारीखें, cancel reasons (saved in the language they were picked in).
+
+Glossary used:
+
+| English | मराठी | हिन्दी |
+|---|---|---|
+| Dashboard | डॅशबोर्ड | डैशबोर्ड |
+| Appointment(s) | अपॉइंटमेंट | अपॉइंटमेंट |
+| Billing / Bill | बिलिंग / बिल | बिलिंग / बिल |
+| More | अधिक | और |
+| Customer | ग्राहक | ग्राहक |
+| Walk-in | वॉक-इन | वॉक-इन |
+| Service | सर्व्हिस | सर्विस |
+| Staff | स्टाफ | स्टाफ |
+| Stylist | स्टायलिस्ट | स्टाइलिस्ट |
+| Product | प्रॉडक्ट | प्रोडक्ट |
+| Stock / Inventory | स्टॉक | स्टॉक |
+| Low stock | कमी स्टॉक | कम स्टॉक |
+| Out of stock | स्टॉक संपला | स्टॉक खत्म |
+| Expense | खर्च | खर्च |
+| Report(s) | रिपोर्ट | रिपोर्ट |
+| Settings | सेटिंग्ज | सेटिंग्स |
+| Sales | विक्री | बिक्री |
+| Profit | नफा | मुनाफ़ा |
+| Payment | पेमेंट | पेमेंट |
+| Paid / Unpaid | भरले / बाकी | भुगतान हुआ / बाकी |
+| Partially paid | अंशतः भरले | आंशिक भुगतान |
+| Due / Balance | बाकी | बाकी |
+| Draft | ड्राफ्ट | ड्राफ्ट |
+| Void (status) / Void (verb) | रद्द / रद्द करा | रद्द / रद्द करें |
+| Discount | सूट | छूट |
+| Subtotal / Total | उपएकूण / एकूण | उप-योग / कुल |
+| Cash / Card / Other | रोख / कार्ड / इतर | नकद / कार्ड / अन्य |
+| Receipt | पावती | रसीद |
+| Tax invoice | कर बीजक | टैक्स इनवॉइस |
+| Upcoming | येणारी | आने वाली |
+| Checked in | आल्या | आ गईं |
+| Completed | पूर्ण | पूरा |
+| Cancelled | रद्द | रद्द |
+| No-show | आल्या नाहीत | नहीं आईं |
+| Today / This week / This month | आज / या आठवड्यात / या महिन्यात | आज / इस हफ़्ते / इस महीने |
+| Save / Cancel / Delete / Edit | सेव्ह करा / रद्द करा / काढून टाका / बदला | सेव करें / रद्द करें / हटाएँ / बदलें |
+| Done / Close / Add | झाले / बंद करा / जोडा | हो गया / बंद करें / जोड़ें |
+| Search | शोधा | खोजें |
+| Deactivate / Reactivate | बंद करा / पुन्हा सुरू करा | बंद करें / फिर से चालू करें |
+| Active / Inactive | सुरू / बंद | चालू / बंद |
+| Hair / Skin / Nails / Waxing | केस / त्वचा / नखे / वॅक्सिंग | बाल / त्वचा / नाखून / वैक्सिंग |
+| Rent / Salary / Electricity / Tea/Snacks | भाडे / पगार / वीज / चहा-नाश्ता | किराया / वेतन / बिजली / चाय-नाश्ता |
+| Senior Beautician / Beautician / Junior / Receptionist | सीनियर ब्युटिशियन / ब्युटिशियन / ज्युनियर / रिसेप्शनिस्ट | सीनियर ब्यूटीशियन / ब्यूटीशियन / जूनियर / रिसेप्शनिस्ट |
+| Hair care / Skin care | केसांची निगा / त्वचेची निगा | बालों की देखभाल / त्वचा की देखभाल |
+| pcs / ml / g | नग / ml / g | पीस / ml / g |
+| min / h (durations) | मि / तास | मि / घं |
+| Demo | डेमो | डेमो |
+| Reset demo data | डेमो डेटा रीसेट करा | डेमो डेटा रीसेट करें |

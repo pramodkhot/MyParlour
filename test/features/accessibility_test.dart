@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myparlour/app/routes.dart';
+import 'package:myparlour/core/l10n/app_language.dart';
 import 'package:myparlour/data/local/local_store.dart';
 import 'package:myparlour/domain/models/appointment.dart';
 
@@ -32,21 +33,24 @@ void main() {
     'settings': (_) => Routes.settings,
   };
 
-  for (final entry in screens.entries) {
-    testWidgets('${entry.key} meets accessibility guidelines', (tester) async {
-      final semantics = tester.ensureSemantics();
-      usePhoneScreen(tester);
-      final store = await pumpDemoApp(tester);
-      await enterApp(tester);
-      GoRouter.of(
-        tester.element(find.byType(NavigationBar)),
-      ).go(entry.value(store));
-      await tester.pumpAndSettle();
+  for (final language in [AppLanguage.en, AppLanguage.mr]) {
+    for (final entry in screens.entries) {
+      testWidgets('${entry.key} meets accessibility guidelines '
+          '(${language.name})', (tester) async {
+        final semantics = tester.ensureSemantics();
+        usePhoneScreen(tester);
+        final store = await pumpDemoApp(tester, language: language);
+        await enterApp(tester);
+        GoRouter.of(
+          tester.element(find.byType(NavigationBar)),
+        ).go(entry.value(store));
+        await tester.pumpAndSettle();
 
-      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
-      await expectLater(tester, meetsGuideline(textContrastGuideline));
-      semantics.dispose();
-    });
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(textContrastGuideline));
+        semantics.dispose();
+      });
+    }
   }
 }

@@ -6,6 +6,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/dates.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../domain/models/appointment.dart';
@@ -26,8 +27,8 @@ class NextAppointmentsCard extends StatelessWidget {
     return Column(
       children: [
         SectionHeader(
-          title: 'Next appointments',
-          actionLabel: 'See all',
+          title: context.l10n.dashNextAppointments,
+          actionLabel: context.l10n.commonSeeAll,
           onAction: openAppointments,
         ),
         AppCard(
@@ -66,6 +67,7 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final a = appointment;
     final services = a.services.map((s) => s.name).join(', ');
     final isToday = DateUtils.isSameDay(a.startsAt.toLocal(), data.now);
@@ -92,7 +94,7 @@ class _Row extends StatelessWidget {
                   ),
                   Text(
                     '${Dates.amPm(a.startsAt)} · '
-                    '${Dates.duration(a.endsAt.difference(a.startsAt).inMinutes)}',
+                    '${l10n.durationOneLine(a.endsAt.difference(a.startsAt).inMinutes)}',
                     style: AppText.caption.copyWith(fontSize: 11),
                   ),
                   if (!isToday)
@@ -109,13 +111,13 @@ class _Row extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data.clientName(a),
+                    data.clientName(a, l10n),
                     style: AppText.bodyStrong,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    '$services · ${data.stylistName(a)}',
+                    '$services · ${data.stylistName(a, l10n)}',
                     style: AppText.caption.copyWith(fontSize: 13),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -147,11 +149,11 @@ class _Empty extends StatelessWidget {
           Gap.w12,
           Expanded(
             child: Text(
-              'No more appointments today.',
+              context.l10n.dashNoMoreToday,
               style: AppText.body.copyWith(color: AppColors.textMuted),
             ),
           ),
-          TextButton(onPressed: onBook, child: const Text('Book')),
+          TextButton(onPressed: onBook, child: Text(context.l10n.dashBook)),
         ],
       ),
     );

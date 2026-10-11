@@ -58,11 +58,3 @@ final reportProvider = FutureProvider.autoDispose
             : null,
       );
     });
-
-/// Label for the period picker.
-String periodLabel(ReportArgs args) => switch (args.period) {
-  ReportPeriod.today => 'Today',
-  ReportPeriod.thisWeek => 'This week',
-  ReportPeriod.thisMonth => 'This month',
-  ReportPeriod.custom => 'Custom range',
-};

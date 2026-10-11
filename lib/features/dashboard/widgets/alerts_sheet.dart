@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/avatar_initials.dart';
-import '../../../domain/models/product.dart';
 import '../../../domain/services/dashboard_service.dart';
 import 'stock_chip.dart';
 
@@ -35,15 +35,16 @@ class _AlertsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final children = <Widget>[
-      const Text('Alerts', style: AppText.barTitle),
+      Text(l10n.dashAlerts, style: AppText.barTitle),
       Gap.h16,
     ];
 
     if (!summary.hasAlerts) {
       children.add(
         Text(
-          'Nothing needs your attention right now.',
+          l10n.dashNothingNeedsAttention,
           style: AppText.body.copyWith(color: AppColors.textMuted),
         ),
       );
@@ -51,14 +52,14 @@ class _AlertsList extends StatelessWidget {
 
     if (summary.birthdaysToday.isNotEmpty) {
       children
-        ..add(const Text('Birthdays today', style: AppText.sectionTitle))
+        ..add(Text(l10n.dashBirthdaysToday, style: AppText.sectionTitle))
         ..add(Gap.h8);
       for (final c in summary.birthdaysToday) {
         children.add(
           _AlertRow(
             leading: AvatarInitials(name: c.name, size: 40),
             title: c.name,
-            subtitle: 'Wish them a happy birthday',
+            subtitle: l10n.dashWishBirthday,
             trailing: const Icon(Icons.cake_outlined, color: AppColors.primary),
           ),
         );
@@ -68,14 +69,14 @@ class _AlertsList extends StatelessWidget {
 
     if (summary.lowStock.isNotEmpty) {
       children
-        ..add(const Text('Low stock', style: AppText.sectionTitle))
+        ..add(Text(l10n.stockLow, style: AppText.sectionTitle))
         ..add(Gap.h8);
       for (final p in summary.lowStock) {
         children.add(
           _AlertRow(
             leading: const _ProductIcon(),
             title: p.name,
-            subtitle: 'Alert at ${p.lowStockAt} ${_unit(p)}',
+            subtitle: l10n.dashAlertAt(p.lowStockAt, l10n.unit(p.unit)),
             trailing: StockChip(product: p),
           ),
         );
@@ -88,8 +89,6 @@ class _AlertsList extends StatelessWidget {
       children: children,
     );
   }
-
-  static String _unit(Product p) => p.unit.name;
 }
 
 class _AlertRow extends StatelessWidget {

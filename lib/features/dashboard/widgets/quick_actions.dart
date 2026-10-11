@@ -5,6 +5,7 @@ import '../../../app/routes.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/l10n/l10n.dart';
 
 /// Four shortcut tiles. The first is filled burgundy.
 class QuickActions extends StatelessWidget {
@@ -12,18 +13,29 @@ class QuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final actions = [
-      (Icons.add_rounded, 'New appointment', Routes.newAppointment(), true),
+      (
+        Icons.add_rounded,
+        l10n.dashNewAppointment,
+        Routes.newAppointment(),
+        true,
+      ),
       (
         Icons.person_add_alt_outlined,
-        'Add customer',
+        l10n.dashAddCustomer,
         Routes.newCustomer,
         false,
       ),
-      (Icons.receipt_long_outlined, 'Create bill', Routes.newBill(), false),
+      (
+        Icons.receipt_long_outlined,
+        l10n.dashCreateBill,
+        Routes.newBill(),
+        false,
+      ),
       (
         Icons.account_balance_wallet_outlined,
-        'Add expense',
+        l10n.expensesAdd,
         Routes.newExpense,
         false,
       ),

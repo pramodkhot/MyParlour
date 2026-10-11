@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/status_chip.dart';
 import '../../domain/models/invoice.dart';
 
@@ -8,14 +9,6 @@ class InvoiceStatusChip extends StatelessWidget {
   const InvoiceStatusChip(this.status, {super.key});
 
   final InvoiceStatus status;
-
-  static String label(InvoiceStatus status) => switch (status) {
-    InvoiceStatus.draft => 'Draft',
-    InvoiceStatus.finalised => 'Unpaid',
-    InvoiceStatus.partiallyPaid => 'Partially paid',
-    InvoiceStatus.paid => 'Paid',
-    InvoiceStatus.void_ => 'Void',
-  };
 
   static ChipTone toneFor(InvoiceStatus status) => switch (status) {
     InvoiceStatus.draft => ChipTone.neutral,
@@ -26,6 +19,8 @@ class InvoiceStatusChip extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) =>
-      StatusChip(label: label(status), tone: toneFor(status));
+  Widget build(BuildContext context) => StatusChip(
+    label: context.l10n.invoiceStatus(status),
+    tone: toneFor(status),
+  );
 }

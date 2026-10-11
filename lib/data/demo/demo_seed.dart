@@ -136,7 +136,7 @@ class DemoSeed {
         'Anita',
         'Senior Beautician',
         '98765 11111',
-        [for (final s in services) s.name],
+        [for (final spec in _serviceSpecs) spec.$1],
         true,
       ),
       (

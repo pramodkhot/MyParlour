@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/dates.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../domain/models/appointment.dart';
 import '../appointment_status_chip.dart';
@@ -44,7 +45,7 @@ class AppointmentCard extends StatelessWidget {
                   style: AppText.bodyStrong.copyWith(color: AppColors.primary),
                 ),
                 Text(
-                  '${Dates.amPm(a.startsAt)} · ${Dates.duration(minutes)}',
+                  '${Dates.amPm(a.startsAt)} · ${context.l10n.durationOneLine(minutes)}',
                   style: AppText.caption.copyWith(fontSize: 11),
                 ),
               ],

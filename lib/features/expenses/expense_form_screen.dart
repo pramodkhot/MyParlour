@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
+import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -37,13 +38,13 @@ class ExpenseFormScreen extends ConsumerWidget {
     final expense = ref.watch(expenseByIdProvider(id));
     if (expense.value != null) return _ExpenseForm(initial: expense.value);
     return Scaffold(
-      appBar: const AppTopBar(title: 'Expense'),
+      appBar: AppTopBar(title: context.l10n.expensesExpense),
       body: Center(
         child: expense.isLoading
             ? const CircularProgressIndicator()
-            : const EmptyState(
+            : EmptyState(
                 icon: Icons.account_balance_wallet_outlined,
-                message: 'This expense no longer exists.',
+                message: context.l10n.expensesNotFound,
               ),
       ),
     );
@@ -133,42 +134,49 @@ class _ExpenseFormState extends ConsumerState<_ExpenseForm> {
         ),
       );
       if (!mounted) return;
-      showMessage(context, _isEdit ? 'Expense updated' : 'Expense added');
+      showMessage(
+        context,
+        _isEdit ? context.l10n.expensesUpdated : context.l10n.expensesAdded,
+      );
       Navigator.of(context).pop();
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
 
   Future<void> _delete() async {
+    final l10n = context.l10n;
     final ok = await ConfirmDialog.show(
       context,
-      title: 'Delete this expense?',
-      message:
-          '${_e!.category} · ${Money.format(_e.amountPaise)} will be removed.',
-      confirmLabel: 'Delete',
+      title: l10n.expensesDeleteTitle,
+      message: l10n.expensesDeleteMessage(
+        l10n.builtIn(_e!.category),
+        Money.format(_e.amountPaise),
+      ),
+      confirmLabel: l10n.commonDelete,
       destructive: true,
     );
     if (!ok) return;
     await ref.read(expenseActionsProvider).delete(_e.id);
     if (!mounted) return;
-    showMessage(context, 'Expense deleted');
+    showMessage(context, context.l10n.expensesDeleted);
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return DiscardChangesScope(
       isDirty: _isDirty && !_saving,
       child: Scaffold(
         appBar: AppTopBar(
-          title: _isEdit ? 'Edit expense' : 'Add expense',
+          title: _isEdit ? l10n.expensesEdit : l10n.expensesAdd,
           actions: [
             if (_isEdit)
               IconButton(
-                tooltip: 'Delete expense',
+                tooltip: l10n.expensesDelete,
                 onPressed: _delete,
                 icon: const Icon(Icons.delete_outline_rounded),
               ),
@@ -184,7 +192,7 @@ class _ExpenseFormState extends ConsumerState<_ExpenseForm> {
               Space.xxl,
             ),
             children: [
-              const FieldLabel('Amount', required: true),
+              FieldLabel(l10n.expensesAmount, required: true),
               Gap.h8,
               TextFormField(
                 controller: _amount,
@@ -206,17 +214,18 @@ class _ExpenseFormState extends ConsumerState<_ExpenseForm> {
                 ),
                 validator: (v) {
                   final paise = Money.parseRupees(v ?? '');
-                  if (paise == null) return 'Enter the amount.';
-                  if (paise <= 0) return 'Enter an amount more than ₹0.';
+                  if (paise == null) return l10n.expensesEnterAmount;
+                  if (paise <= 0) return l10n.errAmountZero;
                   return null;
                 },
               ),
               Gap.h20,
-              const FieldLabel('Category', required: true),
+              FieldLabel(l10n.expensesCategory, required: true),
               Gap.h8,
               ChoiceChips<String>(
                 options: [
-                  for (final c in expenseCategories) ChoiceOption(c, c),
+                  for (final c in expenseCategories)
+                    ChoiceOption(c, l10n.builtIn(c)),
                   if (_category != null &&
                       !expenseCategories.contains(_category))
                     ChoiceOption(_category!, _category!),
@@ -228,35 +237,35 @@ class _ExpenseFormState extends ConsumerState<_ExpenseForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: Space.xs),
                   child: Text(
-                    'Choose a category.',
+                    l10n.errCategoryRequired,
                     style: AppText.caption.copyWith(color: AppColors.error),
                   ),
                 ),
               Gap.h20,
               PickerField(
-                label: 'Date',
+                label: l10n.expensesDate,
                 isRequired: true,
                 icon: Icons.calendar_today_outlined,
-                hint: 'Choose a date',
-                value: DateFormat('EEEE, d MMMM y', 'en_IN').format(_date),
+                hint: l10n.expensesChooseDate,
+                value: Dates.weekdayDayMonthYear(_date),
                 onTap: _pickDate,
               ),
               Gap.h20,
-              const FieldLabel('Paid by'),
+              FieldLabel(l10n.expensesPaidBy),
               Gap.h8,
               ChoiceChips<PaymentMethod>(
                 options: [
                   for (final m in PaymentMethod.values)
-                    ChoiceOption(m, m.label, icon: m.icon),
+                    ChoiceOption(m, l10n.paymentMethod(m), icon: m.icon),
                 ],
                 selected: _method,
                 onSelected: (m) => setState(() => _method = m),
               ),
               Gap.h20,
               AppTextField(
-                label: 'Note',
+                label: l10n.expensesNote,
                 controller: _note,
-                hint: 'e.g. Shop rent for May',
+                hint: l10n.expensesNoteHint,
                 textCapitalization: TextCapitalization.sentences,
               ),
             ],
@@ -271,7 +280,7 @@ class _ExpenseFormState extends ConsumerState<_ExpenseForm> {
               Space.lg,
             ),
             child: PrimaryButton(
-              label: 'Save expense',
+              label: l10n.expensesSave,
               loading: _saving,
               onPressed: _save,
             ),

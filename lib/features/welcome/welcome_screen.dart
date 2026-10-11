@@ -8,9 +8,13 @@ import '../../app/routes.dart';
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
+import '../../core/l10n/l10n.dart';
+import '../../core/l10n/language_controller.dart';
 import '../../core/widgets/buttons.dart';
 import '../../core/widgets/demo_pill.dart';
+import '../../core/widgets/language_picker.dart';
 import '../../data/providers.dart';
+import '../settings/settings_controller.dart';
 
 /// S1 — the demo's front door. No login: one tap goes to the Dashboard.
 class WelcomeScreen extends ConsumerStatefulWidget {
@@ -89,8 +93,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                             child: SvgPicture.asset(
                               'assets/illustrations/welcome_woman.svg',
                               height: artHeight,
-                              semanticsLabel:
-                                  'Line drawing of a woman with leaves in her hair',
+                              semanticsLabel: context.l10n.welcomeArtLabel,
                             ),
                           ),
                           Gap.h16,
@@ -117,7 +120,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
   }
 }
 
-class _Content extends StatelessWidget {
+class _Content extends ConsumerWidget {
   const _Content({
     required this.onExplore,
     required this.autofocus,
@@ -129,7 +132,8 @@ class _Content extends StatelessWidget {
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return Column(
       children: [
         Row(
@@ -141,9 +145,9 @@ class _Content extends StatelessWidget {
               excludeFromSemantics: true,
             ),
             Gap.w4,
-            const Flexible(
+            Flexible(
               child: Text(
-                'MyParlour',
+                l10n.appName,
                 style: AppText.logo,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -153,7 +157,7 @@ class _Content extends StatelessWidget {
         ),
         Gap.h12,
         Text(
-          'Manage your parlour\nbusiness easily',
+          l10n.welcomeTagline,
           textAlign: TextAlign.center,
           maxLines: 2,
           style: AppText.logo.copyWith(
@@ -164,8 +168,7 @@ class _Content extends StatelessWidget {
         ),
         Gap.h12,
         Text(
-          'Appointments, billing, customers, staff, inventory & reports '
-          '— all in one place.',
+          l10n.welcomeFeatures,
           textAlign: TextAlign.center,
           style: AppText.body.copyWith(
             fontSize: 14,
@@ -181,20 +184,25 @@ class _Content extends StatelessWidget {
         compact ? Gap.h16 : Gap.h24,
         PrimaryButton(
           key: const Key('welcome.explore'),
-          label: 'Explore MyParlour',
+          label: l10n.welcomeExplore,
           onPressed: onExplore,
           autofocus: autofocus,
         ),
         Gap.h16,
-        const Wrap(
+        Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
           spacing: Space.sm,
           runSpacing: Space.xs,
           children: [
-            DemoPill(),
-            Text('Sample data · no sign-in needed', style: AppText.caption),
+            const DemoPill(),
+            Text(l10n.welcomeSampleData, style: AppText.caption),
           ],
+        ),
+        Gap.h16,
+        LanguagePicker(
+          selected: ref.watch(languageProvider),
+          onChanged: ref.read(settingsActionsProvider).chooseLanguage,
         ),
       ],
     );

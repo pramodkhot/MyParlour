@@ -6,6 +6,7 @@ import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -35,13 +36,13 @@ class ProductFormScreen extends ConsumerWidget {
       return _ProductForm(initial: detail.value!.product);
     }
     return Scaffold(
-      appBar: const AppTopBar(title: 'Product'),
+      appBar: AppTopBar(title: context.l10n.inventoryProduct),
       body: Center(
         child: detail.isLoading
             ? const CircularProgressIndicator()
-            : const EmptyState(
+            : EmptyState(
                 icon: Icons.inventory_2_outlined,
-                message: 'This product no longer exists.',
+                message: context.l10n.inventoryProductGone,
               ),
       ),
     );
@@ -134,10 +135,15 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
         ),
       );
       if (!mounted) return;
-      showMessage(context, _isEdit ? 'Product updated' : 'Product added');
+      showMessage(
+        context,
+        _isEdit
+            ? context.l10n.inventoryProductUpdated
+            : context.l10n.inventoryProductAdded,
+      );
       Navigator.of(context).pop();
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -145,13 +151,13 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
 
   Future<void> _toggleActive() async {
     final p = _p!;
+    final l10n = context.l10n;
     if (p.isActive) {
       final ok = await ConfirmDialog.show(
         context,
-        title: 'Deactivate ${p.name}?',
-        message:
-            'It will no longer be offered on bills. Its stock history is kept.',
-        confirmLabel: 'Deactivate',
+        title: l10n.inventoryDeactivateTitle(p.name),
+        message: l10n.inventoryDeactivateMessage,
+        confirmLabel: l10n.commonDeactivate,
         destructive: true,
       );
       if (!ok) return;
@@ -162,30 +168,36 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
     if (!mounted) return;
     showMessage(
       context,
-      p.isActive ? 'Product deactivated' : 'Product reactivated',
+      p.isActive ? l10n.inventoryDeactivated : l10n.inventoryReactivated,
     );
     Navigator.of(context).pop();
   }
 
-  String? _wholeNumber(String? v, String what) {
+  /// [message] when [v] is not a whole number.
+  String? _wholeNumber(String? v, String message) {
     // Digits-only input, so the number can never be negative.
-    return int.tryParse(v?.trim() ?? '') == null ? 'Enter $what.' : null;
+    return int.tryParse(v?.trim() ?? '') == null ? message : null;
   }
 
   String? _optionalMoney(String? v) {
     final t = v?.trim() ?? '';
     if (t.isEmpty) return null;
-    return Money.parseRupees(t) == null ? 'Enter a price in rupees.' : null;
+    return Money.parseRupees(t) == null
+        ? context.l10n.inventoryEnterPrice
+        : null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final digits = [FilteringTextInputFormatter.digitsOnly];
     final money = [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))];
     return DiscardChangesScope(
       isDirty: _isDirty && !_saving,
       child: Scaffold(
-        appBar: AppTopBar(title: _isEdit ? 'Edit product' : 'Add product'),
+        appBar: AppTopBar(
+          title: _isEdit ? l10n.inventoryEditProduct : l10n.inventoryAddProduct,
+        ),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -197,14 +209,14 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
             ),
             children: [
               AppTextField(
-                label: 'Name',
+                label: l10n.inventoryName,
                 isRequired: true,
                 controller: _name,
-                hint: 'e.g. Hair Serum',
+                hint: l10n.inventoryNameHint,
                 textCapitalization: TextCapitalization.words,
                 autofocus: !_isEdit,
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Enter the product name.'
+                    ? l10n.errProductNameRequired
                     : null,
               ),
               Gap.h16,
@@ -216,45 +228,45 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
                     borderRadius: Radii.controlAll,
                   ),
                   child: Text(
-                    'In stock: ${_p!.stockQty} ${_p.unit.name}. '
-                    'Use "Adjust stock" on the product screen to change it.',
+                    l10n.inventoryStockInfo(_p!.stockQty, l10n.unit(_p.unit)),
                     style: AppText.body.copyWith(color: AppColors.info),
                   ),
                 )
               else
                 AppTextField(
-                  label: 'Opening stock',
+                  label: l10n.inventoryOpeningStock,
                   isRequired: true,
                   controller: _stock,
                   keyboardType: TextInputType.number,
                   inputFormatters: digits,
-                  hint: 'e.g. 10',
-                  validator: (v) => _wholeNumber(v, 'the opening stock'),
+                  hint: l10n.inventoryOpeningStockHint,
+                  validator: (v) =>
+                      _wholeNumber(v, l10n.inventoryEnterOpeningStock),
                 ),
               Gap.h12,
-              const FieldLabel('Unit', required: true),
+              FieldLabel(l10n.inventoryUnit, required: true),
               Gap.h8,
               ChoiceChips<ProductUnit>(
-                options: const [
-                  ChoiceOption(ProductUnit.pcs, 'pcs'),
-                  ChoiceOption(ProductUnit.ml, 'ml'),
-                  ChoiceOption(ProductUnit.g, 'g'),
+                options: [
+                  for (final u in ProductUnit.values)
+                    ChoiceOption(u, l10n.unit(u)),
                 ],
                 selected: _unit,
                 onSelected: (u) => setState(() => _unit = u),
               ),
               Gap.h16,
               AppTextField(
-                label: 'Low-stock alert at',
+                label: l10n.inventoryLowStockAlertAt,
                 isRequired: true,
                 controller: _alert,
                 keyboardType: TextInputType.number,
                 inputFormatters: digits,
-                validator: (v) => _wholeNumber(v, 'the alert level'),
+                validator: (v) =>
+                    _wholeNumber(v, l10n.inventoryEnterAlertLevel),
               ),
               Gap.h16,
               AppTextField(
-                label: 'Selling price',
+                label: l10n.inventorySellingPrice,
                 controller: _price,
                 prefixText: '₹ ',
                 keyboardType: const TextInputType.numberWithOptions(
@@ -269,13 +281,13 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
                     _p?.category != null || _p?.costPricePaise != null,
                 children: [
                   AppTextField(
-                    label: 'Category',
+                    label: l10n.inventoryCategory,
                     controller: _category,
-                    hint: 'e.g. Hair care',
+                    hint: l10n.inventoryCategoryHint,
                     textCapitalization: TextCapitalization.words,
                   ),
                   AppTextField(
-                    label: 'Cost price',
+                    label: l10n.inventoryCostPrice,
                     controller: _cost,
                     prefixText: '₹ ',
                     keyboardType: const TextInputType.numberWithOptions(
@@ -302,7 +314,9 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
                           : Icons.check_circle_outline_rounded,
                     ),
                     label: Text(
-                      _p.isActive ? 'Deactivate product' : 'Reactivate product',
+                      _p.isActive
+                          ? l10n.inventoryDeactivateProduct
+                          : l10n.inventoryReactivateProduct,
                     ),
                   ),
                 ),
@@ -319,7 +333,7 @@ class _ProductFormState extends ConsumerState<_ProductForm> {
               Space.lg,
             ),
             child: PrimaryButton(
-              label: 'Save product',
+              label: l10n.inventorySaveProduct,
               loading: _saving,
               onPressed: _save,
             ),

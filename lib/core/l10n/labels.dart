@@ -103,6 +103,13 @@ extension Labels on AppLocalizations {
         : commonHoursMinutes(h, m.toString().padLeft(2, '0'));
   }
 
+  /// [duration] that never breaks across lines ("1 तास 30" stays together
+  /// in narrow time columns).
+  String durationOneLine(int minutes) =>
+      duration(minutes).replaceAll(' ', _noBreakSpace);
+
+  static final _noBreakSpace = String.fromCharCode(0xA0);
+
   /// A business-rule problem in this language.
   String error(DomainError e) {
     String arg(String key) => '${e.args[key] ?? ''}';

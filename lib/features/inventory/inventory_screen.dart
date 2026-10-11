@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/spacing.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/search_field.dart';
@@ -46,25 +47,32 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
 
   void _add() => context.push(Routes.newProduct);
 
+  static String _tabLabel(AppLocalizations l10n, InventoryTab t) => switch (t) {
+    InventoryTab.all => l10n.inventoryAllItems,
+    InventoryTab.low => l10n.stockLow,
+    InventoryTab.out => l10n.stockOut,
+  };
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final products = ref.watch(allProductsProvider);
     final all = products.value ?? const [];
     int count(InventoryTab t) => filterProducts(all, tab: t, query: '').length;
 
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Inventory',
+        title: l10n.inventoryTitle,
         actions: [
           IconButton(
-            tooltip: 'Add product',
+            tooltip: l10n.inventoryAddProduct,
             onPressed: _add,
             icon: const Icon(Icons.add_rounded),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add product',
+        tooltip: l10n.inventoryAddProduct,
         onPressed: _add,
         child: const Icon(Icons.add_rounded),
       ),
@@ -78,7 +86,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               0,
             ),
             child: SearchField(
-              hint: 'Search products',
+              hint: l10n.inventorySearch,
               onChanged: (v) => setState(() => _query = v),
             ),
           ),
@@ -88,7 +96,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
             tabAlignment: TabAlignment.start,
             tabs: [
               for (final t in InventoryTab.values)
-                Tab(text: '${t.label} (${count(t)})'),
+                Tab(text: l10n.inventoryTabCount(_tabLabel(l10n, t), count(t))),
             ],
           ),
           Expanded(
@@ -107,7 +115,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen>
               AsyncValue(:final error?) => Center(
                 child: EmptyState(
                   icon: Icons.error_outline_rounded,
-                  message: 'Could not load products. $error',
+                  message: l10n.inventoryLoadError('$error'),
                 ),
               ),
               _ => const Center(child: CircularProgressIndicator()),
@@ -128,22 +136,23 @@ class _List extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (products.isEmpty) {
       return SingleChildScrollView(
         child: switch (tab) {
           InventoryTab.all => EmptyState(
             icon: Icons.inventory_2_outlined,
-            message: 'No products yet.',
-            actionLabel: 'Add product',
+            message: l10n.inventoryEmpty,
+            actionLabel: l10n.inventoryAddProduct,
             onAction: onAdd,
           ),
-          InventoryTab.low => const EmptyState(
+          InventoryTab.low => EmptyState(
             icon: Icons.inventory_2_outlined,
-            message: 'Nothing is running low.',
+            message: l10n.inventoryNoneLow,
           ),
-          InventoryTab.out => const EmptyState(
+          InventoryTab.out => EmptyState(
             icon: Icons.inventory_2_outlined,
-            message: 'Nothing is out of stock.',
+            message: l10n.inventoryNoneOut,
           ),
         },
       );

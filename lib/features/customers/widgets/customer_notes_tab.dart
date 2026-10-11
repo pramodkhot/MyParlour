@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design/spacing.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../domain/errors.dart';
@@ -47,10 +48,10 @@ class _CustomerNotesTabState extends ConsumerState<CustomerNotesTab> {
           .updateNotes(widget.customer, _controller.text);
       if (mounted) {
         FocusScope.of(context).unfocus();
-        showMessage(context, 'Notes saved');
+        showMessage(context, context.l10n.custNotesSaved);
       }
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -66,15 +67,11 @@ class _CustomerNotesTabState extends ConsumerState<CustomerNotesTab> {
           minLines: 5,
           maxLines: 10,
           textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(
-            hintText:
-                'Preferences, allergies, favourite stylist… '
-                '(e.g. Prefers less heat in smoothening)',
-          ),
+          decoration: InputDecoration(hintText: context.l10n.custNotesTabHint),
         ),
         Gap.h16,
         PrimaryButton(
-          label: 'Save notes',
+          label: context.l10n.custSaveNotes,
           loading: _saving,
           onPressed: _changed ? _save : null,
         ),

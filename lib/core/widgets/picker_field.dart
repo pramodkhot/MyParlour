@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../design/typography.dart';
+import '../l10n/l10n.dart';
 import 'field_label.dart';
 
 /// A form field that opens a picker (date, day/month, time) instead of a
@@ -72,7 +73,7 @@ class PickerField extends StatelessWidget {
                     ),
                     if (value != null && onClear != null)
                       IconButton(
-                        tooltip: 'Clear $label',
+                        tooltip: context.l10n.commonClearField(label),
                         onPressed: onClear,
                         icon: const Icon(Icons.close_rounded, size: 20),
                       )

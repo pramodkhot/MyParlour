@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -88,7 +88,7 @@ class _FormFrame extends StatelessWidget {
               Space.lg,
             ),
             child: PrimaryButton(
-              label: 'Save changes',
+              label: context.l10n.commonSaveChanges,
               loading: saving,
               onPressed: onSave,
             ),
@@ -110,10 +110,10 @@ Future<void> _saveParlour(
   try {
     await ref.read(settingsActionsProvider).saveParlour(next);
     if (!context.mounted) return;
-    showMessage(context, 'Settings saved');
+    showMessage(context, context.l10n.settingsSaved);
     Navigator.of(context).pop();
   } on DomainException catch (e) {
-    if (context.mounted) showMessage(context, e.message);
+    if (context.mounted) showMessage(context, context.errorText(e));
   } finally {
     if (context.mounted) setSaving(false);
   }
@@ -167,8 +167,9 @@ Parlour _with(
   );
 }
 
-String? _required(String? v, String what) =>
-    (v == null || v.trim().isEmpty) ? 'Enter $what.' : null;
+/// [message] when [v] is empty.
+String? _required(String? v, String message) =>
+    (v == null || v.trim().isEmpty) ? message : null;
 
 // ------------------------------------------------------------------ profile
 
@@ -241,61 +242,59 @@ class _ProfileFormState extends ConsumerState<_ProfileForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return _FormFrame(
-      title: 'Parlour profile',
+      title: l10n.settingsProfile,
       formKey: _formKey,
       isDirty: _dirty,
       saving: _saving,
       onSave: _save,
       children: [
         AppTextField(
-          label: 'Parlour name',
+          label: l10n.settingsParlourName,
           isRequired: true,
           controller: _name,
           icon: Icons.storefront_outlined,
           textCapitalization: TextCapitalization.words,
-          validator: (v) => _required(v, 'the parlour name'),
+          validator: (v) => _required(v, l10n.settingsEnterParlourName),
         ),
         Gap.h16,
         AppTextField(
-          label: 'Owner name',
+          label: l10n.settingsOwnerName,
           isRequired: true,
           controller: _owner,
           icon: Icons.person_outline_rounded,
           textCapitalization: TextCapitalization.words,
-          validator: (v) => _required(v, 'the owner’s name'),
+          validator: (v) => _required(v, l10n.settingsEnterOwnerName),
         ),
         Gap.h16,
         AppTextField(
-          label: 'Phone',
+          label: l10n.settingsPhone,
           isRequired: true,
           controller: _phone,
           icon: Icons.phone_outlined,
           keyboardType: TextInputType.phone,
-          validator: (v) => _required(v, 'a phone number'),
+          validator: (v) => _required(v, l10n.settingsEnterPhone),
         ),
         Gap.h16,
         AppTextField(
-          label: 'Area',
+          label: l10n.settingsArea,
           isRequired: true,
           controller: _area,
           icon: Icons.place_outlined,
-          hint: 'e.g. MG Road, Pune',
+          hint: l10n.settingsAreaHint,
           textCapitalization: TextCapitalization.words,
-          validator: (v) => _required(v, 'the area'),
+          validator: (v) => _required(v, l10n.settingsEnterArea),
         ),
         Gap.h16,
         AppTextField(
-          label: 'Address',
+          label: l10n.settingsAddress,
           controller: _address,
           maxLines: 3,
           textCapitalization: TextCapitalization.sentences,
         ),
         Gap.h8,
-        const Text(
-          'The name, area and phone appear on receipts.',
-          style: AppText.caption,
-        ),
+        Text(l10n.settingsProfileNote, style: AppText.caption),
       ],
     );
   }
@@ -346,10 +345,11 @@ class _HoursFormState extends ConsumerState<_HoursForm> {
   }
 
   void _save() {
+    final l10n = context.l10n;
     final error = _days.isEmpty
-        ? 'Choose at least one open day.'
+        ? l10n.settingsNoOpenDay
         : _close.compareTo(_open) <= 0
-        ? 'Closing time must be after opening time.'
+        ? l10n.settingsCloseBeforeOpen
         : null;
     setState(() => _error = error);
     if (_saving || error != null) return;
@@ -369,21 +369,21 @@ class _HoursFormState extends ConsumerState<_HoursForm> {
 
   @override
   Widget build(BuildContext context) {
-    final weekday = DateFormat.E('en_IN');
+    final l10n = context.l10n;
     final day = DateTime(2024);
     return _FormFrame(
-      title: 'Business hours',
+      title: l10n.settingsBusinessHours,
       formKey: _formKey,
       isDirty: _dirty,
       saving: _saving,
       onSave: _save,
       children: [
-        const FieldLabel('Open days', required: true),
+        FieldLabel(l10n.settingsOpenDays, required: true),
         Gap.h8,
         MultiChoiceChips<int>(
           options: [
             for (var d = 1; d <= 7; d++)
-              ChoiceOption(d, weekday.format(DateTime(2024, 1, d))),
+              ChoiceOption(d, Dates.weekdayShort(DateTime(2024, 1, d))),
           ],
           selected: _days,
           onChanged: (d) => setState(() => _days = d),
@@ -393,10 +393,10 @@ class _HoursFormState extends ConsumerState<_HoursForm> {
           children: [
             Expanded(
               child: PickerField(
-                label: 'Opens',
+                label: l10n.settingsOpens,
                 isRequired: true,
                 icon: Icons.schedule_rounded,
-                hint: 'Opening time',
+                hint: l10n.settingsOpeningTime,
                 value: Dates.time(_open.on(day)),
                 onTap: () => _pick(open: true),
               ),
@@ -404,10 +404,10 @@ class _HoursFormState extends ConsumerState<_HoursForm> {
             Gap.w12,
             Expanded(
               child: PickerField(
-                label: 'Closes',
+                label: l10n.settingsCloses,
                 isRequired: true,
                 icon: Icons.schedule_rounded,
-                hint: 'Closing time',
+                hint: l10n.settingsClosingTime,
                 value: Dates.time(_close.on(day)),
                 onTap: () => _pick(open: false),
               ),
@@ -415,20 +415,18 @@ class _HoursFormState extends ConsumerState<_HoursForm> {
           ],
         ),
         Gap.h20,
-        const FieldLabel('Booking slots', required: true),
+        FieldLabel(l10n.settingsBookingSlots, required: true),
         Gap.h8,
         ChoiceChips<int>(
           options: [
-            for (final m in const [15, 30, 45, 60]) ChoiceOption(m, '$m min'),
+            for (final m in const [15, 30, 45, 60])
+              ChoiceOption(m, l10n.commonMinutes(m)),
           ],
           selected: _slot,
           onSelected: (m) => setState(() => _slot = m),
         ),
         Gap.h8,
-        const Text(
-          'New appointments are offered at these intervals.',
-          style: AppText.caption,
-        ),
+        Text(l10n.settingsSlotsNote, style: AppText.caption),
         if (_error != null) ...[
           Gap.h12,
           Text(
@@ -507,45 +505,47 @@ class _BillingFormState extends ConsumerState<_BillingForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final prefix = _prefix.text.trim().isEmpty
+        ? 'BBP'
+        : _prefix.text.trim().toUpperCase();
     return _FormFrame(
-      title: 'Billing & tax',
+      title: l10n.settingsBillingTax,
       formKey: _formKey,
       isDirty: _dirty,
       saving: _saving,
       onSave: _save,
       children: [
         AppTextField(
-          label: 'Invoice prefix',
+          label: l10n.settingsInvoicePrefix,
           isRequired: true,
           controller: _prefix,
-          hint: 'e.g. BBP',
+          hint: l10n.settingsPrefixHint,
           textCapitalization: TextCapitalization.characters,
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]')),
             LengthLimitingTextInputFormatter(6),
           ],
-          validator: (v) => _required(v, 'a prefix'),
+          validator: (v) => _required(v, l10n.settingsEnterPrefix),
         ),
         Gap.h4,
         Text(
-          'Bills are numbered like '
-          '${_prefix.text.trim().isEmpty ? 'BBP' : _prefix.text.trim().toUpperCase()}'
-          '/2026-27/0001. Numbers already used do not change.',
+          l10n.settingsNumberingNote('$prefix/2026-27/0001'),
           style: AppText.caption,
         ),
         Gap.h16,
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('Charge GST'),
-          subtitle: const Text('Adds GST to new bills'),
+          title: Text(l10n.settingsChargeGst),
+          subtitle: Text(l10n.settingsChargeGstHint),
           value: _tax,
           onChanged: (v) => setState(() => _tax = v),
         ),
         if (_tax) ...[
           AppTextField(
-            label: 'GSTIN',
+            label: l10n.settingsGstin,
             controller: _gstin,
-            hint: '15 characters',
+            hint: l10n.settingsGstinHint,
             textCapitalization: TextCapitalization.characters,
             inputFormatters: [LengthLimitingTextInputFormatter(15)],
             validator: (v) {
@@ -553,16 +553,13 @@ class _BillingFormState extends ConsumerState<_BillingForm> {
               if (t.isEmpty) return null;
               return RegExp(r'^[0-9A-Za-z]{15}$').hasMatch(t)
                   ? null
-                  : 'A GSTIN has 15 letters and numbers.';
+                  : l10n.settingsGstinInvalid;
             },
           ),
           Gap.h4,
-          const Text(
-            'Receipts become "Tax invoices" only when a GSTIN is added.',
-            style: AppText.caption,
-          ),
+          Text(l10n.settingsGstinNote, style: AppText.caption),
           Gap.h16,
-          const FieldLabel('Default GST rate', required: true),
+          FieldLabel(l10n.settingsDefaultGstRate, required: true),
           Gap.h8,
           ChoiceChips<int>(
             options: [
@@ -575,21 +572,19 @@ class _BillingFormState extends ConsumerState<_BillingForm> {
           Gap.h8,
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Prices include GST'),
-            subtitle: const Text(
-              'Take GST out of the price instead of adding it',
-            ),
+            title: Text(l10n.settingsPricesIncludeGst),
+            subtitle: Text(l10n.settingsPricesIncludeGstHint),
             value: _inclusive,
             onChanged: (v) => setState(() => _inclusive = v),
           ),
         ],
         Gap.h16,
         AppTextField(
-          label: 'Receipt footer',
+          label: l10n.settingsReceiptFooter,
           isRequired: true,
           controller: _footer,
           textCapitalization: TextCapitalization.sentences,
-          validator: (v) => _required(v, 'a footer'),
+          validator: (v) => _required(v, l10n.settingsEnterFooter),
         ),
       ],
     );

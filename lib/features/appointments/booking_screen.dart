@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/colors.dart';
@@ -11,6 +10,7 @@ import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/avatar_initials.dart';
@@ -52,17 +52,19 @@ class BookingScreen extends ConsumerWidget {
     return switch (ref.watch(bookingDataProvider(appointmentId))) {
       AsyncValue(:final value?)
           when appointmentId != null && value.existing == null =>
-        const _Message('This appointment no longer exists.'),
+        _Message(context.l10n.apptNoLongerExists),
       AsyncValue(:final value?)
           when value.existing != null &&
               value.existing!.status != AppointmentStatus.booked =>
-        const _Message('Only upcoming appointments can be rescheduled.'),
+        _Message(context.l10n.bookingOnlyUpcoming),
       AsyncValue(:final value?) => _BookingForm(
         data: value,
         presetCustomerId: customerId,
         presetDate: date,
       ),
-      AsyncValue(:final error?) => _Message('Could not open the form. $error'),
+      AsyncValue(:final error?) => _Message(
+        context.l10n.bookingLoadFailed('$error'),
+      ),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
   }
@@ -240,6 +242,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
     required PeopleNames? names,
   }) async {
     if (_saving) return;
+    final l10n = context.l10n;
     setState(() => _submitted = true);
     final fieldsOk = _formKey.currentState?.validate() ?? false;
     final hasClient = _isReschedule || _walkIn || _customer != null;
@@ -248,7 +251,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
         _services.isEmpty ||
         time == null ||
         stylist == null) {
-      showMessage(context, 'Please fill the fields marked *.');
+      showMessage(context, l10n.commonFillRequired);
       return;
     }
 
@@ -265,7 +268,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
         context,
         stylistName: stylist.name,
         clashes: clashes,
-        clientName: (a) => names?.client(a) ?? 'Customer',
+        clientName: (a) => names?.client(a, l10n) ?? l10n.commonCustomer,
       );
       if (!bookAnyway) return;
     }
@@ -301,14 +304,14 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
       );
       if (!mounted) return;
       if (e != null) {
-        showMessage(context, 'Appointment rescheduled');
+        showMessage(context, l10n.bookingRescheduled);
         Navigator.of(context).pop();
       } else {
-        showMessage(context, 'Appointment booked');
+        showMessage(context, l10n.bookingBooked);
         context.pushReplacement(Routes.appointment(saved.id));
       }
     } on DomainException catch (err) {
-      if (mounted) showMessage(context, err.message);
+      if (mounted) showMessage(context, context.errorText(err));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -363,12 +366,13 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
     }
 
     final isClosed = !widget.data.parlour.isOpenOn(_date);
+    final l10n = context.l10n;
 
     return DiscardChangesScope(
       isDirty: _isDirty && !_saving,
       child: Scaffold(
         appBar: AppTopBar(
-          title: _isReschedule ? 'Reschedule' : 'New appointment',
+          title: _isReschedule ? l10n.apptReschedule : l10n.bookingNewTitle,
         ),
         body: Form(
           key: _formKey,
@@ -385,27 +389,26 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
               ..._servicesSection(),
               Gap.h20,
               PickerField(
-                label: 'Date',
+                label: l10n.bookingDate,
                 isRequired: true,
                 icon: Icons.calendar_today_outlined,
-                hint: 'Choose a date',
-                value: DateFormat('EEEE, d MMMM', 'en_IN').format(_date),
+                hint: l10n.bookingChooseDate,
+                value: Dates.weekdayDayMonth(_date),
                 onTap: _chooseDate,
               ),
               if (isClosed) ...[
                 Gap.h8,
                 Text(
-                  'The parlour is usually closed on '
-                  '${DateFormat.EEEE('en_IN').format(_date)}s.',
+                  l10n.bookingClosedOn(Dates.weekday(_date)),
                   style: AppText.caption.copyWith(color: AppColors.warning),
                 ),
               ],
               Gap.h20,
-              const FieldLabel('Time', required: true),
+              FieldLabel(l10n.bookingTime, required: true),
               Gap.h8,
               if (slots.isEmpty)
                 Text(
-                  'No times left on this day. Choose another date.',
+                  l10n.bookingNoTimesLeft,
                   style: AppText.body.copyWith(color: AppColors.textMuted),
                 )
               else
@@ -420,11 +423,11 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
                   }),
                 ),
               Gap.h20,
-              const FieldLabel('Stylist', required: true),
+              FieldLabel(l10n.commonStylist, required: true),
               Gap.h8,
               if (eligible.isEmpty)
                 Text(
-                  'No stylist works on this day.',
+                  l10n.bookingNoStylist,
                   style: AppText.body.copyWith(color: AppColors.textMuted),
                 )
               else
@@ -459,10 +462,10 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
               ],
               Gap.h20,
               AppTextField(
-                label: 'Notes',
+                label: l10n.apptNotes,
                 controller: _notes,
                 maxLines: 3,
-                hint: 'e.g. Prefers less heat in smoothening',
+                hint: l10n.bookingNotesHint,
                 textCapitalization: TextCapitalization.sentences,
               ),
             ],
@@ -477,7 +480,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
               Space.lg,
             ),
             child: PrimaryButton(
-              label: _isReschedule ? 'Save changes' : 'Book appointment',
+              label: _isReschedule ? l10n.commonSaveChanges : l10n.apptBook,
               loading: _saving,
               onPressed: () => _book(
                 time: time,
@@ -493,14 +496,15 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
   }
 
   List<Widget> _customerSection() {
+    final l10n = context.l10n;
     final error = _submitted && !_walkIn && _customer == null;
     if (_isReschedule) {
-      final name = _customer?.name ?? _existing!.walkInName ?? 'Guest';
+      final name = _customer?.name ?? _existing!.walkInName ?? l10n.commonGuest;
       return [
-        const FieldLabel('Customer', required: true),
+        FieldLabel(l10n.commonCustomer, required: true),
         Gap.h8,
         _CustomerTile(
-          name: _existing!.isWalkIn ? 'Walk-in · $name' : name,
+          name: _existing!.isWalkIn ? l10n.commonWalkInNamed(name) : name,
           phone: _customer?.phone ?? _existing.walkInPhone,
         ),
       ];
@@ -508,19 +512,19 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
     if (_walkIn) {
       return [
         AppTextField(
-          label: 'Walk-in name',
+          label: l10n.bookingWalkInName,
           isRequired: true,
           controller: _walkInName,
           icon: Icons.person_outline_rounded,
           textCapitalization: TextCapitalization.words,
           autofocus: true,
           validator: (v) => (v == null || v.trim().isEmpty)
-              ? 'Enter the customer’s name.'
+              ? l10n.bookingWalkInNameRequired
               : null,
         ),
         Gap.h16,
         AppTextField(
-          label: 'Mobile number',
+          label: l10n.bookingMobileNumber,
           controller: _walkInPhone,
           icon: Icons.phone_outlined,
           prefixText: '+91 ',
@@ -534,7 +538,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
             if (t.isEmpty) return null;
             return PhoneNumber.isValidMobile(t)
                 ? null
-                : 'Enter a 10-digit mobile number.';
+                : l10n.bookingPhoneInvalid;
           },
         ),
         Align(
@@ -542,17 +546,17 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
           child: TextButton.icon(
             onPressed: () => setState(() => _walkIn = false),
             icon: const Icon(Icons.people_alt_outlined, size: 20),
-            label: const Text('Choose a saved customer instead'),
+            label: Text(l10n.bookingChooseSavedCustomer),
           ),
         ),
       ];
     }
     return [
       PickerField(
-        label: 'Customer',
+        label: l10n.commonCustomer,
         isRequired: true,
         icon: Icons.search_rounded,
-        hint: 'Search name or phone',
+        hint: l10n.apptSearchCustomer,
         value: _customer == null
             ? null
             : '${_customer!.name} · ${PhoneNumber.display(_customer!.phone)}',
@@ -562,7 +566,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
         Padding(
           padding: const EdgeInsets.only(top: Space.xs, left: Space.md),
           child: Text(
-            'Choose a customer or add a walk-in.',
+            l10n.bookingCustomerRequired,
             style: AppText.caption.copyWith(color: AppColors.error),
           ),
         ),
@@ -571,7 +575,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
           TextButton.icon(
             onPressed: _newCustomer,
             icon: const Icon(Icons.add_rounded, size: 20),
-            label: const Text('New'),
+            label: Text(l10n.apptNewCustomerShort),
           ),
           TextButton.icon(
             onPressed: () => setState(() {
@@ -579,7 +583,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
               _customer = null;
             }),
             icon: const Icon(Icons.directions_walk_rounded, size: 20),
-            label: const Text('Walk-in'),
+            label: Text(l10n.commonWalkIn),
           ),
         ],
       ),
@@ -587,8 +591,9 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
   }
 
   List<Widget> _servicesSection() {
+    final l10n = context.l10n;
     return [
-      const FieldLabel('Services', required: true),
+      FieldLabel(l10n.apptServices, required: true),
       Gap.h8,
       Wrap(
         spacing: Space.sm,
@@ -603,7 +608,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
                 side: BorderSide(color: AppColors.rose, width: 0.8),
               ),
               deleteIconColor: AppColors.info,
-              deleteButtonTooltipMessage: 'Remove ${s.name}',
+              deleteButtonTooltipMessage: l10n.bookingRemoveService(s.name),
               onDeleted: () => setState(
                 () => _services = [
                   for (final x in _services)
@@ -617,7 +622,9 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
               size: 18,
               color: AppColors.primary,
             ),
-            label: Text(_services.isEmpty ? 'Add services' : 'Add more'),
+            label: Text(
+              _services.isEmpty ? l10n.bookingAddServices : l10n.bookingAddMore,
+            ),
             labelStyle: AppText.chip.copyWith(color: AppColors.primary),
             backgroundColor: AppColors.surface,
             shape: const StadiumBorder(
@@ -631,7 +638,7 @@ class _BookingFormState extends ConsumerState<_BookingForm> {
         Padding(
           padding: const EdgeInsets.only(top: Space.xs, left: Space.md),
           child: Text(
-            'Choose at least one service.',
+            l10n.errAppointmentNoServices,
             style: AppText.caption.copyWith(color: AppColors.error),
           ),
         ),
@@ -689,14 +696,15 @@ class _StylistTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final a = availability;
     final (String text, Color color) = a == null
-        ? ('Choose a time first', AppColors.textMuted)
+        ? (l10n.bookingChooseTimeFirst, AppColors.textMuted)
         : a.isFree
-        ? ('Free', AppColors.success)
+        ? (l10n.bookingFree, AppColors.success)
         : a.busyUntil != null
-        ? ('Busy until ${Dates.time(a.busyUntil!)}', AppColors.warning)
-        : ('Busy from ${Dates.time(a.busyFrom!)}', AppColors.warning);
+        ? (l10n.bookingBusyUntil(Dates.time(a.busyUntil!)), AppColors.warning)
+        : (l10n.bookingBusyFrom(Dates.time(a.busyFrom!)), AppColors.warning);
     return Padding(
       padding: const EdgeInsets.only(bottom: Space.sm),
       child: Material(
@@ -731,7 +739,7 @@ class _StylistTile extends StatelessWidget {
                       // the row wider than a small screen.
                       Text.rich(
                         TextSpan(
-                          text: '${staff.roleTitle} · ',
+                          text: '${l10n.builtIn(staff.roleTitle)} · ',
                           children: [
                             TextSpan(
                               text: text,
@@ -777,9 +785,13 @@ class _Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final h = durationMin ~/ 60;
     final m = durationMin % 60;
-    final duration = [if (h > 0) '$h h', if (m > 0) '$m min'].join(' ');
+    final duration = [
+      if (h > 0) l10n.commonHours(h),
+      if (m > 0) l10n.commonMinutes(m),
+    ].join(' ');
     return Container(
       padding: const EdgeInsets.all(Space.lg),
       decoration: const BoxDecoration(
@@ -799,7 +811,7 @@ class _Summary extends StatelessWidget {
               Gap.w8,
               Expanded(
                 child: Text(
-                  'Duration $duration · ends ${Dates.time(end)}',
+                  l10n.bookingDurationEnds(duration, Dates.time(end)),
                   style: AppText.body.copyWith(color: AppColors.info),
                 ),
               ),
@@ -815,7 +827,7 @@ class _Summary extends StatelessWidget {
               ),
               Gap.w8,
               Text(
-                'Estimate ${Money.format(estimatePaise)}',
+                l10n.bookingEstimate(Money.format(estimatePaise)),
                 style: AppText.bodyStrong.copyWith(color: AppColors.info),
               ),
             ],
@@ -834,7 +846,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Appointment'),
+      appBar: AppTopBar(title: context.l10n.apptTitle),
       body: Center(
         child: EmptyState(icon: Icons.event_busy_outlined, message: message),
       ),

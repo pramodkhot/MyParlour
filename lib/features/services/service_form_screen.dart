@@ -6,6 +6,7 @@ import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -134,9 +135,9 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
   Future<void> _addCategory() async {
     final name = await showTextPrompt(
       context,
-      title: 'New category',
-      confirmLabel: 'Add',
-      hint: 'e.g. Bridal',
+      title: context.l10n.servicesNewCategory,
+      confirmLabel: context.l10n.commonAdd,
+      hint: context.l10n.servicesNewCategoryHint,
     );
     if (name == null || !mounted) return;
     setState(() {
@@ -148,10 +149,11 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
   Future<void> _save() async {
     if (_saving) return;
     final fieldsOk = _formKey.currentState?.validate() ?? false;
+    final l10n = context.l10n;
     final chipError = _category == null
-        ? 'Choose a category.'
+        ? l10n.errCategoryRequired
         : (_minutes == null || _minutes! <= 0)
-        ? 'Choose how long the service takes.'
+        ? l10n.errServiceDurationRequired
         : null;
     setState(() => _chipError = chipError);
     if (!fieldsOk || chipError != null) return;
@@ -176,10 +178,10 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
         ),
       );
       if (!mounted) return;
-      showMessage(context, _isEdit ? 'Service updated' : 'Service added');
+      showMessage(context, _isEdit ? l10n.servicesUpdated : l10n.servicesAdded);
       Navigator.of(context).pop();
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -187,14 +189,13 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
 
   Future<void> _toggleActive() async {
     final s = widget.initial!;
+    final l10n = context.l10n;
     if (s.isActive) {
       final ok = await ConfirmDialog.show(
         context,
-        title: 'Deactivate ${s.name}?',
-        message:
-            'It will no longer be offered for new bookings or bills. '
-            'Past appointments and bills keep it.',
-        confirmLabel: 'Deactivate',
+        title: l10n.servicesDeactivateTitle(s.name),
+        message: l10n.servicesDeactivateMessage,
+        confirmLabel: l10n.commonDeactivate,
         destructive: true,
       );
       if (!ok) return;
@@ -205,17 +206,20 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
     if (!mounted) return;
     showMessage(
       context,
-      s.isActive ? 'Service deactivated' : 'Service reactivated',
+      s.isActive ? l10n.servicesDeactivated : l10n.servicesReactivated,
     );
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return DiscardChangesScope(
       isDirty: _isDirty && !_saving,
       child: Scaffold(
-        appBar: AppTopBar(title: _isEdit ? 'Edit service' : 'Add service'),
+        appBar: AppTopBar(
+          title: _isEdit ? l10n.servicesEdit : l10n.servicesAdd,
+        ),
         body: Form(
           key: _formKey,
           child: ListView(
@@ -227,31 +231,34 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
             ),
             children: [
               AppTextField(
-                label: 'Service name',
+                label: l10n.servicesFieldName,
                 isRequired: true,
                 controller: _name,
-                hint: 'e.g. Haircut',
+                hint: l10n.servicesNameHint,
                 textCapitalization: TextCapitalization.words,
                 autofocus: !_isEdit,
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Enter the service name.'
+                    ? l10n.errServiceNameRequired
                     : null,
               ),
               Gap.h16,
-              const FieldLabel('Category', required: true),
+              FieldLabel(l10n.servicesCategory, required: true),
               Gap.h8,
               Wrap(
                 spacing: Space.sm,
                 runSpacing: Space.sm,
                 children: [
                   ChoiceChips<String>(
-                    options: [for (final c in _categories) ChoiceOption(c, c)],
+                    options: [
+                      for (final c in _categories)
+                        ChoiceOption(c, l10n.builtIn(c)),
+                    ],
                     selected: _category,
                     onSelected: (c) => setState(() => _category = c),
                   ),
                   ActionChip(
                     avatar: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('New category'),
+                    label: Text(l10n.servicesNewCategory),
                     labelStyle: AppText.chip.copyWith(color: AppColors.primary),
                     onPressed: _addCategory,
                     shape: const StadiumBorder(
@@ -263,7 +270,7 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
               ),
               Gap.h16,
               AppTextField(
-                label: 'Price',
+                label: l10n.servicesPrice,
                 isRequired: true,
                 controller: _price,
                 prefixText: '₹ ',
@@ -275,17 +282,17 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                 ],
                 validator: (v) => Money.parseRupees(v ?? '') == null
-                    ? 'Enter the price in rupees.'
+                    ? l10n.servicesPriceInvalid
                     : null,
               ),
               Gap.h16,
-              const FieldLabel('Duration', required: true),
+              FieldLabel(l10n.servicesDuration, required: true),
               Gap.h8,
               ChoiceChips<int>(
                 options: [
                   for (final m in _durationChoices)
-                    ChoiceOption(m, m < 60 ? '$m min' : _hours(m)),
-                  const ChoiceOption(-1, 'Custom'),
+                    ChoiceOption(m, l10n.duration(m)),
+                  ChoiceOption(-1, l10n.servicesCustomDuration),
                 ],
                 selected: _duration,
                 onSelected: (m) => setState(() => _duration = m),
@@ -293,14 +300,14 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
               if (_duration == -1) ...[
                 Gap.h12,
                 AppTextField(
-                  label: 'Minutes',
+                  label: l10n.servicesMinutes,
                   isRequired: true,
                   controller: _customMinutes,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  hint: 'e.g. 75',
+                  hint: l10n.servicesMinutesHint,
                   validator: (v) => (int.tryParse(v ?? '') ?? 0) <= 0
-                      ? 'Enter the minutes.'
+                      ? l10n.servicesMinutesRequired
                       : null,
                 ),
               ],
@@ -316,7 +323,7 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
                 initiallyOpen: widget.initial?.description != null,
                 children: [
                   AppTextField(
-                    label: 'Description',
+                    label: l10n.servicesDescription,
                     controller: _description,
                     maxLines: 3,
                     textCapitalization: TextCapitalization.sentences,
@@ -324,7 +331,7 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const FieldLabel('GST rate'),
+                      FieldLabel(l10n.servicesGstRate),
                       Gap.h8,
                       ChoiceChips<int>(
                         options: [
@@ -335,10 +342,7 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
                         onSelected: (bp) => setState(() => _taxRateBp = bp),
                       ),
                       Gap.h4,
-                      const Text(
-                        'Used only when GST is turned on in Settings.',
-                        style: AppText.caption,
-                      ),
+                      Text(l10n.servicesGstNote, style: AppText.caption),
                     ],
                   ),
                 ],
@@ -360,8 +364,8 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
                     ),
                     label: Text(
                       widget.initial!.isActive
-                          ? 'Deactivate service'
-                          : 'Reactivate service',
+                          ? l10n.servicesDeactivate
+                          : l10n.servicesReactivate,
                     ),
                   ),
                 ),
@@ -378,7 +382,7 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
               Space.lg,
             ),
             child: PrimaryButton(
-              label: 'Save service',
+              label: l10n.servicesSave,
               loading: _saving,
               onPressed: _save,
             ),
@@ -387,9 +391,6 @@ class _ServiceFormState extends ConsumerState<_ServiceForm> {
       ),
     );
   }
-
-  static String _hours(int m) =>
-      m % 60 == 0 ? '${m ~/ 60} h' : '${m ~/ 60} h ${m % 60}';
 }
 
 class _NotFound extends StatelessWidget {
@@ -400,13 +401,13 @@ class _NotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Service'),
+      appBar: AppTopBar(title: context.l10n.servicesService),
       body: Center(
         child: EmptyState(
           icon: Icons.content_cut_rounded,
           message: error == null
-              ? 'This service no longer exists.'
-              : 'Could not load this service. $error',
+              ? context.l10n.servicesNotFound
+              : context.l10n.servicesLoadOneError('$error'),
         ),
       ),
     );

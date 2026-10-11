@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
-import '../../../core/format/dates.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/search_field.dart';
 import '../../../domain/models/service_item.dart';
@@ -42,28 +42,30 @@ class _ServiceListState extends State<_ServiceList> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final q = _query.trim().toLowerCase();
     final shown = widget.services
         .where(
           (s) =>
               q.isEmpty ||
               s.name.toLowerCase().contains(q) ||
-              s.category.toLowerCase().contains(q),
+              s.category.toLowerCase().contains(q) ||
+              l10n.builtIn(s.category).toLowerCase().contains(q),
         )
         .toList();
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(Space.xl, 0, Space.xl, Space.sm),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Space.xl, 0, Space.xl, Space.sm),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Text('Choose services', style: AppText.barTitle),
+            child: Text(l10n.apptChooseServices, style: AppText.barTitle),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Space.xl),
           child: SearchField(
-            hint: 'Search services',
+            hint: l10n.apptSearchServices,
             onChanged: (v) => setState(() => _query = v),
           ),
         ),
@@ -82,7 +84,8 @@ class _ServiceListState extends State<_ServiceList> {
                   }),
                   title: Text(s.name),
                   subtitle: Text(
-                    '${s.category} · ${Dates.duration(s.durationMin)}',
+                    '${l10n.builtIn(s.category)} · '
+                    '${l10n.duration(s.durationMin)}',
                   ),
                   secondary: Text(
                     Money.format(s.pricePaise),
@@ -103,9 +106,8 @@ class _ServiceListState extends State<_ServiceList> {
             ),
             child: PrimaryButton(
               label: _selected.isEmpty
-                  ? 'Done'
-                  : 'Add ${_selected.length} service'
-                        '${_selected.length == 1 ? '' : 's'}',
+                  ? l10n.commonDone
+                  : l10n.apptAddServicesCount(_selected.length),
               onPressed: () => Navigator.of(context).pop(_selected),
             ),
           ),

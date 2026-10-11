@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../design/typography.dart';
+import '../l10n/l10n.dart';
 
 /// Rounded search box with a search icon and a clear button.
 class SearchField extends StatefulWidget {
@@ -51,7 +52,7 @@ class _SearchFieldState extends State<SearchField> {
         suffixIcon: _controller.text.isEmpty
             ? null
             : IconButton(
-                tooltip: 'Clear search',
+                tooltip: context.l10n.commonClearSearch,
                 icon: const Icon(Icons.close_rounded, size: 20),
                 onPressed: _clear,
               ),

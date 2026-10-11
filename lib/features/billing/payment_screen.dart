@@ -33,22 +33,23 @@ class PaymentScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return switch (ref.watch(billDetailProvider(billId))) {
       AsyncValue(:final value?) when !value.invoice.isOpen => _Message(
         value.invoice.isVoid
-            ? 'This bill is void.'
+            ? l10n.errBillIsVoid
             : value.invoice.isDraft
-            ? 'Finish the bill before taking payment.'
-            : 'This bill is fully paid.',
+            ? l10n.paymentFinishBillFirst
+            : l10n.paymentFullyPaid,
         billId: billId,
       ),
       AsyncValue(:final value?) => _PaymentForm(invoice: value.invoice),
       AsyncValue(hasValue: true) => _Message(
-        'This bill no longer exists.',
+        l10n.billingBillGone,
         billId: billId,
       ),
       AsyncValue(:final error?) => _Message(
-        'Could not load this bill. $error',
+        l10n.billingLoadBillError('$error'),
         billId: billId,
       ),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -96,7 +97,7 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
 
   String? get _error {
     final paise = _amountPaise;
-    if (paise == null) return 'Enter the amount received.';
+    if (paise == null) return context.l10n.paymentEnterAmount;
     final rule = InvoiceRules.paymentError(
       amountPaise: paise,
       balancePaise: _balance,
@@ -127,7 +128,7 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
       router.pushReplacement(Routes.paymentDone(widget.invoice.id, _paymentId));
     } on DomainException catch (e) {
       if (mounted) {
-        showMessage(context, e.message);
+        showMessage(context, context.errorText(e));
         setState(() => _saving = false);
       }
     }
@@ -135,17 +136,18 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bill = widget.invoice;
     final paise = _amountPaise;
     final error = _error;
     final caption = paise == null || error != null
         ? null
         : paise == _balance
-        ? 'Full balance'
-        : 'Partial · ${Money.format(_balance - paise)} will still be due';
+        ? l10n.paymentFullBalance
+        : l10n.paymentPartial(Money.format(_balance - paise));
 
     return Scaffold(
-      appBar: AppTopBar(title: 'Payment', subtitle: bill.invoiceNo),
+      appBar: AppTopBar(title: l10n.paymentTitle, subtitle: bill.invoiceNo),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           Space.xl,
@@ -157,34 +159,31 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
           AppCard(
             child: Column(
               children: [
-                _AmountRow('Bill total', bill.totalPaise),
-                _AmountRow('Already received', bill.paidPaise),
+                _AmountRow(l10n.paymentBillTotal, bill.totalPaise),
+                _AmountRow(l10n.paymentAlreadyReceived, bill.paidPaise),
                 const Divider(height: Space.xl),
-                _AmountRow('Balance due', _balance, strong: true),
+                _AmountRow(l10n.billingBalanceDue, _balance, strong: true),
               ],
             ),
           ),
           Gap.h20,
-          const FieldLabel('Payment method', required: true),
+          FieldLabel(l10n.paymentMethodLabel, required: true),
           Gap.h8,
           ChoiceChips<PaymentMethod>(
             options: [
               for (final m in PaymentMethod.values)
-                ChoiceOption(m, m.label, icon: m.icon),
+                ChoiceOption(m, l10n.paymentMethod(m), icon: m.icon),
             ],
             selected: _method,
             onSelected: (m) => setState(() => _method = m),
           ),
           if (_method == PaymentMethod.upi) ...[
             Gap.h8,
-            const Text(
-              'Records the payment; the app does not verify UPI.',
-              style: AppText.caption,
-            ),
+            Text(l10n.paymentUpiNote, style: AppText.caption),
           ],
           Gap.h20,
           AppTextField(
-            label: 'Amount received',
+            label: l10n.paymentAmountReceived,
             isRequired: true,
             controller: _amount,
             prefixText: '₹ ',
@@ -202,7 +201,7 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
           ),
           Gap.h16,
           AppTextField(
-            label: _method.referenceLabel,
+            label: l10n.paymentReference(_method),
             controller: _reference,
             keyboardType: _method == PaymentMethod.card
                 ? TextInputType.number
@@ -211,7 +210,7 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
           ),
           Gap.h16,
           AppTextField(
-            label: 'Note',
+            label: l10n.paymentNote,
             controller: _note,
             textCapitalization: TextCapitalization.sentences,
           ),
@@ -227,8 +226,8 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
           ),
           child: PrimaryButton(
             label: paise == null || error != null
-                ? 'Confirm'
-                : 'Confirm ${Money.format(paise)}',
+                ? l10n.paymentConfirm
+                : l10n.paymentConfirmAmount(Money.format(paise)),
             loading: _saving,
             onPressed: error == null ? _confirm : null,
           ),
@@ -271,12 +270,12 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Payment'),
+      appBar: AppTopBar(title: context.l10n.paymentTitle),
       body: Center(
         child: EmptyState(
           icon: Icons.receipt_long_outlined,
           message: message,
-          actionLabel: 'Open bill',
+          actionLabel: context.l10n.billingOpenBill,
           onAction: () => context.pushReplacement(Routes.bill(billId)),
         ),
       ),

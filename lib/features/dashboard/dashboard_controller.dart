@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../data/providers.dart';
 import '../../domain/models/appointment.dart';
 import '../../domain/models/date_range.dart';
@@ -23,11 +24,13 @@ class DashboardData {
   final Map<String, String> staffNames;
 
   /// "Priya Sharma" or "Walk-in · Kiran".
-  String clientName(Appointment a) => a.customerId == null
-      ? 'Walk-in · ${a.walkInName ?? 'Guest'}'
-      : customerNames[a.customerId] ?? 'Customer';
+  String clientName(Appointment a, AppLocalizations l10n) =>
+      a.customerId == null
+      ? l10n.commonWalkInNamed(a.walkInName ?? l10n.commonGuest)
+      : customerNames[a.customerId] ?? l10n.commonCustomer;
 
-  String stylistName(Appointment a) => staffNames[a.staffId] ?? 'Stylist';
+  String stylistName(Appointment a, AppLocalizations l10n) =>
+      staffNames[a.staffId] ?? l10n.commonStylist;
 }
 
 final dashboardProvider = FutureProvider.autoDispose<DashboardData>((

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../design/colors.dart';
+import '../l10n/l10n.dart';
 
 /// Yes/no confirmation. Resolves to true only when the user confirms.
 abstract final class ConfirmDialog {
@@ -9,7 +10,9 @@ abstract final class ConfirmDialog {
     required String title,
     required String message,
     required String confirmLabel,
-    String cancelLabel = 'Cancel',
+
+    /// Defaults to "Cancel" in the current language.
+    String? cancelLabel,
     bool destructive = false,
   }) async {
     final result = await showDialog<bool>(
@@ -21,7 +24,7 @@ abstract final class ConfirmDialog {
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             style: TextButton.styleFrom(foregroundColor: AppColors.textMuted),
-            child: Text(cancelLabel),
+            child: Text(cancelLabel ?? context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),

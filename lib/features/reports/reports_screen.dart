@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
+import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/empty_state.dart';
@@ -65,20 +66,21 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final report = ref.watch(reportProvider(_args));
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Reports',
+        title: l10n.reportsTitle,
         actions: [
           PopupMenuButton<ReportPeriod>(
-            tooltip: 'Choose period',
+            tooltip: l10n.reportsChoosePeriod,
             onSelected: _choose,
             itemBuilder: (_) => [
               for (final p in ReportPeriod.values)
                 CheckedPopupMenuItem(
                   value: p,
                   checked: p == _args.period,
-                  child: Text(periodLabel((period: p, from: null, to: null))),
+                  child: Text(l10n.reportPeriod(p)),
                 ),
             ],
             child: Container(
@@ -95,7 +97,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(periodLabel(_args), style: AppText.chip),
+                  Text(l10n.reportPeriod(_args.period), style: AppText.chip),
                   const Icon(Icons.expand_more_rounded, size: 18),
                 ],
               ),
@@ -108,7 +110,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         AsyncValue(:final error?) => Center(
           child: EmptyState(
             icon: Icons.error_outline_rounded,
-            message: 'Could not build the report. $error',
+            message: l10n.reportsLoadFailed('$error'),
           ),
         ),
         _ => const Center(child: CircularProgressIndicator()),
@@ -124,23 +126,20 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final s = view.summary;
     final range = s.range;
     final last = range.end.subtract(const Duration(days: 1));
     final rangeText = range.days.length == 1
-        ? DateFormat('EEEE, d MMMM y', 'en_IN').format(range.start)
-        : '${DateFormat('d MMM', 'en_IN').format(range.start)} – '
-              '${DateFormat('d MMM y', 'en_IN').format(last)}';
+        ? Dates.weekdayDayMonthYear(range.start)
+        : '${Dates.dayMonth(range.start)} – ${Dates.dayMonthYear(last)}';
 
     if (s.isEmpty) {
       return ListView(
         padding: const EdgeInsets.all(Space.screen),
         children: [
           Text(rangeText, style: AppText.caption),
-          const EmptyState(
-            icon: Icons.insights_outlined,
-            message: 'No sales, bills or expenses in this period.',
-          ),
+          EmptyState(icon: Icons.insights_outlined, message: l10n.reportsEmpty),
         ],
       );
     }
@@ -159,13 +158,13 @@ class _Body extends StatelessWidget {
         Gap.h12,
         _Pair(
           left: MetricCard(
-            label: 'Total sales',
+            label: l10n.reportsTotalSales,
             value: Money.format(s.salesPaise),
             icon: Icons.payments_outlined,
-            caption: 'Money received',
+            caption: l10n.reportsMoneyReceived,
           ),
           right: MetricCard(
-            label: 'Total expenses',
+            label: l10n.reportsTotalExpenses,
             value: Money.format(s.expensesPaise),
             icon: Icons.account_balance_wallet_outlined,
           ),
@@ -173,17 +172,17 @@ class _Body extends StatelessWidget {
         Gap.h12,
         _Pair(
           left: MetricCard(
-            label: 'Net profit (estimate)',
+            label: l10n.reportsNetProfit,
             value: Money.format(net),
             icon: Icons.trending_up_rounded,
-            caption: 'Sales − expenses',
+            caption: l10n.reportsSalesMinusExpenses,
             captionColor: net < 0 ? AppColors.error : AppColors.success,
           ),
           right: MetricCard(
-            label: 'Total bills',
+            label: l10n.reportsTotalBills,
             value: '${s.billCount}',
             icon: Icons.receipt_long_outlined,
-            caption: 'Finalised, not void',
+            caption: l10n.reportsBillsCaption,
           ),
         ),
         Gap.h20,
@@ -191,7 +190,7 @@ class _Body extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Sales overview', style: AppText.sectionTitle),
+              Text(l10n.reportsSalesOverview, style: AppText.sectionTitle),
               Gap.h16,
               SalesChart(
                 daily: s.dailySales,
@@ -206,11 +205,11 @@ class _Body extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Top services', style: AppText.sectionTitle),
+              Text(l10n.reportsTopServices, style: AppText.sectionTitle),
               Gap.h12,
               if (s.topServices.isEmpty)
                 Text(
-                  'No services billed in this period.',
+                  l10n.reportsNoServices,
                   style: AppText.body.copyWith(color: AppColors.textMuted),
                 ),
               for (final t in s.topServices) _ShareBar(share: t),
@@ -222,7 +221,7 @@ class _Body extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Payment methods', style: AppText.sectionTitle),
+              Text(l10n.reportsPaymentMethods, style: AppText.sectionTitle),
               Gap.h12,
               for (final m in PaymentMethod.values)
                 _MethodBar(
@@ -281,7 +280,10 @@ class _ShareBar extends StatelessWidget {
             ],
           ),
           Text(
-            '${share.count} × · ${Money.format(share.amountPaise)}',
+            context.l10n.reportsServiceCount(
+              share.count,
+              Money.format(share.amountPaise),
+            ),
             style: AppText.caption,
           ),
           Gap.h4,
@@ -320,7 +322,13 @@ class _MethodBar extends StatelessWidget {
         children: [
           Icon(method.icon, size: 18, color: AppColors.primary),
           Gap.w8,
-          SizedBox(width: 52, child: Text(method.label, style: AppText.label)),
+          SizedBox(
+            width: 52,
+            child: Text(
+              context.l10n.paymentMethod(method),
+              style: AppText.label,
+            ),
+          ),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),

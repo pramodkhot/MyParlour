@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myparlour/app/routes.dart';
+import 'package:myparlour/core/l10n/app_language.dart';
 import 'package:myparlour/data/local/local_store.dart';
 import 'package:myparlour/domain/models/appointment.dart';
 
 import '../helpers/pump_app.dart';
 
-/// Phase 8: every screen on a small 360 × 640 phone with text at 130%.
+/// Phase 8: every screen on a small 360 × 640 phone with text at 130%, in
+/// every language (Devanagari text is taller and often longer).
 /// Any layout overflow fails the test for that screen.
 void main() {
   // Each entry builds the path from the demo data.
@@ -71,24 +73,28 @@ void main() {
     'settings billing': (_) => Routes.settingsBilling,
   };
 
-  for (final entry in screens.entries) {
-    testWidgets('${entry.key} fits 360 px at 130% text', (tester) async {
-      usePhoneScreen(tester, logical: const Size(360, 640), textScale: 1.3);
-      final store = await pumpDemoApp(tester);
-      await enterApp(tester);
+  for (final language in AppLanguage.values) {
+    for (final entry in screens.entries) {
+      testWidgets('${entry.key} fits 360 px at 130% text (${language.name})', (
+        tester,
+      ) async {
+        usePhoneScreen(tester, logical: const Size(360, 640), textScale: 1.3);
+        final store = await pumpDemoApp(tester, language: language);
+        await enterApp(tester);
 
-      final context = tester.element(find.byType(NavigationBar));
-      GoRouter.of(context).go(entry.value(store));
-      await tester.pumpAndSettle();
-
-      // Scroll every list on screen to the end so all of it is laid out.
-      for (var i = 0; i < 12; i++) {
-        final scrollables = find.byType(Scrollable).hitTestable();
-        if (scrollables.evaluate().isEmpty) break;
-        await tester.drag(scrollables.first, const Offset(0, -400));
+        final context = tester.element(find.byType(NavigationBar));
+        GoRouter.of(context).go(entry.value(store));
         await tester.pumpAndSettle();
-      }
-      expect(tester.takeException(), isNull);
-    });
+
+        // Scroll every list on screen to the end so all of it is laid out.
+        for (var i = 0; i < 12; i++) {
+          final scrollables = find.byType(Scrollable).hitTestable();
+          if (scrollables.evaluate().isEmpty) break;
+          await tester.drag(scrollables.first, const Offset(0, -400));
+          await tester.pumpAndSettle();
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
   }
 }

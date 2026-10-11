@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/choice_chips.dart';
 import '../../core/widgets/empty_state.dart';
@@ -58,18 +59,28 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
           shrinkWrap: true,
           padding: const EdgeInsets.only(bottom: Space.lg),
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(Space.xl, 0, Space.xl, Space.sm),
-              child: Text('Show appointments for', style: AppText.sectionTitle),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Space.xl,
+                0,
+                Space.xl,
+                Space.sm,
+              ),
+              child: Text(
+                context.l10n.apptShowFor,
+                style: AppText.sectionTitle,
+              ),
             ),
             _StylistOption(
-              label: 'All stylists',
+              label: context.l10n.apptAllStylists,
               selected: _staffId == null,
               onTap: () => Navigator.of(context).pop(''),
             ),
             for (final s in staff)
               _StylistOption(
-                label: s.isActive ? s.name : '${s.name} (inactive)',
+                label: s.isActive
+                    ? s.name
+                    : context.l10n.apptStaffInactive(s.name),
                 selected: _staffId == s.id,
                 onTap: () => Navigator.of(context).pop(s.id),
               ),
@@ -104,18 +115,19 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
         ? null
         : names.value?.staff[_staffId]?.name;
 
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Appointments',
-        subtitle: staffName == null ? null : 'Showing $staffName',
+        title: l10n.apptListTitle,
+        subtitle: staffName == null ? null : l10n.apptShowingStylist(staffName),
         actions: [
           IconButton(
-            tooltip: 'Pick a date',
+            tooltip: l10n.apptPickDate,
             onPressed: _pickDate,
             icon: const Icon(Icons.calendar_month_outlined),
           ),
           IconButton(
-            tooltip: 'Filter by stylist',
+            tooltip: l10n.apptFilterByStylist,
             onPressed: names.hasValue
                 ? () => _pickStylist(names.value!.staff.values.toList())
                 : null,
@@ -129,7 +141,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Book appointment',
+        tooltip: l10n.apptBook,
         onPressed: _book,
         child: const Icon(Icons.add_rounded),
       ),
@@ -160,7 +172,10 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
               onSelected: (f) => setState(() => _filter = f),
               options: [
                 for (final f in AppointmentFilter.values)
-                  ChoiceOption(f, '${f.label} (${counts[f]})'),
+                  ChoiceOption(
+                    f,
+                    l10n.apptFilterCount(f.label(l10n), counts[f]!),
+                  ),
               ],
             ),
           ),
@@ -170,7 +185,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
               (_, AsyncValue(:final error?)) => Center(
                 child: EmptyState(
                   icon: Icons.error_outline_rounded,
-                  message: 'Could not load appointments. $error',
+                  message: l10n.apptLoadFailed('$error'),
                 ),
               ),
               (AsyncValue(hasValue: true), AsyncValue(:final value?)) =>
@@ -179,10 +194,9 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                         child: EmptyState(
                           icon: Icons.event_available_outlined,
                           message: dayList.isEmpty
-                              ? 'No appointments on this day'
-                              : 'No ${_filter.label.toLowerCase()} '
-                                    'appointments on this day',
-                          actionLabel: 'Book appointment',
+                              ? l10n.apptNoneOnDay
+                              : _filter.emptyMessage(l10n),
+                          actionLabel: l10n.apptBook,
                           onAction: _book,
                         ),
                       )
@@ -197,8 +211,8 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                         separatorBuilder: (_, _) => Gap.h8,
                         itemBuilder: (context, i) => AppointmentCard(
                           appointment: shown[i],
-                          clientName: value.client(shown[i]),
-                          stylistName: value.stylist(shown[i]),
+                          clientName: value.client(shown[i], l10n),
+                          stylistName: value.stylist(shown[i], l10n),
                           onTap: () =>
                               context.push(Routes.appointment(shown[i].id)),
                         ),

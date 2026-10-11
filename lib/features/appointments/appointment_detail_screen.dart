@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/colors.dart';
@@ -9,6 +8,7 @@ import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/platform/contact_actions.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
@@ -34,11 +34,9 @@ class AppointmentDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (ref.watch(appointmentDetailProvider(appointmentId))) {
       AsyncValue(:final value?) => _Detail(detail: value),
-      AsyncValue(hasValue: true) => const _Message(
-        'This appointment no longer exists.',
-      ),
+      AsyncValue(hasValue: true) => _Message(context.l10n.apptNoLongerExists),
       AsyncValue(:final error?) => _Message(
-        'Could not load this appointment. $error',
+        context.l10n.apptDetailLoadFailed('$error'),
       ),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
@@ -74,13 +72,14 @@ class _DetailState extends ConsumerState<_Detail> {
           .changeStatus(a.id, to, cancelReason: reason);
       if (mounted) showMessage(context, done);
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _menu(_MenuAction action) async {
+    final l10n = context.l10n;
     switch (action) {
       case _MenuAction.cancel:
         final reason = await showCancelAppointmentDialog(context);
@@ -88,20 +87,18 @@ class _DetailState extends ConsumerState<_Detail> {
         await _change(
           AppointmentStatus.cancelled,
           reason: reason,
-          done: 'Appointment cancelled',
+          done: l10n.apptCancelledDone,
         );
       case _MenuAction.noShow:
         final ok = await ConfirmDialog.show(
           context,
-          title: 'Mark as no-show?',
-          message:
-              '${widget.detail.clientName} did not come. '
-              'This cannot be undone.',
-          confirmLabel: 'Mark no-show',
+          title: l10n.apptNoShowTitle,
+          message: l10n.apptNoShowMessage(widget.detail.clientName(l10n)),
+          confirmLabel: l10n.apptMarkNoShow,
           destructive: true,
         );
         if (ok) {
-          await _change(AppointmentStatus.noShow, done: 'Marked as no-show');
+          await _change(AppointmentStatus.noShow, done: l10n.apptNoShowDone);
         }
       case _MenuAction.openCustomer:
         await context.push(Routes.customer(a.customerId!));
@@ -110,13 +107,15 @@ class _DetailState extends ConsumerState<_Detail> {
 
   Future<void> _contact(Future<bool> Function() action, String what) async {
     if (!await action() && mounted) {
-      showMessage(context, 'No app on this phone can open $what.');
+      showMessage(context, context.l10n.commonNoAppFor(what));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final d = widget.detail;
+    final clientName = d.clientName(l10n);
     final contacts = ref.read(contactActionsProvider);
     final phone = d.phone;
     final canCancel =
@@ -125,28 +124,28 @@ class _DetailState extends ConsumerState<_Detail> {
 
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Appointment',
+        title: l10n.apptTitle,
         actions: [
           if (canCancel || a.customerId != null)
             PopupMenuButton<_MenuAction>(
-              tooltip: 'More actions',
+              tooltip: l10n.apptMoreActions,
               icon: const Icon(Icons.more_horiz_rounded),
               onSelected: _menu,
               itemBuilder: (_) => [
                 if (canCancel)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: _MenuAction.cancel,
-                    child: Text('Cancel appointment'),
+                    child: Text(l10n.apptCancelAppointment),
                   ),
                 if (a.status == AppointmentStatus.booked)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: _MenuAction.noShow,
-                    child: Text('Mark no-show'),
+                    child: Text(l10n.apptMarkNoShow),
                   ),
                 if (a.customerId != null)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: _MenuAction.openCustomer,
-                    child: Text('Open customer'),
+                    child: Text(l10n.apptOpenCustomer),
                   ),
               ],
             ),
@@ -163,14 +162,16 @@ class _DetailState extends ConsumerState<_Detail> {
           AppCard(
             child: Row(
               children: [
-                AvatarInitials(name: d.clientName, size: 56),
+                AvatarInitials(name: clientName, size: 56),
                 Gap.w12,
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        a.isWalkIn ? 'Walk-in · ${d.clientName}' : d.clientName,
+                        a.isWalkIn
+                            ? l10n.commonWalkInNamed(clientName)
+                            : clientName,
                         style: AppText.bodyStrong.copyWith(fontSize: 17),
                       ),
                       if (phone != null)
@@ -183,19 +184,21 @@ class _DetailState extends ConsumerState<_Detail> {
                 ),
                 if (phone != null) ...[
                   IconButton(
-                    tooltip: 'Call',
-                    onPressed: () =>
-                        _contact(() => contacts.call(phone), 'calls'),
+                    tooltip: l10n.commonCall,
+                    onPressed: () => _contact(
+                      () => contacts.call(phone),
+                      l10n.commonAppCalls,
+                    ),
                     icon: const Icon(
                       Icons.call_outlined,
                       color: AppColors.primary,
                     ),
                   ),
                   IconButton(
-                    tooltip: 'WhatsApp',
+                    tooltip: l10n.commonWhatsApp,
                     onPressed: () => _contact(
                       () => contacts.whatsApp(phone),
-                      'WhatsApp links',
+                      l10n.commonAppWhatsApp,
                     ),
                     icon: const Icon(
                       Icons.chat_outlined,
@@ -213,7 +216,7 @@ class _DetailState extends ConsumerState<_Detail> {
               children: [
                 _Row(
                   Icons.calendar_today_outlined,
-                  DateFormat('d MMMM y, EEEE', 'en_IN').format(a.startsAt),
+                  Dates.dayMonthYearWeekday(a.startsAt),
                 ),
                 const Divider(indent: 52),
                 _Row(
@@ -221,7 +224,10 @@ class _DetailState extends ConsumerState<_Detail> {
                   '${Dates.time(a.startsAt)} – ${Dates.time(a.endsAt)}',
                 ),
                 const Divider(indent: 52),
-                _Row(Icons.person_outline_rounded, d.staff?.name ?? 'Stylist'),
+                _Row(
+                  Icons.person_outline_rounded,
+                  d.staff?.name ?? l10n.commonStylist,
+                ),
                 const Divider(indent: 52),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -252,7 +258,7 @@ class _DetailState extends ConsumerState<_Detail> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Services', style: AppText.sectionTitle),
+                Text(l10n.apptServices, style: AppText.sectionTitle),
                 Gap.h8,
                 for (var i = 0; i < a.services.length; i++)
                   Padding(
@@ -275,8 +281,8 @@ class _DetailState extends ConsumerState<_Detail> {
                 const Divider(height: Space.lg),
                 Row(
                   children: [
-                    const Expanded(
-                      child: Text('Total', style: AppText.bodyStrong),
+                    Expanded(
+                      child: Text(l10n.apptTotal, style: AppText.bodyStrong),
                     ),
                     MoneyText(a.totalPricePaise),
                   ],
@@ -290,7 +296,7 @@ class _DetailState extends ConsumerState<_Detail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Notes', style: AppText.sectionTitle),
+                  Text(l10n.apptNotes, style: AppText.sectionTitle),
                   Gap.h8,
                   Text(a.notes!, style: AppText.body),
                 ],
@@ -304,6 +310,7 @@ class _DetailState extends ConsumerState<_Detail> {
   }
 
   Widget? _actions(BuildContext context) {
+    final l10n = context.l10n;
     final Widget content;
     switch (a.status) {
       case AppointmentStatus.booked:
@@ -311,7 +318,7 @@ class _DetailState extends ConsumerState<_Detail> {
           children: [
             Expanded(
               child: SecondaryButton(
-                label: 'Reschedule',
+                label: l10n.apptReschedule,
                 onPressed: _busy
                     ? null
                     : () => context.push(Routes.rescheduleAppointment(a.id)),
@@ -320,28 +327,30 @@ class _DetailState extends ConsumerState<_Detail> {
             Gap.w12,
             Expanded(
               child: PrimaryButton(
-                label: 'Check in',
+                label: l10n.apptCheckIn,
                 loading: _busy,
-                onPressed: () =>
-                    _change(AppointmentStatus.checkedIn, done: 'Checked in'),
+                onPressed: () => _change(
+                  AppointmentStatus.checkedIn,
+                  done: l10n.apptCheckedInDone,
+                ),
               ),
             ),
           ],
         );
       case AppointmentStatus.checkedIn:
         content = PrimaryButton(
-          label: 'Complete',
+          label: l10n.apptComplete,
           icon: Icons.check_rounded,
           loading: _busy,
           onPressed: () => _change(
             AppointmentStatus.completed,
-            done: 'Appointment completed',
+            done: l10n.apptCompletedDone,
           ),
         );
       case AppointmentStatus.completed:
         final bill = widget.detail.invoice;
         content = PrimaryButton(
-          label: bill == null ? 'Create bill' : 'View bill',
+          label: bill == null ? l10n.apptCreateBill : l10n.apptViewBill,
           icon: Icons.receipt_long_outlined,
           onPressed: () => context.go(
             bill == null
@@ -397,7 +406,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Appointment'),
+      appBar: AppTopBar(title: context.l10n.apptTitle),
       body: Center(
         child: EmptyState(icon: Icons.event_busy_outlined, message: message),
       ),

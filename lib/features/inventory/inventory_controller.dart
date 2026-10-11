@@ -4,15 +4,11 @@ import '../../data/providers.dart';
 import '../../domain/models/product.dart';
 import '../../domain/models/stock_movement.dart';
 
-/// Tabs on the Inventory screen.
+/// Tabs on the Inventory screen (titles come from the screen's l10n).
 enum InventoryTab {
-  all('All items'),
-  low('Low stock'),
-  out('Out of stock');
-
-  const InventoryTab(this.label);
-
-  final String label;
+  all,
+  low,
+  out;
 
   /// "low" → low stock tab (used by the Dashboard's Restock link).
   static InventoryTab fromQuery(String? value) => switch (value) {

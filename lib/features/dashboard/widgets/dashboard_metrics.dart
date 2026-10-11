@@ -5,6 +5,7 @@ import '../../../app/routes.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/metric_card.dart';
 import '../../../domain/services/dashboard_service.dart';
 
@@ -16,19 +17,20 @@ class DashboardMetrics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final change = summary.salesChangePercent;
     final String salesCaption;
     final Color salesColor;
     IconData? salesIcon;
     if (change == null) {
-      salesCaption = 'No sales yesterday';
+      salesCaption = l10n.dashNoSalesYesterday;
       salesColor = AppColors.textMuted;
     } else if (change >= 0) {
-      salesCaption = '$change% vs yesterday';
+      salesCaption = l10n.dashVsYesterday(change);
       salesColor = AppColors.success;
       salesIcon = Icons.arrow_drop_up_rounded;
     } else {
-      salesCaption = '${-change}% vs yesterday';
+      salesCaption = l10n.dashVsYesterday(-change);
       salesColor = AppColors.error;
       salesIcon = Icons.arrow_drop_down_rounded;
     }
@@ -38,7 +40,7 @@ class DashboardMetrics extends StatelessWidget {
       children: [
         _Pair(
           left: MetricCard(
-            label: "Today's sales",
+            label: l10n.dashTodaysSales,
             value: Money.format(summary.todaySalesPaise),
             icon: Icons.payments_outlined,
             caption: salesCaption,
@@ -47,30 +49,30 @@ class DashboardMetrics extends StatelessWidget {
             onTap: () => context.go(Routes.reportsToday),
           ),
           right: MetricCard(
-            label: 'Appointments',
+            label: l10n.navAppointments,
             value: '${summary.todayAppointmentCount}',
             icon: Icons.event_available_outlined,
-            caption: '${summary.stillToComeCount} still to come',
+            caption: l10n.dashStillToCome(summary.stillToComeCount),
             onTap: () => context.go(Routes.appointments),
           ),
         ),
         Gap.h12,
         _Pair(
           left: MetricCard(
-            label: 'Pending payments',
+            label: l10n.dashPendingPayments,
             value: Money.format(summary.pendingPaise),
             icon: Icons.account_balance_wallet_outlined,
-            caption: pending == 1 ? '1 bill due' : '$pending bills due',
+            caption: l10n.dashBillsDue(pending),
             captionColor: pending == 0
                 ? AppColors.textMuted
                 : AppColors.warning,
             onTap: () => context.go(Routes.openBills),
           ),
           right: MetricCard(
-            label: 'Customers',
+            label: l10n.dashCustomers,
             value: '${summary.activeCustomerCount}',
             icon: Icons.people_alt_outlined,
-            caption: 'Active clients',
+            caption: l10n.dashActiveClients,
             onTap: () => context.go(Routes.customers),
           ),
         ),

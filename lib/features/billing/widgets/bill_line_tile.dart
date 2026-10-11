@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/qty_stepper.dart';
 import '../../../domain/models/invoice.dart';
 import '../../../domain/repositories/repositories.dart';
@@ -68,7 +69,10 @@ class BillLineTile extends StatelessWidget {
                 children: [
                   Text(line.name, style: AppText.bodyStrong),
                   if (stylistName != null)
-                    Text('Stylist: $stylistName', style: AppText.caption),
+                    Text(
+                      context.l10n.billingStylistName(stylistName!),
+                      style: AppText.caption,
+                    ),
                   Text(
                     Money.format(line.unitPricePaise * line.qty),
                     style: AppText.caption.copyWith(

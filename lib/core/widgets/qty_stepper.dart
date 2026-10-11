@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../design/colors.dart';
 import '../design/typography.dart';
+import '../l10n/l10n.dart';
 
 /// Compact "− 1 +" quantity control with 48 px tap targets.
 class QtyStepper extends StatelessWidget {
@@ -20,6 +21,7 @@ class QtyStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -31,7 +33,7 @@ class QtyStepper extends StatelessWidget {
         children: [
           _StepButton(
             icon: Icons.remove_rounded,
-            tooltip: 'Decrease',
+            tooltip: l10n.commonDecrease,
             onPressed: value > min ? () => onChanged(value - 1) : null,
           ),
           ConstrainedBox(
@@ -44,7 +46,7 @@ class QtyStepper extends StatelessWidget {
           ),
           _StepButton(
             icon: Icons.add_rounded,
-            tooltip: 'Increase',
+            tooltip: l10n.commonIncrease,
             onPressed: value < max ? () => onChanged(value + 1) : null,
           ),
         ],

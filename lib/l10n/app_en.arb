@@ -1,13 +1,10 @@
 {
   "@@locale": "en",
-
   "appName": "MyParlour",
-
   "navDashboard": "Dashboard",
   "navAppointments": "Appointments",
   "navBilling": "Billing",
   "navMore": "More",
-
   "commonCancel": "Cancel",
   "commonSave": "Save",
   "commonSaveChanges": "Save changes",
@@ -20,7 +17,13 @@
   "commonOptional": "(optional)",
   "commonClearSearch": "Clear search",
   "commonClearField": "Clear {label}",
-  "@commonClearField": { "placeholders": { "label": { "type": "String" } } },
+  "@commonClearField": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "commonDecrease": "Decrease",
   "commonIncrease": "Increase",
   "commonMoreDetails": "More details",
@@ -33,13 +36,25 @@
   "commonReactivate": "Reactivate",
   "commonWalkIn": "Walk-in",
   "commonWalkInNamed": "Walk-in · {name}",
-  "@commonWalkInNamed": { "placeholders": { "name": { "type": "String" } } },
+  "@commonWalkInNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "commonWalkInCustomer": "Walk-in customer",
   "commonGuest": "Guest",
   "commonCustomer": "Customer",
   "commonStylist": "Stylist",
   "commonNoAppFor": "No app on this phone can open {what}.",
-  "@commonNoAppFor": { "placeholders": { "what": { "type": "String" } } },
+  "@commonNoAppFor": {
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
   "commonAppCalls": "calls",
   "commonAppWhatsApp": "WhatsApp links",
   "commonAppMessages": "messages",
@@ -49,32 +64,48 @@
   "commonSms": "SMS",
   "commonFillRequired": "Please fill the fields marked *.",
   "commonMinutes": "{count} min",
-  "@commonMinutes": { "placeholders": { "count": { "type": "int" } } },
+  "@commonMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "commonHours": "{count} h",
-  "@commonHours": { "placeholders": { "count": { "type": "int" } } },
+  "@commonHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "commonHoursMinutes": "{hours} h {minutes}",
-  "@commonHoursMinutes": { "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "String" } } },
-
+  "@commonHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "discardTitle": "Discard changes?",
   "discardMessage": "What you entered on this screen will not be saved.",
   "discardConfirm": "Discard",
   "discardKeep": "Keep editing",
-
   "languageTitle": "Language",
   "languageChanged": "Language changed",
-
   "statusUpcoming": "Upcoming",
   "statusCheckedIn": "Checked in",
   "statusCompleted": "Completed",
   "statusCancelled": "Cancelled",
   "statusNoShow": "No-show",
-
   "billStatusDraft": "Draft",
   "billStatusUnpaid": "Unpaid",
   "billStatusPartiallyPaid": "Partially paid",
   "billStatusPaid": "Paid",
   "billStatusVoid": "Void",
-
   "payCash": "Cash",
   "payUpi": "UPI",
   "payCard": "Card",
@@ -82,29 +113,30 @@
   "payRefUpi": "UPI ref",
   "payRefCard": "Card last 4",
   "payRefOther": "Reference",
-
   "stockInStock": "In stock",
   "stockLow": "Low stock",
   "stockOut": "Out of stock",
   "stockLeft": "{count} left",
-  "@stockLeft": { "placeholders": { "count": { "type": "int" } } },
-
+  "@stockLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "reasonPurchase": "Stock in",
   "reasonSale": "Sold on bill",
   "reasonUsedInService": "Used in service",
   "reasonDamaged": "Damaged / expired",
   "reasonCorrection": "Count correction",
   "reasonVoidReversal": "Bill voided (returned)",
-
   "periodToday": "Today",
   "periodThisWeek": "This week",
   "periodThisMonth": "This month",
   "periodCustom": "Custom range",
-
   "unitPcs": "pcs",
   "unitMl": "ml",
   "unitG": "g",
-
   "catHair": "Hair",
   "catSkin": "Skin",
   "catNails": "Nails",
@@ -121,7 +153,6 @@
   "roleReceptionist": "Receptionist",
   "prodCatHairCare": "Hair care",
   "prodCatSkinCare": "Skin care",
-
   "errCustomerNameRequired": "Enter the customer name.",
   "errServiceNameRequired": "Enter the service name.",
   "errPriceNegative": "Price cannot be negative.",
@@ -137,7 +168,16 @@
   "errAppointmentEndBeforeStart": "End time must be after start time.",
   "errAppointmentFinished": "Finished appointments cannot be changed.",
   "errStatusChange": "This appointment cannot change from {from} to {to}.",
-  "@errStatusChange": { "placeholders": { "from": { "type": "String" }, "to": { "type": "String" } } },
+  "@errStatusChange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "errCustomerNotFound": "Customer not found.",
   "errServiceNotFound": "Service not found.",
   "errStaffNotFound": "Staff member not found.",
@@ -147,24 +187,1410 @@
   "errBillProductMissing": "A product on this bill no longer exists.",
   "errBillNoLines": "Add at least one service or product.",
   "errLineQtyInvalid": "Quantity for {name} must be at least 1.",
-  "@errLineQtyInvalid": { "placeholders": { "name": { "type": "String" } } },
+  "@errLineQtyInvalid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "errLinePriceInvalid": "Check the price of {name}.",
-  "@errLinePriceInvalid": { "placeholders": { "name": { "type": "String" } } },
+  "@errLinePriceInvalid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "errDiscountNegative": "Discount cannot be negative.",
   "errDiscountOverSubtotal": "Discount cannot be more than the subtotal.",
   "errDiscountOverHundred": "Discount cannot be more than 100%.",
   "errBillAlreadyFinalised": "This bill is already finalised.",
   "errAppointmentAlreadyBilled": "This appointment already has a bill.",
   "errAppointmentAlreadyBilledNo": "This appointment already has a bill ({invoiceNo}).",
-  "@errAppointmentAlreadyBilledNo": { "placeholders": { "invoiceNo": { "type": "String" } } },
+  "@errAppointmentAlreadyBilledNo": {
+    "placeholders": {
+      "invoiceNo": {
+        "type": "String"
+      }
+    }
+  },
   "errPaymentNeedsFinalisedBill": "Finalise the bill before taking payment.",
   "errBillIsVoid": "This bill is void.",
   "errPaymentMethodRequired": "Choose how the customer paid.",
   "errPaymentOverBalance": "Amount is more than the balance due.",
   "errOutOfStock": "{name} is out of stock.",
-  "@errOutOfStock": { "placeholders": { "name": { "type": "String" } } },
+  "@errOutOfStock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "errNotEnoughStock": "Only {qty} {name} left in stock.",
-  "@errNotEnoughStock": { "placeholders": { "qty": { "type": "String" }, "name": { "type": "String" } } },
+  "@errNotEnoughStock": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "errStockChangeZero": "Enter a quantity more than 0.",
-  "errStockSalesViaBills": "Sales change stock through bills."
+  "errStockSalesViaBills": "Sales change stock through bills.",
+  "uiDay": "Day",
+  "@uiDay": {
+    "description": "Label of the day-of-month dropdown in the birthday/anniversary picker."
+  },
+  "uiMonth": "Month",
+  "@uiMonth": {
+    "description": "Label of the month dropdown in the birthday/anniversary picker."
+  },
+  "uiDemo": "Demo",
+  "@uiDemo": {
+    "description": "Small badge/heading saying this app is a demo with sample data."
+  },
+  "welcomeArtLabel": "Line drawing of a woman with leaves in her hair",
+  "@welcomeArtLabel": {
+    "description": "Screen-reader description of the welcome illustration."
+  },
+  "welcomeTagline": "Manage your parlour\nbusiness easily",
+  "@welcomeTagline": {
+    "description": "Welcome headline; keep the line break so it fits on two lines."
+  },
+  "welcomeFeatures": "Appointments, billing, customers, staff, inventory & reports — all in one place.",
+  "welcomeExplore": "Explore MyParlour",
+  "@welcomeExplore": {
+    "description": "Button that opens the app. MyParlour is the brand name; do not translate it."
+  },
+  "welcomeSampleData": "Sample data · no sign-in needed",
+  "startupErrorTitle": "MyParlour could not open its data",
+  "@startupErrorTitle": {
+    "description": "MyParlour is the brand name; do not translate it."
+  },
+  "startupErrorMessage": "Please check that the phone has free storage space, then try again.",
+  "startupScreenError": "Something went wrong on this screen. Please go back and try again.",
+  "dashLoadError": "Could not load the dashboard. {error}",
+  "@dashLoadError": {
+    "description": "error is a technical message, shown as is.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dashQuickActions": "Quick actions",
+  "dashGreetingMorning": "Good morning",
+  "dashGreetingMorningNamed": "Good morning, {name}",
+  "@dashGreetingMorningNamed": {
+    "description": "name is the parlour owner’s name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashGreetingAfternoon": "Good afternoon",
+  "dashGreetingAfternoonNamed": "Good afternoon, {name}",
+  "@dashGreetingAfternoonNamed": {
+    "description": "name is the parlour owner’s name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashGreetingEvening": "Good evening",
+  "dashGreetingEveningNamed": "Good evening, {name}",
+  "@dashGreetingEveningNamed": {
+    "description": "name is the parlour owner’s name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashYourParlour": "Your parlour",
+  "@dashYourParlour": {
+    "description": "Heading of the sheet that shows the current parlour (branch)."
+  },
+  "dashMoreBranches": "More branches in the full version",
+  "dashAlerts": "Alerts",
+  "@dashAlerts": {
+    "description": "Bell button and sheet with low-stock and birthday alerts."
+  },
+  "dashAlertsNew": "Alerts (new)",
+  "@dashAlertsNew": {
+    "description": "Bell button tooltip when there are alerts to see."
+  },
+  "dashNoSalesYesterday": "No sales yesterday",
+  "dashVsYesterday": "{percent}% vs yesterday",
+  "@dashVsYesterday": {
+    "description": "Change in today’s sales compared with yesterday, e.g. \"12% vs yesterday\".",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dashTodaysSales": "Today's sales",
+  "dashStillToCome": "{count} still to come",
+  "@dashStillToCome": {
+    "description": "Number of today’s appointments that have not happened yet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashPendingPayments": "Pending payments",
+  "dashBillsDue": "{count, plural, =1{1 bill due} other{{count} bills due}}",
+  "@dashBillsDue": {
+    "description": "Number of unpaid bills.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashCustomers": "Customers",
+  "dashActiveClients": "Active clients",
+  "dashNothingNeedsAttention": "Nothing needs your attention right now.",
+  "dashBirthdaysToday": "Birthdays today",
+  "dashWishBirthday": "Wish them a happy birthday",
+  "dashAlertAt": "Alert at {qty} {unit}",
+  "@dashAlertAt": {
+    "description": "Low-stock alert level of a product, e.g. \"Alert at 3 pcs\".",
+    "placeholders": {
+      "qty": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "dashRestock": "Restock",
+  "@dashRestock": {
+    "description": "Link that opens the list of products to buy again."
+  },
+  "dashAllWellStocked": "All products are well stocked.",
+  "dashNextAppointments": "Next appointments",
+  "dashNoMoreToday": "No more appointments today.",
+  "dashBook": "Book",
+  "@dashBook": {
+    "description": "Button: book a new appointment."
+  },
+  "dashNewAppointment": "New appointment",
+  "dashAddCustomer": "Add customer",
+  "dashCreateBill": "Create bill",
+  "moreOwnerSubtitle": "{parlour} · Owner",
+  "@moreOwnerSubtitle": {
+    "description": "Subtitle under \"More\": the parlour name and the user’s role.",
+    "placeholders": {
+      "parlour": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCustomers": "Customers",
+  "moreCustomerCount": "{count, plural, =1{1 customer} other{{count} customers}}",
+  "@moreCustomerCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreStaff": "Staff",
+  "moreActiveStaff": "{count} active",
+  "@moreActiveStaff": {
+    "description": "Number of active staff members.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreServices": "Services",
+  "moreServiceCount": "{count, plural, =1{1 service} other{{count} services}}",
+  "@moreServiceCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreInventory": "Inventory",
+  "moreLowCount": "{count} low",
+  "@moreLowCount": {
+    "description": "Number of products that are low on stock.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreExpensesThisMonth": "{amount} this month",
+  "@moreExpensesThisMonth": {
+    "description": "Money spent this month, e.g. \"₹12,500 this month\".",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moreReports": "Reports",
+  "settingsTitle": "Settings",
+  "settingsLoadError": "Could not load settings. {error}",
+  "@settingsLoadError": {
+    "description": "error is a technical message, shown as is.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsResetTitle": "Reset demo data?",
+  "settingsResetMessage": "All changes are replaced with the original sample data for Beauty Bliss Parlour, dated around today. This cannot be undone.",
+  "@settingsResetMessage": {
+    "description": "Beauty Bliss Parlour is the name of the sample parlour; keep it as is."
+  },
+  "settingsResetConfirm": "Reset",
+  "settingsResetDone": "Demo data restored",
+  "settingsEmptyTitle": "Start with an empty parlour?",
+  "settingsEmptyMessage": "All customers, services, staff, appointments, bills, products and expenses are removed. Your parlour profile, hours and billing settings are kept. You can bring the sample data back with \"{resetLabel}\".",
+  "@settingsEmptyMessage": {
+    "description": "resetLabel is the \"Reset demo data\" button name.",
+    "placeholders": {
+      "resetLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsStartEmpty": "Start empty",
+  "settingsEmptyDone": "Started with an empty parlour",
+  "settingsProfile": "Parlour profile",
+  "settingsName": "Name",
+  "settingsOwner": "Owner",
+  "settingsPhone": "Phone",
+  "settingsArea": "Area",
+  "@settingsArea": {
+    "description": "Locality of the parlour in the city, e.g. \"MG Road, Pune\"."
+  },
+  "settingsAddress": "Address",
+  "settingsBusinessHours": "Business hours",
+  "settingsOpenDays": "Open days",
+  "settingsHours": "Hours",
+  "@settingsHours": {
+    "description": "Opening and closing time of the parlour."
+  },
+  "settingsTimeRange": "{from} – {to}",
+  "@settingsTimeRange": {
+    "description": "Opening to closing time, e.g. \"10:00 AM – 8:00 PM\".",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsBookingSlots": "Booking slots",
+  "@settingsBookingSlots": {
+    "description": "Length of the time slots offered when booking an appointment."
+  },
+  "settingsBillingTax": "Billing & tax",
+  "settingsInvoicePrefix": "Invoice prefix",
+  "@settingsInvoicePrefix": {
+    "description": "Letters at the start of every bill number, e.g. \"BBP\"."
+  },
+  "settingsGst": "GST",
+  "@settingsGst": {
+    "description": "Indian Goods and Services Tax."
+  },
+  "settingsOn": "On",
+  "@settingsOn": {
+    "description": "A setting is switched on."
+  },
+  "settingsOff": "Off",
+  "@settingsOff": {
+    "description": "A setting is switched off."
+  },
+  "settingsGstin": "GSTIN",
+  "@settingsGstin": {
+    "description": "GST identification number (Indian tax registration number)."
+  },
+  "settingsDefaultRate": "Default rate",
+  "@settingsDefaultRate": {
+    "description": "Default GST rate."
+  },
+  "settingsPricesIncludeGst": "Prices include GST",
+  "settingsYes": "Yes",
+  "settingsNo": "No",
+  "settingsReceiptFooter": "Receipt footer",
+  "@settingsReceiptFooter": {
+    "description": "Line of text printed at the bottom of every receipt."
+  },
+  "settingsDemoNote": "This is a demo. Data stays on this phone only.",
+  "settingsResetDemo": "Reset demo data",
+  "settingsResetDemoHint": "Restore the original sample data",
+  "settingsStartEmptyHint": "Clear everything to try a blank parlour",
+  "settingsAbout": "About",
+  "settingsAboutNote": "Sign-in and cloud backup arrive in the full version.",
+  "settingsSaved": "Settings saved",
+  "settingsParlourName": "Parlour name",
+  "settingsEnterParlourName": "Enter the parlour name.",
+  "settingsOwnerName": "Owner name",
+  "settingsEnterOwnerName": "Enter the owner’s name.",
+  "settingsEnterPhone": "Enter a phone number.",
+  "settingsAreaHint": "e.g. MG Road, Pune",
+  "@settingsAreaHint": {
+    "description": "Example area; translate \"e.g.\" and keep the place names."
+  },
+  "settingsEnterArea": "Enter the area.",
+  "settingsProfileNote": "The name, area and phone appear on receipts.",
+  "settingsNoOpenDay": "Choose at least one open day.",
+  "settingsCloseBeforeOpen": "Closing time must be after opening time.",
+  "settingsOpens": "Opens",
+  "@settingsOpens": {
+    "description": "Opening time of the parlour."
+  },
+  "settingsOpeningTime": "Opening time",
+  "settingsCloses": "Closes",
+  "@settingsCloses": {
+    "description": "Closing time of the parlour."
+  },
+  "settingsClosingTime": "Closing time",
+  "settingsSlotsNote": "New appointments are offered at these intervals.",
+  "settingsPrefixHint": "e.g. BBP",
+  "@settingsPrefixHint": {
+    "description": "Example invoice prefix; keep \"BBP\"."
+  },
+  "settingsEnterPrefix": "Enter a prefix.",
+  "settingsNumberingNote": "Bills are numbered like {example}. Numbers already used do not change.",
+  "@settingsNumberingNote": {
+    "description": "example is a sample bill number such as \"BBP/2026-27/0001\".",
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsChargeGst": "Charge GST",
+  "settingsChargeGstHint": "Adds GST to new bills",
+  "settingsGstinHint": "15 characters",
+  "settingsGstinInvalid": "A GSTIN has 15 letters and numbers.",
+  "settingsGstinNote": "Receipts become \"Tax invoices\" only when a GSTIN is added.",
+  "settingsDefaultGstRate": "Default GST rate",
+  "settingsPricesIncludeGstHint": "Take GST out of the price instead of adding it",
+  "settingsEnterFooter": "Enter a footer.",
+  "expensesTitle": "Expenses",
+  "expensesAdd": "Add expense",
+  "expensesPreviousMonth": "Previous month",
+  "expensesNextMonth": "Next month",
+  "expensesTotalSpent": "Total spent",
+  "expensesEmpty": "No expenses in this month.",
+  "expensesExpense": "Expense",
+  "@expensesExpense": {
+    "description": "Screen title for one expense."
+  },
+  "expensesNotFound": "This expense no longer exists.",
+  "expensesUpdated": "Expense updated",
+  "expensesAdded": "Expense added",
+  "expensesDeleteTitle": "Delete this expense?",
+  "expensesDeleteMessage": "{category} · {amount} will be removed.",
+  "@expensesDeleteMessage": {
+    "description": "e.g. \"Rent · ₹15,000 will be removed.\"",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "expensesDeleted": "Expense deleted",
+  "expensesEdit": "Edit expense",
+  "expensesDelete": "Delete expense",
+  "expensesAmount": "Amount",
+  "expensesEnterAmount": "Enter the amount.",
+  "expensesCategory": "Category",
+  "expensesDate": "Date",
+  "expensesChooseDate": "Choose a date",
+  "expensesPaidBy": "Paid by",
+  "@expensesPaidBy": {
+    "description": "How the expense was paid (cash, UPI, card…)."
+  },
+  "expensesNote": "Note",
+  "expensesNoteHint": "e.g. Shop rent for May",
+  "expensesSave": "Save expense",
+  "apptTitle": "Appointment",
+  "@apptTitle": {
+    "description": "Top bar title of a single appointment screen."
+  },
+  "apptListTitle": "Appointments",
+  "@apptListTitle": {
+    "description": "Top bar title of the appointments list screen."
+  },
+  "apptBook": "Book appointment",
+  "apptPickDate": "Pick a date",
+  "apptFilterByStylist": "Filter by stylist",
+  "apptShowingStylist": "Showing {name}",
+  "@apptShowingStylist": {
+    "description": "Subtitle when the list is filtered to one stylist.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "apptShowFor": "Show appointments for",
+  "apptAllStylists": "All stylists",
+  "apptStaffInactive": "{name} (inactive)",
+  "@apptStaffInactive": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "apptFilterAll": "All",
+  "@apptFilterAll": {
+    "description": "Filter chip showing appointments of every status."
+  },
+  "apptFilterCount": "{label} ({count})",
+  "@apptFilterCount": {
+    "description": "Filter chip: status name and how many appointments have it.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "apptLoadFailed": "Could not load appointments. {error}",
+  "@apptLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "apptNoneOnDay": "No appointments on this day",
+  "apptNoneUpcomingOnDay": "No upcoming appointments on this day",
+  "apptNoneCheckedInOnDay": "No checked in appointments on this day",
+  "apptNoneCompletedOnDay": "No completed appointments on this day",
+  "apptNoneCancelledOnDay": "No cancelled appointments on this day",
+  "apptNoneNoShowOnDay": "No no-show appointments on this day",
+  "apptPreviousWeek": "Previous week",
+  "apptNextWeek": "Next week",
+  "apptDayHasBookings": "{day}, has bookings",
+  "@apptDayHasBookings": {
+    "description": "Screen-reader label of a day in the week strip that has appointments.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "apptNoLongerExists": "This appointment no longer exists.",
+  "apptDetailLoadFailed": "Could not load this appointment. {error}",
+  "@apptDetailLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "apptMoreActions": "More actions",
+  "apptCancelAppointment": "Cancel appointment",
+  "@apptCancelAppointment": {
+    "description": "Action/button that cancels the appointment."
+  },
+  "apptMarkNoShow": "Mark no-show",
+  "apptOpenCustomer": "Open customer",
+  "apptCancelledDone": "Appointment cancelled",
+  "apptNoShowTitle": "Mark as no-show?",
+  "apptNoShowMessage": "{name} did not come. This cannot be undone.",
+  "@apptNoShowMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "apptNoShowDone": "Marked as no-show",
+  "apptServices": "Services",
+  "apptTotal": "Total",
+  "apptNotes": "Notes",
+  "apptReschedule": "Reschedule",
+  "apptCheckIn": "Check in",
+  "@apptCheckIn": {
+    "description": "Button: mark that the customer has arrived."
+  },
+  "apptCheckedInDone": "Checked in",
+  "@apptCheckedInDone": {
+    "description": "Message shown after the customer was checked in."
+  },
+  "apptComplete": "Complete",
+  "@apptComplete": {
+    "description": "Button: mark the appointment as finished."
+  },
+  "apptCompletedDone": "Appointment completed",
+  "apptCreateBill": "Create bill",
+  "apptViewBill": "View bill",
+  "apptCancelTitle": "Cancel appointment?",
+  "apptCancelReasonLabel": "Reason (optional)",
+  "apptCancelReasonHint": "Or type a reason",
+  "apptCancelKeep": "Keep it",
+  "@apptCancelKeep": {
+    "description": "Button: do not cancel the appointment."
+  },
+  "apptReasonCustomerCancelled": "Customer cancelled",
+  "apptReasonCustomerUnwell": "Customer unwell",
+  "apptReasonRescheduledByCustomer": "Rescheduled by customer",
+  "apptReasonStylistUnavailable": "Stylist unavailable",
+  "apptChooseCustomer": "Choose customer",
+  "apptNewCustomerShort": "New",
+  "@apptNewCustomerShort": {
+    "description": "Short button that adds a new customer."
+  },
+  "apptSearchCustomer": "Search name or phone",
+  "apptNoCustomerMatch": "No customer matches your search.",
+  "apptAddNewCustomer": "Add new customer",
+  "apptChooseServices": "Choose services",
+  "apptSearchServices": "Search services",
+  "apptAddServicesCount": "{count, plural, =1{Add 1 service} other{Add {count} services}}",
+  "@apptAddServicesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "apptAlreadyBooked": "{name} is already booked",
+  "@apptAlreadyBooked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "apptPickAnotherTime": "Pick another time",
+  "apptBookAnyway": "Book anyway",
+  "bookingOnlyUpcoming": "Only upcoming appointments can be rescheduled.",
+  "bookingLoadFailed": "Could not open the form. {error}",
+  "@bookingLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRescheduled": "Appointment rescheduled",
+  "bookingBooked": "Appointment booked",
+  "bookingNewTitle": "New appointment",
+  "bookingDate": "Date",
+  "bookingChooseDate": "Choose a date",
+  "bookingClosedOn": "The parlour is usually closed on {weekday}s.",
+  "@bookingClosedOn": {
+    "description": "Warning; weekday is a full day name such as Monday (the English adds 's' to make it plural).",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingTime": "Time",
+  "bookingNoTimesLeft": "No times left on this day. Choose another date.",
+  "bookingNoStylist": "No stylist works on this day.",
+  "bookingNotesHint": "e.g. Prefers less heat in smoothening",
+  "bookingWalkInName": "Walk-in name",
+  "bookingWalkInNameRequired": "Enter the customer’s name.",
+  "bookingMobileNumber": "Mobile number",
+  "bookingPhoneInvalid": "Enter a 10-digit mobile number.",
+  "bookingChooseSavedCustomer": "Choose a saved customer instead",
+  "bookingCustomerRequired": "Choose a customer or add a walk-in.",
+  "bookingRemoveService": "Remove {name}",
+  "@bookingRemoveService": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingAddServices": "Add services",
+  "bookingAddMore": "Add more",
+  "bookingChooseTimeFirst": "Choose a time first",
+  "bookingFree": "Free",
+  "@bookingFree": {
+    "description": "Stylist availability: not busy at the chosen time."
+  },
+  "bookingBusyUntil": "Busy until {time}",
+  "@bookingBusyUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingBusyFrom": "Busy from {time}",
+  "@bookingBusyFrom": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingDurationEnds": "Duration {duration} · ends {time}",
+  "@bookingDurationEnds": {
+    "description": "Booking summary, e.g. 'Duration 1 h 30 min · ends 6:30 PM'.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingEstimate": "Estimate {amount}",
+  "@bookingEstimate": {
+    "description": "Estimated price of the booking, e.g. 'Estimate ₹1,300'.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsTitle": "Reports",
+  "reportsChoosePeriod": "Choose period",
+  "reportsLoadFailed": "Could not build the report. {error}",
+  "@reportsLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsEmpty": "No sales, bills or expenses in this period.",
+  "reportsTotalSales": "Total sales",
+  "reportsMoneyReceived": "Money received",
+  "reportsTotalExpenses": "Total expenses",
+  "reportsNetProfit": "Net profit (estimate)",
+  "reportsSalesMinusExpenses": "Sales − expenses",
+  "reportsTotalBills": "Total bills",
+  "reportsBillsCaption": "Finalised, not void",
+  "reportsSalesOverview": "Sales overview",
+  "reportsTopServices": "Top services",
+  "reportsNoServices": "No services billed in this period.",
+  "reportsPaymentMethods": "Payment methods",
+  "reportsServiceCount": "{count} × · {amount}",
+  "@reportsServiceCount": {
+    "description": "How many times a service was billed, and the total amount.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsCompactThousands": "₹{value}k",
+  "@reportsCompactThousands": {
+    "description": "Chart axis: rupees in thousands, e.g. ₹5k.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsCompactLakhs": "₹{value}L",
+  "@reportsCompactLakhs": {
+    "description": "Chart axis: rupees in lakhs, e.g. ₹1.5L.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "custTitle": "Customers",
+  "custAdd": "Add customer",
+  "@custAdd": {
+    "description": "Button, tooltip and screen title for adding a new customer."
+  },
+  "custEdit": "Edit customer",
+  "@custEdit": {
+    "description": "Button, tooltip and screen title for editing a customer."
+  },
+  "custSearchHint": "Search name or phone",
+  "custViewRecent": "Recent visit",
+  "@custViewRecent": {
+    "description": "Sort option: customers with the most recent visit first."
+  },
+  "custViewAz": "A–Z",
+  "@custViewAz": {
+    "description": "Sort option: customers alphabetically."
+  },
+  "custViewInactive": "Inactive ({count})",
+  "@custViewInactive": {
+    "description": "Filter chip showing deactivated customers, with their count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "custLoadError": "Could not load customers. {error}",
+  "@custLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "custNoMatch": "No customer matches your search.",
+  "custNoInactive": "No inactive customers.",
+  "custEmpty": "No customers yet.",
+  "custRowCaption": "{visits, plural, =0{No visits yet} =1{1 visit · {last}} other{{visits} visits · {last}}}",
+  "@custRowCaption": {
+    "description": "Caption under a customer in the list: number of completed visits and when the last one was. 'last' is custLastVisit or custNoVisitsYet.",
+    "placeholders": {
+      "visits": {
+        "type": "int"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "custLastVisit": "last {date}",
+  "@custLastVisit": {
+    "description": "Part of the customer row caption, e.g. 'last 12 May'.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "custNoVisitsYet": "no visits yet",
+  "@custNoVisitsYet": {
+    "description": "Part of the customer row caption (lower case, after a middle dot)."
+  },
+  "custNotFound": "This customer no longer exists.",
+  "custLoadOneError": "Could not load this customer. {error}",
+  "@custLoadOneError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "custShareContact": "Share contact",
+  "custDeactivate": "Deactivate customer",
+  "custReactivate": "Reactivate customer",
+  "custDeactivateTitle": "Deactivate {name}?",
+  "@custDeactivateTitle": {
+    "description": "Confirm dialog title; name is the customer's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "custDeactivateMessage": "They will be hidden from the customer list and booking. Their history is kept, and you can reactivate them later.",
+  "custDeactivated": "Customer deactivated",
+  "custReactivated": "Customer reactivated",
+  "custActionMore": "More",
+  "@custActionMore": {
+    "description": "Round action button on the customer screen that opens more options (share, edit, deactivate)."
+  },
+  "custTabHistory": "History",
+  "custTabDetails": "Details",
+  "custNotes": "Notes",
+  "@custNotes": {
+    "description": "Customer notes: tab title and form field label."
+  },
+  "custNewAppointment": "New appointment",
+  "custSaved": "Customer saved",
+  "custUpdated": "Customer updated",
+  "custFieldName": "Name",
+  "custNameHint": "e.g. Priya Sharma",
+  "custNameRequired": "Enter the customer’s name.",
+  "custFieldMobile": "Mobile number",
+  "custMobileRequired": "Enter the mobile number.",
+  "custMobileInvalid": "Enter a 10-digit mobile number.",
+  "custBirthday": "Birthday",
+  "custAnniversary": "Anniversary",
+  "custDayMonthHint": "Day and month",
+  "custNotesHint": "e.g. Prefers less heat in smoothening",
+  "custEmail": "Email",
+  "custEmailInvalid": "Enter a valid email address.",
+  "custSave": "Save customer",
+  "custSaveAndBook": "Save & book appointment",
+  "custAlreadySaved": "Already saved as {name}",
+  "@custAlreadySaved": {
+    "description": "Warning when the typed mobile number belongs to an existing customer.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "custOpen": "Open",
+  "@custOpen": {
+    "description": "Button to open the existing customer with the same number."
+  },
+  "custMobile": "Mobile",
+  "custSince": "Customer since",
+  "custVisits": "Visits",
+  "custTotalSpent": "Total spent",
+  "custHistoryEmpty": "No visits or bills yet.",
+  "custNotesSaved": "Notes saved",
+  "custNotesTabHint": "Preferences, allergies, favourite stylist… (e.g. Prefers less heat in smoothening)",
+  "custSaveNotes": "Save notes",
+  "servicesTitle": "Services",
+  "servicesAdd": "Add service",
+  "@servicesAdd": {
+    "description": "Button, tooltip and screen title for adding a service."
+  },
+  "servicesEdit": "Edit service",
+  "servicesEmpty": "No services yet. Add what your parlour offers.",
+  "servicesLoadError": "Could not load services. {error}",
+  "@servicesLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "servicesNewCategory": "New category",
+  "servicesNewCategoryHint": "e.g. Bridal",
+  "servicesAdded": "Service added",
+  "servicesUpdated": "Service updated",
+  "servicesDeactivateTitle": "Deactivate {name}?",
+  "@servicesDeactivateTitle": {
+    "description": "Confirm dialog title; name is the service name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "servicesDeactivateMessage": "It will no longer be offered for new bookings or bills. Past appointments and bills keep it.",
+  "servicesDeactivated": "Service deactivated",
+  "servicesReactivated": "Service reactivated",
+  "servicesFieldName": "Service name",
+  "servicesNameHint": "e.g. Haircut",
+  "servicesCategory": "Category",
+  "servicesPrice": "Price",
+  "servicesPriceInvalid": "Enter the price in rupees.",
+  "servicesDuration": "Duration",
+  "servicesCustomDuration": "Custom",
+  "@servicesCustomDuration": {
+    "description": "Duration chip to type a custom number of minutes."
+  },
+  "servicesMinutes": "Minutes",
+  "servicesMinutesHint": "e.g. 75",
+  "servicesMinutesRequired": "Enter the minutes.",
+  "servicesDescription": "Description",
+  "servicesGstRate": "GST rate",
+  "servicesGstNote": "Used only when GST is turned on in Settings.",
+  "servicesDeactivate": "Deactivate service",
+  "servicesReactivate": "Reactivate service",
+  "servicesSave": "Save service",
+  "servicesService": "Service",
+  "@servicesService": {
+    "description": "Screen title when a service cannot be shown."
+  },
+  "servicesNotFound": "This service no longer exists.",
+  "servicesLoadOneError": "Could not load this service. {error}",
+  "@servicesLoadOneError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "staffTitle": "Staff",
+  "staffAdd": "Add staff",
+  "@staffAdd": {
+    "description": "Button, tooltip and screen title for adding a staff member."
+  },
+  "staffEdit": "Edit staff",
+  "staffSearchHint": "Search name, role or phone",
+  "staffLoadError": "Could not load staff. {error}",
+  "@staffLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "staffNoMatch": "No staff member matches your search.",
+  "staffEmpty": "No staff yet.",
+  "staffNotFound": "This staff member no longer exists.",
+  "staffDeactivateTitle": "Deactivate {name}?",
+  "@staffDeactivateTitle": {
+    "description": "Confirm dialog title; name is the staff member's name.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "staffDeactivateMessage": "{name} will not be offered for new bookings. Past appointments and bills keep their name. You can reactivate later.",
+  "@staffDeactivateMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "staffDeactivated": "Staff deactivated",
+  "staffActivated": "Staff activated",
+  "staffActivate": "Activate",
+  "@staffActivate": {
+    "description": "Button to make an inactive staff member active again."
+  },
+  "staffMobile": "Mobile",
+  "staffWorks": "Works",
+  "@staffWorks": {
+    "description": "Row label before the staff member's working days, e.g. 'Mon, Tue, Wed'."
+  },
+  "staffHours": "Hours",
+  "staffServices": "Services",
+  "@staffServices": {
+    "description": "Row label before the services this staff member does."
+  },
+  "staffHoursRange": "{start} – {end}",
+  "@staffHoursRange": {
+    "description": "Working hours, e.g. '10:00 AM – 8:00 PM'.",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "staffServicesDone": "Services done",
+  "staffAmountBilled": "Amount billed",
+  "staffTodayAndUpcoming": "Today and upcoming",
+  "staffNoAppointments": "No appointments booked.",
+  "staffFormLoadError": "Could not load this form. Please try again.",
+  "staffAdded": "Staff added",
+  "staffUpdated": "Staff updated",
+  "staffFieldName": "Name",
+  "staffFieldMobile": "Mobile number",
+  "staffMobileInvalid": "Enter a 10-digit mobile number.",
+  "staffRole": "Role",
+  "staffServicesTheyDo": "Services they do",
+  "staffClearAll": "Clear all",
+  "staffTickAll": "Tick all",
+  "staffWorkingDays": "Working days",
+  "staffStarts": "Starts",
+  "staffStartHint": "Start",
+  "staffEnds": "Ends",
+  "staffEndHint": "End",
+  "staffNoWorkingDay": "Choose at least one working day.",
+  "staffSave": "Save staff",
+  "billingNewBill": "New bill",
+  "billingOpenBills": "Open bills",
+  "billingAllBills": "All bills",
+  "billingLoadError": "Could not load bills. {error}",
+  "@billingLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "billingNoOpenBills": "No open bills. Everything is paid.",
+  "billingNoBills": "No bills yet.",
+  "billingDraftBill": "Draft bill",
+  "@billingDraftBill": {
+    "description": "Shown instead of a bill number for a bill that is not finalised yet."
+  },
+  "billingDue": "Due {amount}",
+  "@billingDue": {
+    "description": "Amount still to be paid on a bill, e.g. 'Due ₹355'.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingBill": "Bill",
+  "@billingBill": {
+    "description": "Screen title / fallback name for a bill (noun)."
+  },
+  "billingOpenBill": "Open bill",
+  "@billingOpenBill": {
+    "description": "Button: open (view) the bill. 'Open' is a verb here."
+  },
+  "billingNoLongerDraft": "This bill is no longer a draft.",
+  "billingOpenError": "Could not open the bill. {error}",
+  "@billingOpenError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "billingEnterNumber": "Enter a number.",
+  "billingChooseSavedCustomer": "Choose a saved customer",
+  "billingWalkInName": "Walk-in name",
+  "billingWalkInNameHint": "e.g. Kiran",
+  "billingCheckDiscount": "Check the discount.",
+  "billingDraftSaved": "Draft saved",
+  "billingSavedNothingToPay": "{invoiceNo} saved. Nothing to pay.",
+  "@billingSavedNothingToPay": {
+    "placeholders": {
+      "invoiceNo": {
+        "type": "String"
+      }
+    }
+  },
+  "billingCreateBill": "Create bill",
+  "billingChange": "Change",
+  "@billingChange": {
+    "description": "Button: change the customer on the bill (verb)."
+  },
+  "billingItems": "Items",
+  "billingSwipeToRemove": "Swipe a line left to remove it.",
+  "billingAddItem": "Add service or product",
+  "billingDiscount": "Discount",
+  "billingDiscountHintPercent": "e.g. 10",
+  "billingDiscountHintAmount": "e.g. 300",
+  "billingSaveDraft": "Save draft",
+  "billingProceedToPayment": "Proceed to payment",
+  "billingBillGone": "This bill no longer exists.",
+  "billingLoadBillError": "Could not load this bill. {error}",
+  "@billingLoadBillError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "billingVoidTitle": "Void this bill?",
+  "billingVoidMessage": "The bill and its payments will be marked void and any products sold go back into stock. The bill number is not reused.",
+  "billingVoidBill": "Void bill",
+  "@billingVoidBill": {
+    "description": "Action (verb): cancel this bill."
+  },
+  "billingVoided": "Bill voided",
+  "billingMoreActions": "More actions",
+  "billingPrintReceipt": "Print receipt",
+  "billingDownloadPdf": "Download PDF",
+  "billingVoidBanner": "This bill is void. Its payments are not counted and its products went back into stock.",
+  "billingPaidAmount": "Paid",
+  "@billingPaidAmount": {
+    "description": "Row label in the totals: the amount already paid (not the bill status)."
+  },
+  "billingBalanceDue": "Balance due",
+  "billingPayments": "Payments",
+  "billingVoidTag": "void",
+  "@billingVoidTag": {
+    "description": "Lower-case marker after a cancelled payment's date, e.g. '14 May, 4:12 PM · void'."
+  },
+  "billingShare": "Share",
+  "billingRecordPayment": "Record payment",
+  "billingShareReceiptWhatsApp": "Share receipt on WhatsApp",
+  "billingStylistName": "Stylist: {name}",
+  "@billingStylistName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "billingAddToBill": "Add to bill",
+  "billingSearchItems": "Search services or products",
+  "billingServicesTab": "Services",
+  "billingProductsTab": "Products",
+  "billingNoSellingPrice": "No selling price set",
+  "billingInStockCount": "In stock: {count}",
+  "@billingInStockCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingNoMatch": "Nothing matches your search.",
+  "billingReceiptShareText": "Receipt from {parlour}",
+  "@billingReceiptShareText": {
+    "description": "Text sent along with the shared receipt PDF.",
+    "placeholders": {
+      "parlour": {
+        "type": "String"
+      }
+    }
+  },
+  "billingShareFailed": "Could not open sharing on this phone.",
+  "billingPrintFailed": "Could not open printing on this phone.",
+  "billingDownloadFailed": "Could not save the PDF on this phone.",
+  "billingReceiptFailed": "Could not create the receipt.",
+  "billingSubtotal": "Subtotal",
+  "billingGst": "GST",
+  "billingTotal": "Total",
+  "paymentTitle": "Payment",
+  "paymentFinishBillFirst": "Finish the bill before taking payment.",
+  "paymentFullyPaid": "This bill is fully paid.",
+  "paymentEnterAmount": "Enter the amount received.",
+  "paymentFullBalance": "Full balance",
+  "paymentPartial": "Partial · {amount} will still be due",
+  "@paymentPartial": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentBillTotal": "Bill total",
+  "paymentAlreadyReceived": "Already received",
+  "paymentMethodLabel": "Payment method",
+  "paymentUpiNote": "Records the payment; the app does not verify UPI.",
+  "paymentAmountReceived": "Amount received",
+  "paymentNote": "Note",
+  "paymentConfirm": "Confirm",
+  "paymentConfirmAmount": "Confirm {amount}",
+  "@paymentConfirmAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentNotFound": "This payment could not be found.",
+  "paymentRecorded": "Payment recorded",
+  "paymentAmountByMethod": "{amount} by {method}",
+  "@paymentAmountByMethod": {
+    "description": "e.g. '₹500 by Cash'.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentTotalAmount": "Total {amount}",
+  "@paymentTotalAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentBalance": "Balance",
+  "paymentBookNextVisit": "Book next visit",
+  "paymentBackToDashboard": "Back to dashboard",
+  "inventoryTitle": "Inventory",
+  "inventoryAddProduct": "Add product",
+  "inventorySearch": "Search products",
+  "inventoryAllItems": "All items",
+  "inventoryTabCount": "{label} ({count})",
+  "@inventoryTabCount": {
+    "description": "Tab title with the number of products, e.g. 'Low stock (2)'.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inventoryLoadError": "Could not load products. {error}",
+  "@inventoryLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryEmpty": "No products yet.",
+  "inventoryNoneLow": "Nothing is running low.",
+  "inventoryNoneOut": "Nothing is out of stock.",
+  "inventoryProduct": "Product",
+  "inventoryProductGone": "This product no longer exists.",
+  "inventoryEditProduct": "Edit product",
+  "inventoryInStockLabel": "In stock",
+  "@inventoryInStockLabel": {
+    "description": "Row label: quantity currently in stock."
+  },
+  "inventoryLowStockAlertAt": "Low-stock alert at",
+  "inventorySellingPrice": "Selling price",
+  "inventoryNotSet": "Not set",
+  "inventoryCostPrice": "Cost price",
+  "inventoryStockHistory": "Stock history",
+  "inventoryNoStockChanges": "No stock changes yet.",
+  "inventoryAdjustStock": "Adjust stock",
+  "inventoryProductUpdated": "Product updated",
+  "inventoryProductAdded": "Product added",
+  "inventoryDeactivateTitle": "Deactivate {name}?",
+  "@inventoryDeactivateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryDeactivateMessage": "It will no longer be offered on bills. Its stock history is kept.",
+  "inventoryDeactivated": "Product deactivated",
+  "inventoryReactivated": "Product reactivated",
+  "inventoryEnterOpeningStock": "Enter the opening stock.",
+  "inventoryEnterAlertLevel": "Enter the alert level.",
+  "inventoryEnterPrice": "Enter a price in rupees.",
+  "inventoryName": "Name",
+  "inventoryNameHint": "e.g. Hair Serum",
+  "inventoryStockInfo": "In stock: {qty} {unit}. Use \"Adjust stock\" on the product screen to change it.",
+  "@inventoryStockInfo": {
+    "placeholders": {
+      "qty": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryOpeningStock": "Opening stock",
+  "inventoryOpeningStockHint": "e.g. 10",
+  "inventoryUnit": "Unit",
+  "inventoryCategory": "Category",
+  "inventoryCategoryHint": "e.g. Hair care",
+  "inventoryDeactivateProduct": "Deactivate product",
+  "inventoryReactivateProduct": "Reactivate product",
+  "inventorySaveProduct": "Save product",
+  "inventoryOnlyInStock": "Only {count} in stock.",
+  "@inventoryOnlyInStock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inventorySameAsCurrent": "That is the same as the current stock.",
+  "inventoryStockUpdated": "Stock updated",
+  "inventoryAdjustSubtitle": "{name} · now {qty} {unit}",
+  "@inventoryAdjustSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryAdjustType": "Type",
+  "@inventoryAdjustType": {
+    "description": "Field label: kind of stock change (noun)."
+  },
+  "inventoryCountedQty": "Counted quantity",
+  "inventoryQty": "Quantity",
+  "inventoryNewStock": "New stock: {qty} {unit}",
+  "@inventoryNewStock": {
+    "placeholders": {
+      "qty": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "inventoryNote": "Note",
+  "inventoryNoteHint": "e.g. Bought from supplier",
+  "inventoryStockLine": "Stock: {qty} {unit}",
+  "@inventoryStockLine": {
+    "placeholders": {
+      "qty": {
+        "type": "int"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptPhone": "Phone {phone}",
+  "@receiptPhone": {
+    "description": "Parlour phone line at the top of the printed receipt.",
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptGstin": "GSTIN {gstin}",
+  "@receiptGstin": {
+    "placeholders": {
+      "gstin": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptTaxInvoice": "TAX INVOICE",
+  "@receiptTaxInvoice": {
+    "description": "Heading of a receipt when GST is charged. Capital letters in English."
+  },
+  "receiptHeading": "RECEIPT",
+  "@receiptHeading": {
+    "description": "Heading of a plain payment receipt. Capital letters in English."
+  },
+  "receiptItem": "Item",
+  "@receiptItem": {
+    "description": "Receipt table column: the service or product."
+  },
+  "receiptQty": "Qty",
+  "@receiptQty": {
+    "description": "Receipt table column: quantity (short)."
+  },
+  "receiptRate": "Rate",
+  "@receiptRate": {
+    "description": "Receipt table column: price of one."
+  },
+  "receiptAmount": "Amount",
+  "@receiptAmount": {
+    "description": "Receipt table column: rate × quantity."
+  },
+  "receiptStylist": "Stylist: {name}",
+  "@receiptStylist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptSubtotal": "Subtotal",
+  "receiptDiscount": "Discount",
+  "receiptGst": "GST",
+  "receiptTotal": "Total",
+  "receiptPaid": "Paid",
+  "@receiptPaid": {
+    "description": "Receipt row: amount paid so far."
+  },
+  "receiptBalance": "Balance",
+  "@receiptBalance": {
+    "description": "Receipt row: amount still to pay."
+  },
+  "receiptPayments": "Payments",
+  "receiptNotTaxInvoice": "This is a payment receipt, not a GST tax invoice."
 }

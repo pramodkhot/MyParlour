@@ -10,6 +10,7 @@ import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/buttons.dart';
@@ -123,7 +124,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
   Future<void> _pickBirthday() async {
     final picked = await showDayMonthPicker(
       context,
-      title: 'Birthday',
+      title: context.l10n.custBirthday,
       initial: _birthday,
     );
     if (picked != null) setState(() => _birthday = picked);
@@ -132,7 +133,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
   Future<void> _pickAnniversary() async {
     final picked = await showDayMonthPicker(
       context,
-      title: 'Anniversary',
+      title: context.l10n.custAnniversary,
       initial: _anniversary,
     );
     if (picked != null) setState(() => _anniversary = picked);
@@ -162,14 +163,17 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
         ),
       );
       if (!mounted) return;
-      showMessage(context, _isEdit ? 'Customer updated' : 'Customer saved');
+      showMessage(
+        context,
+        _isEdit ? context.l10n.custUpdated : context.l10n.custSaved,
+      );
       if (thenBook) {
         context.go(Routes.newAppointment(customerId: saved.id));
       } else {
         Navigator.of(context).pop(saved);
       }
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -177,6 +181,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final form = Form(
       key: _formKey,
       child: ListView(
@@ -188,21 +193,20 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
         ),
         children: [
           AppTextField(
-            label: 'Name',
+            label: l10n.custFieldName,
             isRequired: true,
             controller: _name,
             icon: Icons.person_outline_rounded,
-            hint: 'e.g. Priya Sharma',
+            hint: l10n.custNameHint,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
             autofocus: !_isEdit,
-            validator: (v) => (v == null || v.trim().isEmpty)
-                ? 'Enter the customer’s name.'
-                : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? l10n.custNameRequired : null,
           ),
           Gap.h16,
           AppTextField(
-            label: 'Mobile number',
+            label: l10n.custFieldMobile,
             isRequired: true,
             controller: _phone,
             icon: Icons.phone_outlined,
@@ -216,10 +220,10 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
             ],
             validator: (v) {
               if (v == null || v.trim().isEmpty) {
-                return 'Enter the mobile number.';
+                return l10n.custMobileRequired;
               }
               if (!PhoneNumber.isValidMobile(v)) {
-                return 'Enter a 10-digit mobile number.';
+                return l10n.custMobileInvalid;
               }
               return null;
             },
@@ -233,18 +237,18 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
           ],
           Gap.h16,
           PickerField(
-            label: 'Birthday',
+            label: l10n.custBirthday,
             icon: Icons.cake_outlined,
-            hint: 'Day and month',
+            hint: l10n.custDayMonthHint,
             value: _birthday == null ? null : formatDayMonth(_birthday!),
             onTap: _pickBirthday,
             onClear: () => setState(() => _birthday = null),
           ),
           Gap.h16,
           AppTextField(
-            label: 'Notes',
+            label: l10n.custNotes,
             controller: _notes,
-            hint: 'e.g. Prefers less heat in smoothening',
+            hint: l10n.custNotesHint,
             maxLines: 3,
             textCapitalization: TextCapitalization.sentences,
           ),
@@ -255,7 +259,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                 widget.initial?.anniversary != null,
             children: [
               AppTextField(
-                label: 'Email',
+                label: l10n.custEmail,
                 controller: _email,
                 icon: Icons.mail_outline_rounded,
                 keyboardType: TextInputType.emailAddress,
@@ -264,13 +268,13 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                   if (t.isEmpty) return null;
                   return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(t)
                       ? null
-                      : 'Enter a valid email address.';
+                      : l10n.custEmailInvalid;
                 },
               ),
               PickerField(
-                label: 'Anniversary',
+                label: l10n.custAnniversary,
                 icon: Icons.favorite_border_rounded,
-                hint: 'Day and month',
+                hint: l10n.custDayMonthHint,
                 value: _anniversary == null
                     ? null
                     : formatDayMonth(_anniversary!),
@@ -294,14 +298,14 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           PrimaryButton(
-            label: 'Save customer',
+            label: l10n.custSave,
             loading: _saving,
             onPressed: _save,
           ),
           if (!widget.asSheet && !_isEdit) ...[
             Gap.h12,
             SecondaryButton(
-              label: 'Save & book appointment',
+              label: l10n.custSaveAndBook,
               onPressed: _saving ? null : () => _save(thenBook: true),
             ),
           ],
@@ -312,7 +316,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
     return DiscardChangesScope(
       isDirty: _isDirty && !_saving,
       child: Scaffold(
-        appBar: AppTopBar(title: _isEdit ? 'Edit customer' : 'Add customer'),
+        appBar: AppTopBar(title: _isEdit ? l10n.custEdit : l10n.custAdd),
         body: form,
         bottomNavigationBar: SafeArea(child: buttons),
       ),
@@ -344,7 +348,7 @@ class _DuplicateBanner extends StatelessWidget {
           Gap.w8,
           Expanded(
             child: Text(
-              'Already saved as ${customer.name}',
+              context.l10n.custAlreadySaved(customer.name),
               style: AppText.body.copyWith(
                 color: AppColors.warning,
                 fontSize: 14,
@@ -354,7 +358,7 @@ class _DuplicateBanner extends StatelessWidget {
           TextButton(
             onPressed: onOpen,
             style: TextButton.styleFrom(foregroundColor: AppColors.warning),
-            child: const Text('Open'),
+            child: Text(context.l10n.custOpen),
           ),
         ],
       ),
@@ -370,13 +374,13 @@ class _NotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Customer'),
+      appBar: AppTopBar(title: context.l10n.commonCustomer),
       body: Center(
         child: EmptyState(
           icon: Icons.person_off_outlined,
           message: error == null
-              ? 'This customer no longer exists.'
-              : 'Could not load this customer. $error',
+              ? context.l10n.custNotFound
+              : context.l10n.custLoadOneError('$error'),
         ),
       ),
     );

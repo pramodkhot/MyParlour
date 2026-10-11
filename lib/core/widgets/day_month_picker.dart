@@ -3,12 +3,11 @@ import 'package:intl/intl.dart';
 
 import '../../domain/models/value_types.dart';
 import '../design/spacing.dart';
+import '../l10n/l10n.dart';
 
-/// "14 May" for a birthday or anniversary.
-String formatDayMonth(DayMonth value) => DateFormat(
-  'd MMMM',
-  'en_IN',
-).format(DateTime(2000, value.month, value.day));
+/// "14 May" for a birthday or anniversary, in the current language.
+String formatDayMonth(DayMonth value) =>
+    DateFormat('d MMMM').format(DateTime(2000, value.month, value.day));
 
 /// Picks a day and month without a year (birthdays, anniversaries).
 Future<DayMonth?> showDayMonthPicker(
@@ -41,7 +40,8 @@ class _DayMonthDialogState extends State<_DayMonthDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final months = DateFormat.MMMM('en_IN');
+    final months = DateFormat.MMMM();
+    final l10n = context.l10n;
     return AlertDialog(
       title: Text(widget.title),
       content: Row(
@@ -50,7 +50,7 @@ class _DayMonthDialogState extends State<_DayMonthDialog> {
             width: 84,
             child: DropdownButtonFormField<int>(
               initialValue: _day,
-              decoration: const InputDecoration(labelText: 'Day'),
+              decoration: InputDecoration(labelText: l10n.uiDay),
               items: [
                 for (var d = 1; d <= _daysInMonth; d++)
                   DropdownMenuItem(value: d, child: Text('$d')),
@@ -63,7 +63,7 @@ class _DayMonthDialogState extends State<_DayMonthDialog> {
             child: DropdownButtonFormField<int>(
               initialValue: _month,
               isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Month'),
+              decoration: InputDecoration(labelText: l10n.uiMonth),
               items: [
                 for (var m = 1; m <= 12; m++)
                   DropdownMenuItem(
@@ -82,11 +82,11 @@ class _DayMonthDialogState extends State<_DayMonthDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(DayMonth(_day, _month)),
-          child: const Text('Done'),
+          child: Text(l10n.commonDone),
         ),
       ],
     );

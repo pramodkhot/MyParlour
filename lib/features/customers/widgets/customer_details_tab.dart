@@ -6,6 +6,7 @@ import '../../../core/design/typography.dart';
 import '../../../core/format/dates.dart';
 import '../../../core/format/money.dart';
 import '../../../core/format/phone.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/day_month_picker.dart';
 import '../customers_controller.dart';
@@ -19,25 +20,34 @@ class CustomerDetailsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = detail.customer;
+    final l10n = context.l10n;
     final rows = [
-      (Icons.phone_outlined, 'Mobile', '+91 ${PhoneNumber.display(c.phone)}'),
-      (Icons.mail_outline_rounded, 'Email', c.email ?? 'Not added'),
+      (
+        Icons.phone_outlined,
+        l10n.custMobile,
+        '+91 ${PhoneNumber.display(c.phone)}',
+      ),
+      (
+        Icons.mail_outline_rounded,
+        l10n.custEmail,
+        c.email ?? l10n.commonNotAdded,
+      ),
       (
         Icons.cake_outlined,
-        'Birthday',
-        c.birthday == null ? 'Not added' : formatDayMonth(c.birthday!),
+        l10n.custBirthday,
+        c.birthday == null ? l10n.commonNotAdded : formatDayMonth(c.birthday!),
       ),
       if (c.anniversary != null)
         (
           Icons.favorite_border_rounded,
-          'Anniversary',
+          l10n.custAnniversary,
           formatDayMonth(c.anniversary!),
         ),
-      (Icons.event_outlined, 'Customer since', Dates.dayMonthYear(c.createdAt)),
-      (Icons.repeat_rounded, 'Visits', '${detail.visits}'),
+      (Icons.event_outlined, l10n.custSince, Dates.dayMonthYear(c.createdAt)),
+      (Icons.repeat_rounded, l10n.custVisits, '${detail.visits}'),
       (
         Icons.payments_outlined,
-        'Total spent',
+        l10n.custTotalSpent,
         Money.format(detail.totalSpentPaise),
       ),
     ];

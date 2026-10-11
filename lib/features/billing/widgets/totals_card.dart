@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 
 /// Tinted card: Subtotal, Discount (−), GST (only when on), Total.
 class TotalsCard extends StatelessWidget {
@@ -28,6 +29,7 @@ class TotalsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     Widget row(String label, String value, {TextStyle? style}) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
@@ -46,13 +48,13 @@ class TotalsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          row('Subtotal', Money.format(subtotalPaise)),
+          row(l10n.billingSubtotal, Money.format(subtotalPaise)),
           if (discountPaise > 0)
-            row('Discount', '− ${Money.format(discountPaise)}'),
-          if (showTax) row('GST', Money.format(taxPaise)),
+            row(l10n.billingDiscount, '− ${Money.format(discountPaise)}'),
+          if (showTax) row(l10n.billingGst, Money.format(taxPaise)),
           const Divider(height: Space.xl, color: AppColors.blushDeep),
           row(
-            'Total',
+            l10n.billingTotal,
             Money.format(totalPaise),
             style: AppText.bodyStrong.copyWith(fontSize: 18),
           ),

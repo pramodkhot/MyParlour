@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/status_chip.dart';
 import '../../../domain/models/product.dart';
 
@@ -12,16 +13,16 @@ class StockChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (product.stockLevel) {
-      StockLevel.out => const StatusChip(
-        label: 'Out of stock',
+      StockLevel.out => StatusChip(
+        label: context.l10n.stockOut,
         tone: ChipTone.error,
       ),
       StockLevel.low => StatusChip(
-        label: '${product.stockQty} left',
+        label: context.l10n.stockLeft(product.stockQty),
         tone: ChipTone.warning,
       ),
-      StockLevel.inStock => const StatusChip(
-        label: 'In stock',
+      StockLevel.inStock => StatusChip(
+        label: context.l10n.stockInStock,
         tone: ChipTone.success,
       ),
     };

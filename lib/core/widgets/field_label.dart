@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../design/colors.dart';
 import '../design/typography.dart';
+import '../l10n/l10n.dart';
 
 /// Form label: required fields get " *", optional ones "(optional)"
 /// (form rules, spec Section 9).
@@ -24,7 +25,7 @@ class FieldLabel extends StatelessWidget {
             )
           else
             TextSpan(
-              text: '  (optional)',
+              text: '  ${context.l10n.commonOptional}',
               style: AppText.caption.copyWith(fontWeight: FontWeight.w500),
             ),
         ],

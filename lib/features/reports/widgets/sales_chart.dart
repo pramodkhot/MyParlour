@@ -1,10 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/design/colors.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/format/dates.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../domain/services/report_service.dart';
 
 /// Burgundy line with dots over a light pink area (spec S14). Shows days,
@@ -24,13 +25,14 @@ class SalesChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final hours = hourly;
     final values = hours != null
         ? [for (final h in hours) h.$2]
         : [for (final d in daily) d.amountPaise];
     final labels = hours != null
         ? [for (final h in hours) _hourLabel(h.$1)]
-        : [for (final d in daily) DateFormat('d MMM', 'en_IN').format(d.day)];
+        : [for (final d in daily) Dates.dayMonth(d.day)];
     if (values.isEmpty) return const SizedBox.shrink();
 
     // How many points have happened (at least one).
@@ -70,7 +72,7 @@ class SalesChart extends StatelessWidget {
                 reservedSize: 44,
                 interval: top / 4,
                 getTitlesWidget: (value, meta) => Text(
-                  _compact(value),
+                  _compact(l10n, value),
                   style: AppText.caption.copyWith(fontSize: 10),
                 ),
               ),
@@ -140,7 +142,7 @@ class SalesChart extends StatelessWidget {
 
   static String _hourLabel(int h) {
     final hour = h % 12 == 0 ? 12 : h % 12;
-    return '$hour ${h < 12 ? 'AM' : 'PM'}';
+    return '$hour ${Dates.amPm(DateTime(2000, 1, 1, h))}';
   }
 
   /// A round top value for the y-axis (₹1k, 2k, 5k, 10k…).
@@ -153,9 +155,13 @@ class SalesChart extends StatelessWidget {
     return step * 4;
   }
 
-  static String _compact(double rupees) {
-    if (rupees >= 100000) return '₹${(rupees / 100000).toStringAsFixed(1)}L';
-    if (rupees >= 1000) return '₹${(rupees / 1000).round()}k';
+  static String _compact(AppLocalizations l10n, double rupees) {
+    if (rupees >= 100000) {
+      return l10n.reportsCompactLakhs((rupees / 100000).toStringAsFixed(1));
+    }
+    if (rupees >= 1000) {
+      return l10n.reportsCompactThousands('${(rupees / 1000).round()}');
+    }
     return '₹${rupees.round()}';
   }
 }

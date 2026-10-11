@@ -7,6 +7,7 @@ import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
 import '../../core/widgets/empty_state.dart';
@@ -40,13 +41,14 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final rows = ref.watch(billRowsProvider);
     return Scaffold(
-      appBar: const AppTopBar(title: 'Billing'),
+      appBar: AppTopBar(title: l10n.navBilling),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _newBill,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('New bill'),
+        label: Text(l10n.billingNewBill),
         shape: const StadiumBorder(),
       ),
       body: Column(
@@ -62,14 +64,14 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
               width: double.infinity,
               child: SegmentedButton<BillFilter>(
                 showSelectedIcon: false,
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: BillFilter.open,
-                    label: Text('Open bills'),
+                    label: Text(l10n.billingOpenBills),
                   ),
                   ButtonSegment(
                     value: BillFilter.all,
-                    label: Text('All bills'),
+                    label: Text(l10n.billingAllBills),
                   ),
                 ],
                 selected: {_filter},
@@ -87,7 +89,7 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
               AsyncValue(:final error?) => Center(
                 child: EmptyState(
                   icon: Icons.error_outline_rounded,
-                  message: 'Could not load bills. $error',
+                  message: l10n.billingLoadError('$error'),
                 ),
               ),
               _ => const Center(child: CircularProgressIndicator()),
@@ -108,14 +110,15 @@ class _List extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (rows.isEmpty) {
       return SingleChildScrollView(
         child: EmptyState(
           icon: Icons.receipt_long_outlined,
           message: filter == BillFilter.open
-              ? 'No open bills. Everything is paid.'
-              : 'No bills yet.',
-          actionLabel: 'New bill',
+              ? l10n.billingNoOpenBills
+              : l10n.billingNoBills,
+          actionLabel: l10n.billingNewBill,
           onAction: onNew,
         ),
       );
@@ -139,13 +142,13 @@ class _List extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      bill.invoiceNo ?? 'Draft bill',
+                      bill.invoiceNo ?? l10n.billingDraftBill,
                       style: AppText.caption.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      rows[i].clientName,
+                      rows[i].clientName(l10n),
                       style: AppText.bodyStrong,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -161,7 +164,7 @@ class _List extends StatelessWidget {
                   MoneyText(bill.totalPaise),
                   if (bill.isOpen && bill.balancePaise != bill.totalPaise)
                     Text(
-                      'Due ${Money.format(bill.balancePaise)}',
+                      l10n.billingDue(Money.format(bill.balancePaise)),
                       style: AppText.caption,
                     ),
                   Gap.h4,

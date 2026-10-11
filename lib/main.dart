@@ -9,6 +9,7 @@ import 'core/l10n/app_language.dart';
 import 'core/l10n/language_controller.dart';
 import 'core/l10n/western_digits.dart';
 import 'data/local/open_local_store.dart';
+import 'data/local/prefs_store.dart';
 import 'data/providers.dart';
 
 Future<void> main() async {
@@ -24,8 +25,9 @@ Future<void> main() async {
 /// Opens the data and runs the app, or shows a "Try again" screen if the
 /// data cannot be opened.
 Future<void> _start() async {
+  PrefsStore? prefs;
   try {
-    final prefs = await openPrefsStore();
+    prefs = await openPrefsStore();
     final store = await openLocalStore(
       language: AppLanguage.fromCode(prefs['language']),
     );
@@ -39,6 +41,14 @@ Future<void> _start() async {
       ),
     );
   } on Object catch (error) {
-    runApp(StartupErrorApp(error: error, onRetry: _start));
+    runApp(
+      StartupErrorApp(
+        error: error,
+        onRetry: _start,
+        language: prefs == null
+            ? null
+            : AppLanguage.fromCode(prefs['language']),
+      ),
+    );
   }
 }

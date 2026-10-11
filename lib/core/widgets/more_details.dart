@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../design/spacing.dart';
+import '../l10n/l10n.dart';
 
 /// "+ More details" link that reveals extra optional fields.
 class MoreDetails extends StatefulWidget {
@@ -31,7 +32,7 @@ class _MoreDetailsState extends State<MoreDetails> {
         child: TextButton.icon(
           onPressed: () => setState(() => _open = true),
           icon: const Icon(Icons.add_rounded, size: 20),
-          label: const Text('More details'),
+          label: Text(context.l10n.commonMoreDetails),
         ),
       );
     }

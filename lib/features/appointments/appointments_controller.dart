@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../data/providers.dart';
 import '../../domain/models/appointment.dart';
 import '../../domain/models/customer.dart';
@@ -11,19 +12,34 @@ import '../../domain/models/staff.dart';
 
 /// Status chips on the Appointments screen.
 enum AppointmentFilter {
-  all('All', null),
-  upcoming('Upcoming', AppointmentStatus.booked),
-  checkedIn('Checked in', AppointmentStatus.checkedIn),
-  completed('Completed', AppointmentStatus.completed),
-  cancelled('Cancelled', AppointmentStatus.cancelled),
-  noShow('No-show', AppointmentStatus.noShow);
+  all(null),
+  upcoming(AppointmentStatus.booked),
+  checkedIn(AppointmentStatus.checkedIn),
+  completed(AppointmentStatus.completed),
+  cancelled(AppointmentStatus.cancelled),
+  noShow(AppointmentStatus.noShow);
 
-  const AppointmentFilter(this.label, this.status);
+  const AppointmentFilter(this.status);
 
-  final String label;
   final AppointmentStatus? status;
 
   bool matches(Appointment a) => status == null || a.status == status;
+
+  /// Chip text in the current language.
+  String label(AppLocalizations l10n) {
+    final s = status;
+    return s == null ? l10n.apptFilterAll : l10n.appointmentStatus(s);
+  }
+
+  /// Empty-list message when nothing on the day matches this filter.
+  String emptyMessage(AppLocalizations l10n) => switch (this) {
+    AppointmentFilter.all => l10n.apptNoneOnDay,
+    AppointmentFilter.upcoming => l10n.apptNoneUpcomingOnDay,
+    AppointmentFilter.checkedIn => l10n.apptNoneCheckedInOnDay,
+    AppointmentFilter.completed => l10n.apptNoneCompletedOnDay,
+    AppointmentFilter.cancelled => l10n.apptNoneCancelledOnDay,
+    AppointmentFilter.noShow => l10n.apptNoneNoShowOnDay,
+  };
 }
 
 /// Monday of the week containing [day] (local midnight).
@@ -62,11 +78,12 @@ class PeopleNames {
   final Map<String, Customer> customers;
   final Map<String, Staff> staff;
 
-  String client(Appointment a) => a.customerId == null
-      ? 'Walk-in · ${a.walkInName ?? 'Guest'}'
-      : customers[a.customerId]?.name ?? 'Customer';
+  String client(Appointment a, AppLocalizations l10n) => a.customerId == null
+      ? l10n.commonWalkInNamed(a.walkInName ?? l10n.commonGuest)
+      : customers[a.customerId]?.name ?? l10n.commonCustomer;
 
-  String stylist(Appointment a) => staff[a.staffId]?.name ?? 'Stylist';
+  String stylist(Appointment a, AppLocalizations l10n) =>
+      staff[a.staffId]?.name ?? l10n.commonStylist;
 }
 
 final peopleNamesProvider = FutureProvider.autoDispose<PeopleNames>((
@@ -123,7 +140,8 @@ class AppointmentDetail {
   /// The non-void bill for this appointment, if any.
   final Invoice? invoice;
 
-  String get clientName => customer?.name ?? appointment.walkInName ?? 'Guest';
+  String clientName(AppLocalizations l10n) =>
+      customer?.name ?? appointment.walkInName ?? l10n.commonGuest;
   String? get phone => customer?.phone ?? appointment.walkInPhone;
 }
 

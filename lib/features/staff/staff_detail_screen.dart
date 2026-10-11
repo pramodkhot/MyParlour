@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/colors.dart';
@@ -10,6 +9,7 @@ import '../../core/design/typography.dart';
 import '../../core/format/dates.dart';
 import '../../core/format/money.dart';
 import '../../core/format/phone.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/platform/contact_actions.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_top_bar.dart';
@@ -35,10 +35,10 @@ class StaffDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return switch (ref.watch(staffDetailProvider(staffId))) {
       AsyncValue(:final value?) => _Detail(detail: value),
-      AsyncValue(hasValue: true) => const _Message(
-        'This staff member no longer exists.',
+      AsyncValue(hasValue: true) => _Message(context.l10n.staffNotFound),
+      AsyncValue(:final error?) => _Message(
+        context.l10n.staffLoadError('$error'),
       ),
-      AsyncValue(:final error?) => _Message('Could not load staff. $error'),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
   }
@@ -51,14 +51,13 @@ class _Detail extends ConsumerWidget {
 
   Future<void> _toggleActive(BuildContext context, WidgetRef ref) async {
     final s = detail.staff;
+    final l10n = context.l10n;
     if (s.isActive) {
       final ok = await ConfirmDialog.show(
         context,
-        title: 'Deactivate ${s.name}?',
-        message:
-            '${s.name} will not be offered for new bookings. Past '
-            'appointments and bills keep their name. You can reactivate later.',
-        confirmLabel: 'Deactivate',
+        title: l10n.staffDeactivateTitle(s.name),
+        message: l10n.staffDeactivateMessage(s.name),
+        confirmLabel: l10n.commonDeactivate,
         destructive: true,
       );
       if (!ok) return;
@@ -67,7 +66,7 @@ class _Detail extends ConsumerWidget {
     if (context.mounted) {
       showMessage(
         context,
-        s.isActive ? 'Staff deactivated' : 'Staff activated',
+        s.isActive ? l10n.staffDeactivated : l10n.staffActivated,
       );
     }
   }
@@ -78,7 +77,7 @@ class _Detail extends ConsumerWidget {
     String what,
   ) async {
     if (!await action() && context.mounted) {
-      showMessage(context, 'No app on this phone can open $what.');
+      showMessage(context, context.l10n.commonNoAppFor(what));
     }
   }
 
@@ -86,21 +85,22 @@ class _Detail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = detail.staff;
     final contacts = ref.read(contactActionsProvider);
-    final days = DateFormat.E('en_IN');
+    final l10n = context.l10n;
     final workingDays = [
       for (final d in [1, 2, 3, 4, 5, 6, 7])
-        if (s.workingDays.contains(d)) days.format(DateTime(2024, 1, d)),
+        if (s.workingDays.contains(d)) Dates.weekdayShort(DateTime(2024, 1, d)),
     ].join(', ');
-    final hours =
-        '${Dates.time(s.startTime.on(detail.now))} – '
-        '${Dates.time(s.endTime.on(detail.now))}';
+    final hours = l10n.staffHoursRange(
+      Dates.time(s.startTime.on(detail.now)),
+      Dates.time(s.endTime.on(detail.now)),
+    );
 
     return Scaffold(
       appBar: AppTopBar(
-        title: 'Staff',
+        title: l10n.staffTitle,
         actions: [
           IconButton(
-            tooltip: 'Edit staff',
+            tooltip: l10n.staffEdit,
             onPressed: () => context.push(Routes.editStaff(s.id)),
             icon: const Icon(Icons.edit_outlined),
           ),
@@ -123,10 +123,12 @@ class _Detail extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(s.name, style: AppText.barTitle),
-                    Text(s.roleTitle, style: AppText.caption),
+                    Text(l10n.builtIn(s.roleTitle), style: AppText.caption),
                     Gap.h4,
                     StatusChip(
-                      label: s.isActive ? 'Active' : 'Inactive',
+                      label: s.isActive
+                          ? l10n.commonActive
+                          : l10n.commonInactive,
                       tone: s.isActive ? ChipTone.success : ChipTone.neutral,
                     ),
                   ],
@@ -134,17 +136,20 @@ class _Detail extends ConsumerWidget {
               ),
               RoundAction(
                 icon: Icons.call_outlined,
-                label: 'Call',
-                onTap: () =>
-                    _contact(context, () => contacts.call(s.phone), 'calls'),
+                label: l10n.commonCall,
+                onTap: () => _contact(
+                  context,
+                  () => contacts.call(s.phone),
+                  l10n.commonAppCalls,
+                ),
               ),
               RoundAction(
                 icon: Icons.chat_outlined,
-                label: 'WhatsApp',
+                label: l10n.commonWhatsApp,
                 onTap: () => _contact(
                   context,
                   () => contacts.whatsApp(s.phone),
-                  'WhatsApp links',
+                  l10n.commonAppWhatsApp,
                 ),
               ),
             ],
@@ -156,17 +161,21 @@ class _Detail extends ConsumerWidget {
               children: [
                 _InfoRow(
                   Icons.phone_outlined,
-                  'Mobile',
+                  l10n.staffMobile,
                   '+91 ${PhoneNumber.display(s.phone)}',
                 ),
                 const Divider(indent: 52),
-                _InfoRow(Icons.calendar_month_outlined, 'Works', workingDays),
+                _InfoRow(
+                  Icons.calendar_month_outlined,
+                  l10n.staffWorks,
+                  workingDays,
+                ),
                 const Divider(indent: 52),
-                _InfoRow(Icons.schedule_rounded, 'Hours', hours),
+                _InfoRow(Icons.schedule_rounded, l10n.staffHours, hours),
                 const Divider(indent: 52),
                 _InfoRow(
                   Icons.content_cut_rounded,
-                  'Services',
+                  l10n.staffServices,
                   s.serviceIds
                       .map((id) => detail.serviceNames[id])
                       .whereType<String>()
@@ -176,7 +185,7 @@ class _Detail extends ConsumerWidget {
             ),
           ),
           Gap.h20,
-          const Text('This month', style: AppText.sectionTitle),
+          Text(l10n.periodThisMonth, style: AppText.sectionTitle),
           Gap.h12,
           IntrinsicHeight(
             child: Row(
@@ -184,7 +193,7 @@ class _Detail extends ConsumerWidget {
               children: [
                 Expanded(
                   child: MetricCard(
-                    label: 'Services done',
+                    label: l10n.staffServicesDone,
                     value: '${detail.month.servicesDone}',
                     icon: Icons.check_circle_outline_rounded,
                   ),
@@ -192,7 +201,7 @@ class _Detail extends ConsumerWidget {
                 Gap.w12,
                 Expanded(
                   child: MetricCard(
-                    label: 'Amount billed',
+                    label: l10n.staffAmountBilled,
                     value: Money.format(detail.month.billedPaise),
                     icon: Icons.payments_outlined,
                   ),
@@ -201,12 +210,12 @@ class _Detail extends ConsumerWidget {
             ),
           ),
           Gap.h12,
-          const SectionHeader(title: 'Today and upcoming'),
+          SectionHeader(title: l10n.staffTodayAndUpcoming),
           if (detail.upcoming.isEmpty)
-            const AppCard(
+            AppCard(
               child: Text(
-                'No appointments booked.',
-                style: TextStyle(color: AppColors.textMuted),
+                l10n.staffNoAppointments,
+                style: const TextStyle(color: AppColors.textMuted),
               ),
             )
           else
@@ -224,7 +233,7 @@ class _Detail extends ConsumerWidget {
             ),
           Gap.h24,
           SecondaryButton(
-            label: s.isActive ? 'Deactivate' : 'Activate',
+            label: s.isActive ? l10n.commonDeactivate : l10n.staffActivate,
             icon: s.isActive ? Icons.block_rounded : Icons.check_rounded,
             onPressed: () => _toggleActive(context, ref),
           ),
@@ -253,7 +262,7 @@ class _InfoRow extends StatelessWidget {
           SizedBox(width: 72, child: Text(label, style: AppText.label)),
           Expanded(
             child: Text(
-              value.isEmpty ? 'None' : value,
+              value.isEmpty ? context.l10n.commonNone : value,
               textAlign: TextAlign.end,
               style: AppText.bodyStrong,
             ),
@@ -287,7 +296,9 @@ class _AppointmentRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isToday ? 'Today' : Dates.dayMonth(a.startsAt),
+                  isToday
+                      ? context.l10n.periodToday
+                      : Dates.dayMonth(a.startsAt),
                   style: AppText.caption,
                 ),
                 Text(
@@ -302,7 +313,7 @@ class _AppointmentRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  detail.clientName(a),
+                  detail.clientName(a, context.l10n),
                   style: AppText.bodyStrong,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -331,7 +342,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Staff'),
+      appBar: AppTopBar(title: context.l10n.staffTitle),
       body: Center(
         child: EmptyState(icon: Icons.badge_outlined, message: message),
       ),

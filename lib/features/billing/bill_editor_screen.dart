@@ -37,11 +37,12 @@ class BillEditorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return switch (ref.watch(billEditorDataProvider(args))) {
       AsyncValue(:final value?) when value.existingBillForAppointment != null =>
         _Message(
-          'This appointment already has a bill.',
-          actionLabel: 'Open bill',
+          l10n.errAppointmentAlreadyBilled,
+          actionLabel: l10n.billingOpenBill,
           onAction: () => context.pushReplacement(
             Routes.bill(value.existingBillForAppointment!.id),
           ),
@@ -50,12 +51,12 @@ class BillEditorScreen extends ConsumerWidget {
           when args.draftId != null &&
               (value.draft == null || !value.draft!.isDraft) =>
         _Message(
-          'This bill is no longer a draft.',
-          actionLabel: 'Open bill',
+          l10n.billingNoLongerDraft,
+          actionLabel: l10n.billingOpenBill,
           onAction: () => context.pushReplacement(Routes.bill(args.draftId!)),
         ),
       AsyncValue(:final value?) => _Editor(data: value),
-      AsyncValue(:final error?) => _Message('Could not open the bill. $error'),
+      AsyncValue(:final error?) => _Message(l10n.billingOpenError('$error')),
       _ => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
   }
@@ -140,7 +141,7 @@ class _EditorState extends ConsumerState<_Editor> {
   String? get _discountInputError {
     final text = _discount.text.trim();
     if (text.isEmpty) return null;
-    if (Money.parseRupees(text) == null) return 'Enter a number.';
+    if (Money.parseRupees(text) == null) return context.l10n.billingEnterNumber;
     return null;
   }
 
@@ -173,12 +174,12 @@ class _EditorState extends ConsumerState<_Editor> {
           children: [
             ListTile(
               leading: const Icon(Icons.people_alt_outlined),
-              title: const Text('Choose a saved customer'),
+              title: Text(context.l10n.billingChooseSavedCustomer),
               onTap: () => Navigator.of(context).pop('customer'),
             ),
             ListTile(
               leading: const Icon(Icons.directions_walk_rounded),
-              title: const Text('Walk-in customer'),
+              title: Text(context.l10n.commonWalkInCustomer),
               onTap: () => Navigator.of(context).pop('walkin'),
             ),
           ],
@@ -200,9 +201,9 @@ class _EditorState extends ConsumerState<_Editor> {
     } else {
       final name = await showTextPrompt(
         context,
-        title: 'Walk-in name',
-        confirmLabel: 'Done',
-        hint: 'e.g. Kiran',
+        title: context.l10n.billingWalkInName,
+        confirmLabel: context.l10n.commonDone,
+        hint: context.l10n.billingWalkInNameHint,
       );
       setState(() {
         _customer = null;
@@ -237,11 +238,11 @@ class _EditorState extends ConsumerState<_Editor> {
 
   bool _validate() {
     if (_lines.isEmpty) {
-      showMessage(context, 'Add at least one service or product.');
+      showMessage(context, context.l10n.errBillNoLines);
       return false;
     }
     if (_discountInputError != null) {
-      showMessage(context, 'Check the discount.');
+      showMessage(context, context.l10n.billingCheckDiscount);
       return false;
     }
     return true;
@@ -253,10 +254,10 @@ class _EditorState extends ConsumerState<_Editor> {
     try {
       await ref.read(billingActionsProvider).saveDraft(_draft());
       if (!mounted) return;
-      showMessage(context, 'Draft saved');
+      showMessage(context, context.l10n.billingDraftSaved);
       Navigator.of(context).pop();
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -269,13 +270,16 @@ class _EditorState extends ConsumerState<_Editor> {
       final bill = await ref.read(billingActionsProvider).finalise(_draft());
       if (!mounted) return;
       if (bill.status == InvoiceStatus.paid) {
-        showMessage(context, '${bill.invoiceNo} saved. Nothing to pay.');
+        showMessage(
+          context,
+          context.l10n.billingSavedNothingToPay(bill.invoiceNo ?? ''),
+        );
         context.go(Routes.bill(bill.id));
       } else {
         context.go(Routes.payBill(bill.id));
       }
     } on DomainException catch (e) {
-      if (mounted) showMessage(context, e.message);
+      if (mounted) showMessage(context, context.errorText(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -283,6 +287,7 @@ class _EditorState extends ConsumerState<_Editor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final p = widget.data.parlour;
     final totals = InvoiceCalculator.calculate(
       items: [
@@ -298,20 +303,20 @@ class _EditorState extends ConsumerState<_Editor> {
     );
     final discountError =
         _discountInputError ??
-        (discountRule == null ? null : context.l10n.error(discountRule));
+        (discountRule == null ? null : l10n.error(discountRule));
 
     final clientName =
         _customer?.name ??
         (_walkInName == null || _walkInName!.isEmpty
-            ? 'Walk-in customer'
-            : 'Walk-in · $_walkInName');
+            ? l10n.commonWalkInCustomer
+            : l10n.commonWalkInNamed(_walkInName!));
 
     return DiscardChangesScope(
       isDirty: _touched && !_busy,
       child: Scaffold(
         appBar: AppTopBar(
-          title: 'Create bill',
-          subtitle: widget.data.draft == null ? null : 'Draft',
+          title: l10n.billingCreateBill,
+          subtitle: widget.data.draft == null ? null : l10n.billStatusDraft,
         ),
         body: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -321,7 +326,7 @@ class _EditorState extends ConsumerState<_Editor> {
             Space.xxl,
           ),
           children: [
-            const FieldLabel('Customer', required: true),
+            FieldLabel(l10n.commonCustomer, required: true),
             Gap.h8,
             Container(
               padding: const EdgeInsets.only(left: Space.md),
@@ -350,13 +355,13 @@ class _EditorState extends ConsumerState<_Editor> {
                   if (widget.data.appointment == null)
                     TextButton(
                       onPressed: _changeClient,
-                      child: const Text('Change'),
+                      child: Text(l10n.billingChange),
                     ),
                 ],
               ),
             ),
             Gap.h20,
-            const FieldLabel('Items', required: true),
+            FieldLabel(l10n.billingItems, required: true),
             Gap.h8,
             for (var i = 0; i < _lines.length; i++) ...[
               BillLineTile(
@@ -376,17 +381,17 @@ class _EditorState extends ConsumerState<_Editor> {
               Gap.h8,
             ],
             if (_lines.isNotEmpty)
-              const Padding(
-                padding: EdgeInsets.only(left: Space.xs, bottom: Space.xs),
-                child: Text(
-                  'Swipe a line left to remove it.',
-                  style: AppText.caption,
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: Space.xs,
+                  bottom: Space.xs,
                 ),
+                child: Text(l10n.billingSwipeToRemove, style: AppText.caption),
               ),
             OutlinedButton.icon(
               onPressed: _addItem,
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Add service or product'),
+              label: Text(l10n.billingAddItem),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
                 side: const BorderSide(color: AppColors.border),
@@ -394,7 +399,7 @@ class _EditorState extends ConsumerState<_Editor> {
               ),
             ),
             Gap.h20,
-            const FieldLabel('Discount'),
+            FieldLabel(l10n.billingDiscount),
             Gap.h8,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,8 +432,8 @@ class _EditorState extends ConsumerState<_Editor> {
                     style: AppText.body,
                     decoration: InputDecoration(
                       hintText: _discountType == DiscountType.percent
-                          ? 'e.g. 10'
-                          : 'e.g. 300',
+                          ? l10n.billingDiscountHintPercent
+                          : l10n.billingDiscountHintAmount,
                       suffixText: _discountType == DiscountType.percent
                           ? '%'
                           : null,
@@ -464,14 +469,14 @@ class _EditorState extends ConsumerState<_Editor> {
                 SizedBox(
                   width: 140,
                   child: SecondaryButton(
-                    label: 'Save draft',
+                    label: l10n.billingSaveDraft,
                     onPressed: _busy ? null : _saveDraft,
                   ),
                 ),
                 Gap.w12,
                 Expanded(
                   child: PrimaryButton(
-                    label: 'Proceed to payment',
+                    label: l10n.billingProceedToPayment,
                     loading: _busy,
                     onPressed: discountError == null ? _proceed : null,
                   ),
@@ -495,7 +500,7 @@ class _Message extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(title: 'Bill'),
+      appBar: AppTopBar(title: context.l10n.billingBill),
       body: Center(
         child: EmptyState(
           icon: Icons.receipt_long_outlined,

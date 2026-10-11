@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../data/providers.dart';
 import '../../domain/models/appointment.dart';
 import '../../domain/models/customer.dart';
@@ -13,21 +14,28 @@ import '../../domain/repositories/repositories.dart';
 import 'receipt/receipt_pdf.dart';
 
 /// "Walk-in · Kiran", or "Walk-in customer" when no name was given.
-String walkInLabel(String? name) {
+/// ('Walk-in' is the stored placeholder name for an unnamed walk-in.)
+String walkInLabel(AppLocalizations l10n, String? name) {
   final n = name?.trim();
   return (n == null || n.isEmpty || n == 'Walk-in')
-      ? 'Walk-in customer'
-      : 'Walk-in · $n';
+      ? l10n.commonWalkInCustomer
+      : l10n.commonWalkInNamed(n);
 }
 
 /// Segments on the Billing tab.
 enum BillFilter { open, all }
 
 class BillRow {
-  const BillRow({required this.invoice, required this.clientName});
+  const BillRow({required this.invoice, this.customerName});
 
   final Invoice invoice;
-  final String clientName;
+
+  /// The saved customer's name (null for walk-ins or a missing customer).
+  final String? customerName;
+
+  String clientName(AppLocalizations l10n) => invoice.customerId == null
+      ? walkInLabel(l10n, invoice.walkInName)
+      : customerName ?? l10n.commonCustomer;
 }
 
 /// All bills, newest first, with the client's name.
@@ -42,9 +50,7 @@ final billRowsProvider = FutureProvider.autoDispose<List<BillRow>>((ref) async {
     for (final i in invoices)
       BillRow(
         invoice: i,
-        clientName: i.customerId == null
-            ? walkInLabel(i.walkInName)
-            : names[i.customerId] ?? 'Customer',
+        customerName: i.customerId == null ? null : names[i.customerId],
       ),
   ];
 });
@@ -72,13 +78,19 @@ class BillDetail {
   final Customer? customer;
   final Map<String, String> staffNames;
 
-  String get clientName => customer?.name ?? walkInLabel(invoice.walkInName);
+  String clientName(AppLocalizations l10n) =>
+      customer?.name ?? walkInLabel(l10n, invoice.walkInName);
 
-  ReceiptData get receipt => ReceiptData(
+  ReceiptData receipt(AppLocalizations l10n) => ReceiptData(
     parlour: parlour,
     invoice: invoice,
     payments: payments.where((p) => !p.isVoid).toList(),
-    customerName: customer?.name ?? invoice.walkInName ?? 'Walk-in',
+    customerName:
+        customer?.name ??
+        switch (invoice.walkInName) {
+          null || 'Walk-in' => l10n.commonWalkIn,
+          final name => name,
+        },
     customerPhone: customer?.phone,
     staffNames: staffNames,
   );

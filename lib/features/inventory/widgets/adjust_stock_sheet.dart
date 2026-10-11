@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/choice_chips.dart';
@@ -55,9 +56,9 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
   String? get _error {
     final next = widget.product.stockQty + _change;
     if (next < 0) {
-      return 'Only ${widget.product.stockQty} in stock.';
+      return context.l10n.inventoryOnlyInStock(widget.product.stockQty);
     }
-    if (_change == 0) return 'That is the same as the current stock.';
+    if (_change == 0) return context.l10n.inventorySameAsCurrent;
     return null;
   }
 
@@ -81,11 +82,11 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
             note: _note.text,
           );
       if (!mounted) return;
-      showMessage(context, 'Stock updated');
+      showMessage(context, context.l10n.inventoryStockUpdated);
       navigator.pop();
     } on DomainException catch (e) {
       if (mounted) {
-        showMessage(context, e.message);
+        showMessage(context, context.errorText(e));
         setState(() => _saving = false);
       }
     }
@@ -93,7 +94,9 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final p = widget.product;
+    final unit = l10n.unit(p.unit);
     final next = p.stockQty + _change;
     final error = _error;
     return SafeArea(
@@ -103,18 +106,18 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Adjust stock', style: AppText.barTitle),
+            Text(l10n.inventoryAdjustStock, style: AppText.barTitle),
             Text(
-              '${p.name} · now ${p.stockQty} ${p.unit.name}',
+              l10n.inventoryAdjustSubtitle(p.name, p.stockQty, unit),
               style: AppText.caption,
             ),
             Gap.h16,
-            const FieldLabel('Type', required: true),
+            FieldLabel(l10n.inventoryAdjustType, required: true),
             Gap.h8,
             ChoiceChips<StockAdjustment>(
               options: [
                 for (final t in StockAdjustment.values)
-                  ChoiceOption(t, t.label),
+                  ChoiceOption(t, l10n.stockAdjustment(t)),
               ],
               selected: _type,
               onSelected: _setType,
@@ -122,8 +125,8 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
             Gap.h16,
             FieldLabel(
               _type == StockAdjustment.countCorrection
-                  ? 'Counted quantity'
-                  : 'Quantity',
+                  ? l10n.inventoryCountedQty
+                  : l10n.inventoryQty,
               required: true,
             ),
             Gap.h8,
@@ -137,7 +140,7 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
                 Gap.w16,
                 Expanded(
                   child: Text(
-                    error ?? 'New stock: $next ${p.unit.name}',
+                    error ?? l10n.inventoryNewStock(next, unit),
                     style: AppText.body.copyWith(
                       color: error == null
                           ? AppColors.success
@@ -150,14 +153,14 @@ class _AdjustSheetState extends ConsumerState<_AdjustSheet> {
             ),
             Gap.h16,
             AppTextField(
-              label: 'Note',
+              label: l10n.inventoryNote,
               controller: _note,
-              hint: 'e.g. Bought from supplier',
+              hint: l10n.inventoryNoteHint,
               textCapitalization: TextCapitalization.sentences,
             ),
             Gap.h20,
             PrimaryButton(
-              label: 'Save',
+              label: l10n.commonSave,
               loading: _saving,
               onPressed: error == null ? _save : null,
             ),

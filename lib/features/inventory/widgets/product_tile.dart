@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/money.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/status_chip.dart';
 import '../../../domain/models/product.dart';
@@ -16,22 +17,20 @@ class StockLevelChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (!product.isActive) {
-      return const StatusChip(label: 'Inactive', tone: ChipTone.neutral);
+      return StatusChip(label: l10n.commonInactive, tone: ChipTone.neutral);
     }
     return switch (product.stockLevel) {
-      StockLevel.inStock => const StatusChip(
-        label: 'In stock',
+      StockLevel.inStock => StatusChip(
+        label: l10n.stockInStock,
         tone: ChipTone.success,
       ),
-      StockLevel.low => const StatusChip(
-        label: 'Low stock',
+      StockLevel.low => StatusChip(
+        label: l10n.stockLow,
         tone: ChipTone.warning,
       ),
-      StockLevel.out => const StatusChip(
-        label: 'Out of stock',
-        tone: ChipTone.error,
-      ),
+      StockLevel.out => StatusChip(label: l10n.stockOut, tone: ChipTone.error),
     };
   }
 }
@@ -90,7 +89,10 @@ class ProductTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'Stock: ${p.stockQty} ${p.unit.name}',
+                    context.l10n.inventoryStockLine(
+                      p.stockQty,
+                      context.l10n.unit(p.unit),
+                    ),
                     style: AppText.caption.copyWith(fontSize: 13),
                   ),
                 ],

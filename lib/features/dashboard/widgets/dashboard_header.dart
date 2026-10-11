@@ -4,6 +4,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
 import '../../../core/format/dates.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/avatar_initials.dart';
 import '../../../core/widgets/header_band.dart';
 import '../dashboard_controller.dart';
@@ -78,13 +79,32 @@ class DashboardHeader extends StatelessWidget {
           ),
           Gap.h8,
           Text(
-            Greeting.forTime(data.now, name: parlour.ownerName),
+            _greeting(context.l10n, data.now, parlour.ownerName),
             style: AppText.greeting,
             maxLines: 2,
           ),
         ],
       ),
     );
+  }
+
+  /// "Good morning" or "Good morning, Kavita".
+  static String _greeting(AppLocalizations l10n, DateTime now, String? owner) {
+    final name = owner?.trim() ?? '';
+    return switch (Greeting.partOfDay(now)) {
+      DayPart.morning =>
+        name.isEmpty
+            ? l10n.dashGreetingMorning
+            : l10n.dashGreetingMorningNamed(name),
+      DayPart.afternoon =>
+        name.isEmpty
+            ? l10n.dashGreetingAfternoon
+            : l10n.dashGreetingAfternoonNamed(name),
+      DayPart.evening =>
+        name.isEmpty
+            ? l10n.dashGreetingEvening
+            : l10n.dashGreetingEveningNamed(name),
+    };
   }
 
   void _showParlourSheet(BuildContext context) {
@@ -98,7 +118,7 @@ class DashboardHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Your parlour', style: AppText.label),
+              Text(context.l10n.dashYourParlour, style: AppText.label),
               Gap.h12,
               Row(
                 children: [
@@ -132,7 +152,7 @@ class DashboardHeader extends StatelessWidget {
                   Gap.w8,
                   Expanded(
                     child: Text(
-                      'More branches in the full version',
+                      context.l10n.dashMoreBranches,
                       style: AppText.body.copyWith(color: AppColors.textMuted),
                     ),
                   ),
@@ -187,7 +207,7 @@ class _AlertsBell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: hasAlerts ? 'Alerts (new)' : 'Alerts',
+      tooltip: hasAlerts ? context.l10n.dashAlertsNew : context.l10n.dashAlerts,
       onPressed: onTap,
       color: Colors.white,
       icon: Badge(
