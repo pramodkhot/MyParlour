@@ -84,11 +84,15 @@ class MoreScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (meta != null)
-                  Text(
-                    meta,
-                    style: AppText.caption.copyWith(
-                      color: alert ? AppColors.warning : AppColors.textMuted,
-                      fontWeight: alert ? FontWeight.w700 : FontWeight.w500,
+                  Flexible(
+                    child: Text(
+                      meta,
+                      textAlign: TextAlign.end,
+                      maxLines: 2,
+                      style: AppText.caption.copyWith(
+                        color: alert ? AppColors.warning : AppColors.textMuted,
+                        fontWeight: alert ? FontWeight.w700 : FontWeight.w500,
+                      ),
                     ),
                   ),
                 const RowChevron(),

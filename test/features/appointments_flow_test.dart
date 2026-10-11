@@ -86,7 +86,10 @@ void main() {
     await scrollTo(tester, find.textContaining('Duration'));
     expect(find.text('Duration 30 min · ends 5:00 PM'), findsOneWidget);
     expect(find.text('Estimate ₹500'), findsOneWidget);
-    expect(find.text('Busy until 5:00 PM'), findsOneWidget);
+    expect(
+      find.textContaining('Busy until 5:00 PM', findRichText: true),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Book appointment'));
     await tester.pumpAndSettle();

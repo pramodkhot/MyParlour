@@ -43,11 +43,16 @@ class RoundAction extends StatelessWidget {
                 child: Icon(icon, color: AppColors.primary, size: 22),
               ),
               Gap.h4,
-              Text(
-                label,
-                style: AppText.caption.copyWith(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.w600,
+              // Scales down rather than overflowing with large text.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: AppText.caption.copyWith(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

@@ -186,40 +186,43 @@ class _Detail extends ConsumerWidget {
                     ],
                     Gap.h16,
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        RoundAction(
-                          icon: Icons.call_outlined,
-                          label: 'Call',
-                          onTap: () => _contact(
-                            context,
-                            () => contacts.call(c.phone),
-                            'calls',
+                        for (final action in [
+                          RoundAction(
+                            icon: Icons.call_outlined,
+                            label: 'Call',
+                            onTap: () => _contact(
+                              context,
+                              () => contacts.call(c.phone),
+                              'calls',
+                            ),
                           ),
-                        ),
-                        RoundAction(
-                          icon: Icons.chat_outlined,
-                          label: 'WhatsApp',
-                          onTap: () => _contact(
-                            context,
-                            () => contacts.whatsApp(c.phone),
-                            'WhatsApp links',
+                          RoundAction(
+                            icon: Icons.chat_outlined,
+                            label: 'WhatsApp',
+                            onTap: () => _contact(
+                              context,
+                              () => contacts.whatsApp(c.phone),
+                              'WhatsApp links',
+                            ),
                           ),
-                        ),
-                        RoundAction(
-                          icon: Icons.sms_outlined,
-                          label: 'SMS',
-                          onTap: () => _contact(
-                            context,
-                            () => contacts.sms(c.phone),
-                            'messages',
+                          RoundAction(
+                            icon: Icons.sms_outlined,
+                            label: 'SMS',
+                            onTap: () => _contact(
+                              context,
+                              () => contacts.sms(c.phone),
+                              'messages',
+                            ),
                           ),
-                        ),
-                        RoundAction(
-                          icon: Icons.more_horiz_rounded,
-                          label: 'More',
-                          onTap: () => _more(context, ref),
-                        ),
+                          RoundAction(
+                            icon: Icons.more_horiz_rounded,
+                            label: 'More',
+                            onTap: () => _more(context, ref),
+                          ),
+                        ])
+                          // Equal shares, so the row always fits.
+                          Expanded(child: action),
                       ],
                     ),
                   ],

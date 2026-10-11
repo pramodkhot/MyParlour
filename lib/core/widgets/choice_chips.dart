@@ -42,7 +42,7 @@ class ChoiceChips<T> extends StatelessWidget {
     ];
 
     if (!scrollable) {
-      return Wrap(spacing: Space.sm, runSpacing: Space.sm, children: chips);
+      return Wrap(spacing: Space.sm, children: chips);
     }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -75,7 +75,6 @@ class MultiChoiceChips<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       spacing: Space.sm,
-      runSpacing: Space.sm,
       children: [
         for (final option in options)
           _Chip(
@@ -93,6 +92,9 @@ class MultiChoiceChips<T> extends StatelessWidget {
   }
 }
 
+/// Invisible space above and below each chip that still counts as the chip.
+const double _tapMargin = 4;
+
 class _Chip extends StatelessWidget {
   const _Chip({
     required this.label,
@@ -109,36 +111,54 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fg = isSelected ? AppColors.primary : AppColors.textMuted;
+    // The pill is 40 high; 4 px of invisible margin above and below makes
+    // the tap target 48 px (spec Section 8).
     return Semantics(
       selected: isSelected,
       button: true,
-      child: Material(
-        color: isSelected ? AppColors.chipSelected : AppColors.surface,
-        shape: StadiumBorder(
-          side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.border,
-          ),
-        ),
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 40),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 18, color: fg),
-                    Gap.w4,
-                  ],
-                  // Flexible lets long labels wrap instead of overflowing
-                  // narrow spaces such as dialogs.
-                  Flexible(
-                    child: Text(label, style: AppText.chip.copyWith(color: fg)),
+      label: label,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: _tapMargin),
+          child: Material(
+            color: isSelected ? AppColors.chipSelected : AppColors.surface,
+            shape: StadiumBorder(
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.border,
+              ),
+            ),
+            child: InkWell(
+              customBorder: const StadiumBorder(),
+              onTap: onTap,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 40),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
                   ),
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (icon != null) ...[
+                        Icon(icon, size: 18, color: fg),
+                        Gap.w4,
+                      ],
+                      // Flexible lets long labels wrap instead of
+                      // overflowing narrow spaces such as dialogs.
+                      Flexible(
+                        child: Text(
+                          label,
+                          style: AppText.chip.copyWith(color: fg),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

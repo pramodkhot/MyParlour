@@ -727,15 +727,24 @@ class _StylistTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(staff.name, style: AppText.bodyStrong),
-                      Text(staff.roleTitle, style: AppText.caption),
+                      // Availability under the name, so it never pushes
+                      // the row wider than a small screen.
+                      Text.rich(
+                        TextSpan(
+                          text: '${staff.roleTitle} · ',
+                          children: [
+                            TextSpan(
+                              text: text,
+                              style: TextStyle(
+                                color: color,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: AppText.caption,
+                      ),
                     ],
-                  ),
-                ),
-                Text(
-                  text,
-                  style: AppText.caption.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Gap.w8,

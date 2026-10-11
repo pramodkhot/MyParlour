@@ -65,7 +65,9 @@ class ListRowCard extends StatelessWidget {
             ],
           ),
         ),
-        if (trailing != null) ...[Gap.w8, trailing!],
+        // Flexible: on narrow screens or large text the trailing part may
+        // shrink (up to half the row) instead of overflowing.
+        if (trailing != null) ...[Gap.w8, Flexible(child: trailing!)],
       ],
     );
 

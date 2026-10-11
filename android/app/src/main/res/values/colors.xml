@@ -2,4 +2,5 @@
 <resources>
     <!-- Blush from the design system; used behind the splash and the app. -->
     <color name="splash_background">#FFF6F7</color>
+    <color name="ic_launcher_background">#FFF6F7</color>
 </resources>
