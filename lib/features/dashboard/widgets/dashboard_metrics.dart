@@ -64,7 +64,7 @@ class DashboardMetrics extends StatelessWidget {
             captionColor: pending == 0
                 ? AppColors.textMuted
                 : AppColors.warning,
-            onTap: () => context.go('${Routes.billing}?filter=open'),
+            onTap: () => context.go(Routes.openBills),
           ),
           right: MetricCard(
             label: 'Customers',

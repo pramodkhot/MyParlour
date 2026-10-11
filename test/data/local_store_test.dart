@@ -7,6 +7,7 @@ import 'package:myparlour/data/local/store_data.dart';
 import 'package:myparlour/data/local/store_file.dart';
 import 'package:myparlour/domain/errors.dart';
 
+import '../helpers/memory_store_file.dart';
 import '../helpers/test_data.dart';
 
 void main() {
@@ -77,13 +78,21 @@ void main() {
   });
 
   test('concurrent changes are applied one after another', () async {
+    // In memory: this checks ordering, not the disk. (On Windows, 20 rapid
+    // renames of one file can briefly hit an antivirus lock.)
+    final memory = LocalStore(
+      storage: MemoryStoreFile(),
+      seeder: (_) => smallData(),
+    );
+    await memory.load();
     await Future.wait([
       for (var i = 0; i < 20; i++)
-        store.transact((data) {
+        memory.transact((data) {
           data.invoiceSerials['n'] = (data.invoiceSerials['n'] ?? 0) + 1;
         }),
     ]);
-    expect(store.data.invoiceSerials['n'], 20);
+    expect(memory.data.invoiceSerials['n'], 20);
+    await memory.dispose();
   });
 
   test('a damaged file is set aside and the seed is used', () async {

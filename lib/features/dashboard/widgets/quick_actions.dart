@@ -20,7 +20,7 @@ class QuickActions extends StatelessWidget {
         Routes.newCustomer,
         false,
       ),
-      (Icons.receipt_long_outlined, 'Create bill', Routes.billing, false),
+      (Icons.receipt_long_outlined, 'Create bill', Routes.newBill(), false),
       (
         Icons.account_balance_wallet_outlined,
         'Add expense',

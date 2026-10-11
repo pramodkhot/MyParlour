@@ -343,7 +343,13 @@ class _DetailState extends ConsumerState<_Detail> {
         content = PrimaryButton(
           label: bill == null ? 'Create bill' : 'View bill',
           icon: Icons.receipt_long_outlined,
-          onPressed: () => context.go(Routes.billing),
+          onPressed: () => context.go(
+            bill == null
+                ? Routes.newBill(appointmentId: a.id)
+                : (bill.isDraft
+                      ? Routes.editBill(bill.id)
+                      : Routes.bill(bill.id)),
+          ),
         );
       case AppointmentStatus.cancelled || AppointmentStatus.noShow:
         return null;

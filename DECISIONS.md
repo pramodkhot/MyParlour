@@ -150,3 +150,40 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
   bill itself.
 - **Messages float above bottom action buttons**, so they never hide "Check in" or "Save".
 - **Customer history entries** open the appointment.
+
+## Phase 6
+
+- **Open bills** = drafts plus finalised bills with money still due. "All bills" includes paid and
+  void ones. The Dashboard's "Pending payments" card opens Open bills.
+- **A bill's id is chosen when the Create bill screen opens**, and a payment's id when the Payment
+  screen opens. Tapping "Proceed to payment" or "Confirm" twice therefore creates one bill and one
+  payment (also covered by tests).
+- **Save draft** keeps the bill without a number and without touching stock. Drafts reopen in the
+  editor from the bills list; "Proceed to payment" finalises them.
+- **Proceed to payment** finalises the bill (number assigned, stock reduced) and opens Payment. A
+  ₹0 bill is paid at once and opens the bill instead.
+- **Bill from an appointment** fills the customer, services, prices (from the booking) and the
+  stylist, and links the bill to the appointment. The customer cannot be changed there. Lines can
+  still be added, changed or removed.
+- **New lines** added on a bill from an appointment are credited to that appointment's stylist.
+- **Products** without a selling price, or out of stock, cannot be added. Quantity is capped at the
+  stock on hand; the final check happens when the bill is finalised.
+- **Discount** is entered as ₹ or %; percent accepts decimals (12.5%). It cannot exceed the
+  subtotal.
+- **Lines are removed by swiping left** (as specified), with a hint under the list.
+- **Bill view** (opened from the list or "View bill") shows items, totals, paid, balance and the
+  payment list, with Record payment, Share, Print, Download and Void.
+- **Payment reference** label changes with the method: "UPI ref", "Card last 4" (4 digits) or
+  "Reference".
+- **Receipt PDF** is A5, uses the app's fonts (₹ sign included), and says "RECEIPT" with "This is a
+  payment receipt, not a GST tax invoice" unless GST was on for that bill *and* a GSTIN is set,
+  in which case it says "TAX INVOICE" and shows the GSTIN.
+- **Share** sends the PDF through the phone's share sheet (WhatsApp, email…). **Print** opens the
+  phone's print screen. **Download PDF** opens the same screen, where "Save as PDF" saves the file
+  to Downloads (no storage permission needed on any Android version).
+- **Void bill** (bill menu) asks first, then voids the bill and its payments and returns sold
+  products to stock.
+- **`image` is pinned to 4.9.2.** `pdf` 3.12 allows only `archive` < 4.1, but `image` 4.10+ calls
+  an `archive` method added later, so it fails to compile. `pdf` 3.13.1 fixes this but needs
+  Dart 3.12, newer than the Flutter on the build PC. Revisit when upgrading Flutter.
+- **Walk-in bills with no name** show as "Walk-in customer".

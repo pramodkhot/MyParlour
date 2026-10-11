@@ -23,6 +23,26 @@ abstract final class Routes {
     ).toString();
   }
 
+  static const openBills = '/billing?filter=open';
+
+  /// New bill, optionally from an appointment or for a customer.
+  static String newBill({String? appointmentId, String? customerId}) {
+    final query = <String, String>{
+      'appointmentId': ?appointmentId,
+      'customerId': ?customerId,
+    };
+    return Uri(
+      path: '/billing/new',
+      queryParameters: query.isEmpty ? null : query,
+    ).toString();
+  }
+
+  static String bill(String id) => '/billing/$id';
+  static String editBill(String id) => '/billing/$id/edit';
+  static String payBill(String id) => '/billing/$id/pay';
+  static String paymentDone(String id, String paymentId) =>
+      '/billing/$id/paid/$paymentId';
+
   static String appointment(String id) => '/appointments/$id';
   static String rescheduleAppointment(String id) => '/appointments/$id/edit';
 

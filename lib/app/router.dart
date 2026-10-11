@@ -5,6 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../features/appointments/appointment_detail_screen.dart';
 import '../features/appointments/appointments_screen.dart';
 import '../features/appointments/booking_screen.dart';
+import '../features/billing/bill_editor_screen.dart';
+import '../features/billing/bill_screen.dart';
+import '../features/billing/billing_controller.dart';
+import '../features/billing/billing_screen.dart';
+import '../features/billing/payment_screen.dart';
+import '../features/billing/payment_success_screen.dart';
 import '../features/customers/customer_detail_screen.dart';
 import '../features/customers/customer_form_screen.dart';
 import '../features/customers/customers_screen.dart';
@@ -73,11 +79,53 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.billing,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Billing',
-                  icon: Icons.receipt_long_outlined,
-                  phase: 6,
+                builder: (_, state) => BillingScreen(
+                  initialFilter: state.uri.queryParameters['filter'] == 'all'
+                      ? BillFilter.all
+                      : BillFilter.open,
                 ),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    builder: (_, state) => BillEditorScreen(
+                      args: (
+                        draftId: null,
+                        appointmentId:
+                            state.uri.queryParameters['appointmentId'],
+                        customerId: state.uri.queryParameters['customerId'],
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':id',
+                    builder: (_, state) =>
+                        BillScreen(billId: state.pathParameters['id']!),
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        builder: (_, state) => BillEditorScreen(
+                          args: (
+                            draftId: state.pathParameters['id'],
+                            appointmentId: null,
+                            customerId: null,
+                          ),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'pay',
+                        builder: (_, state) =>
+                            PaymentScreen(billId: state.pathParameters['id']!),
+                      ),
+                      GoRoute(
+                        path: 'paid/:paymentId',
+                        builder: (_, state) => PaymentSuccessScreen(
+                          billId: state.pathParameters['id']!,
+                          paymentId: state.pathParameters['paymentId']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

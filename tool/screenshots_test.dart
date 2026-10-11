@@ -159,6 +159,35 @@ void main() {
     await _shot(tester, '44_overlap');
   });
 
+  testWidgets('billing', (tester) async {
+    usePhoneScreen(tester);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    await pumpDemoApp(tester);
+    await enterApp(tester);
+    await tapAndSettle(tester, navItem('Billing'));
+    await _shot(tester, '50_billing');
+
+    await tapAndSettle(tester, find.text('New bill'));
+    await tapAndSettle(tester, find.text('Add service or product'));
+    await tapAndSettle(tester, find.text('Smoothening'));
+    await tapAndSettle(tester, find.text('Add service or product'));
+    await tapAndSettle(tester, find.text('Products'));
+    await tapAndSettle(tester, find.text('Hair Serum').last);
+    await tester.enterText(find.byType(TextField).last, '300');
+    await tester.pumpAndSettle();
+    await _shot(tester, '51_create_bill');
+
+    await tapAndSettle(tester, find.text('Proceed to payment'));
+    await tester.tap(find.text('UPI'));
+    await tester.pumpAndSettle();
+    await typeInto(tester, 'Amount received', '2000');
+    await _shot(tester, '52_payment');
+
+    await tapAndSettle(tester, find.text('Confirm ₹2,000'));
+    await _shot(tester, '53_success');
+  });
+
   testWidgets('staff', (tester) async {
     await open(tester, 'Staff');
     await _shot(tester, '30_staff');
