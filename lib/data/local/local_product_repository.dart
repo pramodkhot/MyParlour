@@ -24,15 +24,15 @@ class LocalProductRepository implements ProductRepository {
   @override
   Future<Product> save(Product product) => _store.transact((data) {
     if (product.name.trim().isEmpty) {
-      throw const ValidationException('Enter the product name.');
+      throw const ValidationException(ErrorCode.productNameRequired);
     }
     if (product.lowStockAt < 0) {
-      throw const ValidationException('Low-stock alert cannot be negative.');
+      throw const ValidationException(ErrorCode.lowStockNegative);
     }
     final existing = findById(data.products, product.id, (p) => p.id);
     if (existing == null) {
       if (product.stockQty < 0) {
-        throw const ValidationException('Opening stock cannot be negative.');
+        throw const ValidationException(ErrorCode.openingStockNegative);
       }
       final created = product.copyWith(parlourId: data.parlour.id);
       data.products.add(created);
@@ -65,7 +65,7 @@ class LocalProductRepository implements ProductRepository {
       _store.transact((data) {
         final product = findById(data.products, id, (p) => p.id);
         if (product == null) {
-          throw const NotFoundException('Product not found.');
+          throw const NotFoundException(ErrorCode.productNotFound);
         }
         upsertById(
           data.products,
@@ -82,13 +82,15 @@ class LocalProductRepository implements ProductRepository {
     String? note,
   }) => _store.transact((data) {
     if (qtyChange == 0) {
-      throw const ValidationException('Enter a quantity more than 0.');
+      throw const ValidationException(ErrorCode.stockChangeZero);
     }
     if (reason == StockReason.sale || reason == StockReason.voidReversal) {
-      throw const ValidationException('Sales change stock through bills.');
+      throw const ValidationException(ErrorCode.stockSalesViaBills);
     }
     final product = findById(data.products, productId, (p) => p.id);
-    if (product == null) throw const NotFoundException('Product not found.');
+    if (product == null) {
+      throw const NotFoundException(ErrorCode.productNotFound);
+    }
     final updated = StockRules.apply(product, qtyChange);
     upsertById(data.products, updated, (p) => p.id);
     final trimmed = note?.trim();

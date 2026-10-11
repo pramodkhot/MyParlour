@@ -36,10 +36,10 @@ abstract final class AppointmentRules {
     String? cancelReason,
   }) {
     if (!canChange(appointment.status, to)) {
-      throw InvalidStatusChangeException(
-        'This appointment is ${label(appointment.status).toLowerCase()} '
-        'and cannot be marked ${label(to).toLowerCase()}.',
-      );
+      throw InvalidStatusChangeException(ErrorCode.statusChange, {
+        'from': appointment.status.name,
+        'to': to.name,
+      });
     }
     final reason = cancelReason?.trim();
     return appointment.copyWith(
@@ -52,14 +52,6 @@ abstract final class AppointmentRules {
           : null,
     );
   }
-
-  static String label(AppointmentStatus status) => switch (status) {
-    AppointmentStatus.booked => 'Upcoming',
-    AppointmentStatus.checkedIn => 'Checked in',
-    AppointmentStatus.completed => 'Completed',
-    AppointmentStatus.cancelled => 'Cancelled',
-    AppointmentStatus.noShow => 'No-show',
-  };
 
   /// True when [aStart, aEnd) and [bStart, bEnd) share any time.
   static bool overlaps(

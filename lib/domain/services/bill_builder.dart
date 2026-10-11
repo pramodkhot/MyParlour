@@ -15,16 +15,18 @@ abstract final class BillBuilder {
     Invoice? previous,
   }) {
     if (draft.lines.isEmpty) {
-      throw const ValidationException('Add at least one service or product.');
+      throw const ValidationException(ErrorCode.billNoLines);
     }
     for (final line in draft.lines) {
       if (line.qty <= 0) {
-        throw ValidationException(
-          'Quantity for ${line.name} must be at least 1.',
-        );
+        throw ValidationException(ErrorCode.lineQtyInvalid, {
+          'name': line.name,
+        });
       }
       if (line.unitPricePaise < 0 || line.itemDiscountPaise < 0) {
-        throw ValidationException('Check the price of ${line.name}.');
+        throw ValidationException(ErrorCode.linePriceInvalid, {
+          'name': line.name,
+        });
       }
     }
 
@@ -55,7 +57,9 @@ abstract final class BillBuilder {
       draft.discount,
       subtotal,
     );
-    if (discountError != null) throw ValidationException(discountError);
+    if (discountError != null) {
+      throw ValidationException(discountError.code, discountError.args);
+    }
 
     final totals = InvoiceCalculator.calculate(
       items: items,

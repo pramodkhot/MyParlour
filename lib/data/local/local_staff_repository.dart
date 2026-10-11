@@ -25,7 +25,7 @@ class LocalStaffRepository implements StaffRepository {
   @override
   Future<Staff> save(Staff staff) => _store.transact((data) {
     if (staff.name.trim().isEmpty) {
-      throw const ValidationException('Enter the staff member’s name.');
+      throw const ValidationException(ErrorCode.staffNameRequired);
     }
     final saved = staff.copyWith(parlourId: data.parlour.id);
     upsertById(data.staff, saved, (s) => s.id);
@@ -37,7 +37,7 @@ class LocalStaffRepository implements StaffRepository {
       _store.transact((data) {
         final staff = findById(data.staff, id, (s) => s.id);
         if (staff == null) {
-          throw const NotFoundException('Staff member not found.');
+          throw const NotFoundException(ErrorCode.staffNotFound);
         }
         upsertById(data.staff, staff.copyWith(isActive: isActive), (s) => s.id);
       });

@@ -2,17 +2,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 
 import 'app/app.dart';
 import 'app/startup_error_app.dart';
+import 'core/l10n/app_language.dart';
+import 'core/l10n/language_controller.dart';
+import 'core/l10n/western_digits.dart';
 import 'data/local/open_local_store.dart';
 import 'data/providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Intl.defaultLocale = 'en_IN';
-  await initializeDateFormatting('en_IN');
+  for (final language in AppLanguage.values) {
+    await initializeDateFormatting(language.intlLocale);
+  }
+  useWesternDigits();
   if (kReleaseMode) ErrorWidget.builder = friendlyErrorWidget;
   await _start();
 }
@@ -21,10 +25,16 @@ Future<void> main() async {
 /// data cannot be opened.
 Future<void> _start() async {
   try {
-    final store = await openLocalStore();
+    final prefs = await openPrefsStore();
+    final store = await openLocalStore(
+      language: AppLanguage.fromCode(prefs['language']),
+    );
     runApp(
       ProviderScope(
-        overrides: [localStoreProvider.overrideWithValue(store)],
+        overrides: [
+          localStoreProvider.overrideWithValue(store),
+          prefsStoreProvider.overrideWithValue(prefs),
+        ],
         child: const MyParlourApp(),
       ),
     );

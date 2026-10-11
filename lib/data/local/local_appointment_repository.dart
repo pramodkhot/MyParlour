@@ -39,20 +39,18 @@ class LocalAppointmentRepository implements AppointmentRepository {
   @override
   Future<Appointment> save(Appointment appointment) => _store.transact((data) {
     if (appointment.services.isEmpty) {
-      throw const ValidationException('Choose at least one service.');
+      throw const ValidationException(ErrorCode.appointmentNoServices);
     }
     if (appointment.customerId == null &&
         (appointment.walkInName?.trim().isEmpty ?? true)) {
-      throw const ValidationException('Choose a customer or enter a name.');
+      throw const ValidationException(ErrorCode.appointmentNoClient);
     }
     if (!appointment.endsAt.isAfter(appointment.startsAt)) {
-      throw const ValidationException('End time must be after start time.');
+      throw const ValidationException(ErrorCode.appointmentEndBeforeStart);
     }
     final existing = findById(data.appointments, appointment.id, (a) => a.id);
     if (existing != null && AppointmentRules.isFinal(existing.status)) {
-      throw const InvalidStatusChangeException(
-        'Finished appointments cannot be changed.',
-      );
+      throw const InvalidStatusChangeException(ErrorCode.appointmentFinished);
     }
     final saved = appointment.copyWith(parlourId: data.parlour.id);
     upsertById(data.appointments, saved, (a) => a.id);
@@ -67,7 +65,7 @@ class LocalAppointmentRepository implements AppointmentRepository {
   }) => _store.transact((data) {
     final appointment = findById(data.appointments, id, (a) => a.id);
     if (appointment == null) {
-      throw const NotFoundException('Appointment not found.');
+      throw const NotFoundException(ErrorCode.appointmentNotFound);
     }
     final updated = AppointmentRules.changeStatus(
       appointment,

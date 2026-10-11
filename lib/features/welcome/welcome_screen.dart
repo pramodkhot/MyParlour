@@ -180,6 +180,7 @@ class _Content extends StatelessWidget {
         ),
         compact ? Gap.h16 : Gap.h24,
         PrimaryButton(
+          key: const Key('welcome.explore'),
           label: 'Explore MyParlour',
           onPressed: onExplore,
           autofocus: autofocus,

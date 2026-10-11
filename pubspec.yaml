@@ -40,6 +40,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Builds lib/l10n/gen/app_localizations*.dart from lib/l10n/*.arb.
+  generate: true
 
   assets:
     - assets/illustrations/
@@ -64,4 +66,17 @@ flutter:
         - asset: assets/fonts/PlayfairDisplay-600.ttf
           weight: 600
         - asset: assets/fonts/PlayfairDisplay-700.ttf
+          weight: 700
+    # Devanagari (Marathi, Hindi): used as fallbacks for Manrope / Playfair.
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-400.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansDevanagari-600.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansDevanagari-700.ttf
+          weight: 700
+    - family: NotoSerifDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSerifDevanagari-700.ttf
           weight: 700

@@ -55,9 +55,7 @@ class LocalInvoiceRepository implements InvoiceRepository {
     for (final entry in soldByProduct.entries) {
       final product = findById(data.products, entry.key, (p) => p.id);
       if (product == null) {
-        throw const NotFoundException(
-          'A product on this bill no longer exists.',
-        );
+        throw const NotFoundException(ErrorCode.billProductMissing);
       }
       upsertById(
         data.products,
@@ -102,25 +100,23 @@ class LocalInvoiceRepository implements InvoiceRepository {
   @override
   Future<Invoice> recordPayment(PaymentInput input) => _store.transact((data) {
     final invoice = findById(data.invoices, input.invoiceId, (i) => i.id);
-    if (invoice == null) throw const NotFoundException('Bill not found.');
+    if (invoice == null) throw const NotFoundException(ErrorCode.billNotFound);
 
     // Same payment id again (double tap): nothing extra is recorded.
     if (data.payments.any((p) => p.id == input.id)) return invoice;
 
     if (invoice.isDraft) {
-      throw const ValidationException(
-        'Finalise the bill before taking payment.',
-      );
+      throw const ValidationException(ErrorCode.paymentNeedsFinalisedBill);
     }
     if (invoice.isVoid) {
-      throw const ValidationException('This bill is void.');
+      throw const ValidationException(ErrorCode.billIsVoid);
     }
     final error = InvoiceRules.paymentError(
       amountPaise: input.amountPaise,
       balancePaise: invoice.balancePaise,
       method: input.method,
     );
-    if (error != null) throw ValidationException(error);
+    if (error != null) throw ValidationException(error.code, error.args);
 
     data.payments.add(
       Payment(
@@ -142,7 +138,7 @@ class LocalInvoiceRepository implements InvoiceRepository {
   @override
   Future<Invoice> voidInvoice(String id) => _store.transact((data) {
     final invoice = findById(data.invoices, id, (i) => i.id);
-    if (invoice == null) throw const NotFoundException('Bill not found.');
+    if (invoice == null) throw const NotFoundException(ErrorCode.billNotFound);
     if (invoice.isVoid) return invoice;
     final now = _store.clock();
 
@@ -191,15 +187,14 @@ class LocalInvoiceRepository implements InvoiceRepository {
   Invoice _putDraft(StoreData data, BillDraft draft) {
     final previous = findById(data.invoices, draft.id, (i) => i.id);
     if (previous != null && !previous.isDraft) {
-      throw const ValidationException('This bill is already finalised.');
+      throw const ValidationException(ErrorCode.billAlreadyFinalised);
     }
     if (draft.appointmentId != null) {
       final other = _billForAppointment(data, draft.appointmentId!);
       if (other != null && other.id != draft.id) {
-        throw ValidationException(
-          'This appointment already has a bill'
-          '${other.invoiceNo == null ? '' : ' (${other.invoiceNo})'}.',
-        );
+        throw ValidationException(ErrorCode.appointmentAlreadyBilled, {
+          'invoiceNo': ?other.invoiceNo,
+        });
       }
     }
     final invoice = BillBuilder.buildDraft(

@@ -111,7 +111,7 @@ void main() {
           amountPaise: 1001,
           balancePaise: 1000,
           method: PaymentMethod.upi,
-        ),
+        )?.message,
         'Amount is more than the balance due.',
       );
     });

@@ -20,13 +20,13 @@ class LocalServiceRepository implements ServiceRepository {
   @override
   Future<ServiceItem> save(ServiceItem service) => _store.transact((data) {
     if (service.name.trim().isEmpty) {
-      throw const ValidationException('Enter the service name.');
+      throw const ValidationException(ErrorCode.serviceNameRequired);
     }
     if (service.pricePaise < 0) {
-      throw const ValidationException('Price cannot be negative.');
+      throw const ValidationException(ErrorCode.priceNegative);
     }
     if (service.durationMin <= 0) {
-      throw const ValidationException('Choose how long the service takes.');
+      throw const ValidationException(ErrorCode.serviceDurationRequired);
     }
     final saved = service.copyWith(parlourId: data.parlour.id);
     upsertById(data.services, saved, (s) => s.id);
@@ -38,7 +38,7 @@ class LocalServiceRepository implements ServiceRepository {
       _store.transact((data) {
         final service = findById(data.services, id, (s) => s.id);
         if (service == null) {
-          throw const NotFoundException('Service not found.');
+          throw const NotFoundException(ErrorCode.serviceNotFound);
         }
         upsertById(
           data.services,

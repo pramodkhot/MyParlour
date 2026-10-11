@@ -7,6 +7,7 @@
 /// - Each method that changes several records does so all-or-nothing.
 library;
 
+import '../../core/l10n/app_language.dart';
 import '../models/appointment.dart';
 import '../models/customer.dart';
 import '../models/date_range.dart';
@@ -192,8 +193,13 @@ abstract interface class ExpenseRepository {
 }
 
 abstract interface class DemoDataRepository {
-  /// Restores the original sample data, dated relative to today.
-  Future<void> resetDemo();
+  /// Restores the original sample data, dated relative to today, with its
+  /// names and notes in [language].
+  Future<void> resetDemo({AppLanguage language = AppLanguage.en});
+
+  /// True while the data is the untouched sample (nothing changed since it
+  /// was created), so it can be re-created in another language safely.
+  bool get isUntouchedSample;
 
   /// Keeps the parlour profile and clears everything else.
   Future<void> startEmpty();

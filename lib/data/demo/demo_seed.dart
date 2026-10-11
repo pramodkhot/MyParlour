@@ -13,20 +13,37 @@ import '../../domain/repositories/repositories.dart';
 import '../../domain/services/bill_builder.dart';
 import '../../domain/services/invoice_calculator.dart';
 import '../../domain/services/invoice_rules.dart';
+import '../../core/l10n/app_language.dart';
 import '../local/store_data.dart';
+import 'demo_seed_texts.dart';
 
 /// Builds the "Beauty Bliss Parlour" sample data (spec Section 7).
 ///
 /// Every date is relative to [now], so today's appointments are always
 /// today. The content is fixed (no randomness); only ids differ per reset.
 class DemoSeed {
-  DemoSeed({required this.now, required this.newId});
+  DemoSeed({
+    required this.now,
+    required this.newId,
+    this.language = AppLanguage.en,
+  });
 
   final DateTime now;
   final String Function() newId;
 
-  static StoreData build(DateTime now, String Function() newId) =>
-      DemoSeed(now: now, newId: newId)._build();
+  /// Service and product names and notes are written in this language.
+  /// Categories, roles and expense types stay as stable English keys (the
+  /// app shows them translated).
+  final AppLanguage language;
+
+  static StoreData build(
+    DateTime now,
+    String Function() newId, {
+    AppLanguage language = AppLanguage.en,
+  }) => DemoSeed(now: now, newId: newId, language: language)._build();
+
+  /// [english] in the seed's language (unchanged when no translation).
+  String _t(String english) => seedText(language, english);
 
   late final String _parlourId = newId();
   late final DateTime _today = DateTime(now.year, now.month, now.day);
@@ -73,6 +90,7 @@ class DemoSeed {
     invoicePrefix: 'BBP',
     taxEnabled: false,
     defaultTaxRateBp: 1800,
+    receiptFooter: _t('Thank you! Visit again.'),
   );
 
   // --------------------------------------------------------------- services
@@ -97,7 +115,7 @@ class DemoSeed {
       _serviceByName[name] = ServiceItem(
         id: newId(),
         parlourId: _parlourId,
-        name: name,
+        name: _t(name),
         category: category,
         pricePaise: rupees * 100,
         durationMin: minutes,
@@ -243,7 +261,7 @@ class DemoSeed {
           phone: phone,
           email: email,
           birthday: birthday,
-          notes: notes,
+          notes: notes == null ? null : _t(notes),
           createdAt: _at(-sinceDays, 11),
         ),
     ];
@@ -271,7 +289,7 @@ class DemoSeed {
       _productByName[name] = Product(
         id: newId(),
         parlourId: _parlourId,
-        name: name,
+        name: _t(name),
         category: category,
         unit: unit,
         sellingPricePaise: price * 100,
@@ -298,7 +316,7 @@ class DemoSeed {
           productId: product.id,
           qtyChange: opening,
           reason: StockReason.purchase,
-          note: 'Opening stock',
+          note: _t('Opening stock'),
           createdAt: _at(-31, 10),
         ),
       );
@@ -321,7 +339,7 @@ class DemoSeed {
       amountPaise: rupees * 100,
       spentOn: _day(dayOffset),
       method: method,
-      note: note,
+      note: note == null ? null : _t(note),
     );
     // Rent is paid on the 1st of this month and salaries on the last day of
     // last month, so "This month" in Reports shows a realistic picture.
@@ -406,7 +424,7 @@ class DemoSeed {
         start: _at(-3, 17, 30),
         services: ['Facial'],
         status: AppointmentStatus.cancelled,
-        cancelReason: 'Customer was unwell',
+        cancelReason: _t('Customer was unwell'),
       ),
       _appointment(
         customer: 'Sakshi Gupta',
@@ -414,7 +432,7 @@ class DemoSeed {
         start: _at(-9, 18),
         services: ['Haircut'],
         status: AppointmentStatus.cancelled,
-        cancelReason: 'Rescheduled by customer',
+        cancelReason: _t('Rescheduled by customer'),
       ),
       _appointment(
         customer: 'Rashmi Pawar',
@@ -433,7 +451,7 @@ class DemoSeed {
         start: _at(0, 10),
         services: ['Haircut', 'Smoothening'],
         status: AppointmentStatus.completed,
-        notes: 'Prefers less heat in smoothening.',
+        notes: _t('Prefers less heat in smoothening.'),
       ),
       _appointment(
         customer: 'Neha Verma',
@@ -602,7 +620,7 @@ class DemoSeed {
       for (final name in services)
         AppointmentService(
           serviceId: _serviceByName[name]!.id,
-          name: name,
+          name: _serviceByName[name]!.name,
           pricePaise: _serviceByName[name]!.pricePaise,
           durationMin: _serviceByName[name]!.durationMin,
         ),
@@ -646,7 +664,7 @@ class DemoSeed {
         BillLine(
           type: InvoiceItemType.product,
           refId: _productByName[product.$1]!.id,
-          name: product.$1,
+          name: _productByName[product.$1]!.name,
           unitPricePaise: _productByName[product.$1]!.sellingPricePaise!,
           qty: product.$2,
           taxRateBp: 1800,

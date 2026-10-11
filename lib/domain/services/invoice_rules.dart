@@ -1,3 +1,4 @@
+import '../errors.dart';
 import '../models/invoice.dart';
 import '../models/payment.dart';
 
@@ -34,16 +35,18 @@ abstract final class InvoiceRules {
     required int serial,
   }) => '$prefix/${financialYear(date)}/${serial.toString().padLeft(4, '0')}';
 
-  /// Plain-language problem with a payment, or null when it can be recorded.
-  static String? paymentError({
+  /// The problem with a payment, or null when it can be recorded.
+  static DomainError? paymentError({
     required int amountPaise,
     required int balancePaise,
     required PaymentMethod? method,
   }) {
-    if (method == null) return 'Choose how the customer paid.';
-    if (amountPaise <= 0) return 'Enter an amount more than ₹0.';
+    if (method == null) {
+      return const DomainError(ErrorCode.paymentMethodRequired);
+    }
+    if (amountPaise <= 0) return const DomainError(ErrorCode.paymentAmountZero);
     if (amountPaise > balancePaise) {
-      return 'Amount is more than the balance due.';
+      return const DomainError(ErrorCode.paymentOverBalance);
     }
     return null;
   }

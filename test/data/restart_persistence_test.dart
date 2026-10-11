@@ -17,7 +17,7 @@ import '../helpers/test_data.dart';
 void main() {
   test('customers, services and staff survive an app restart', () async {
     final store = await openTestStore(
-      seeder: (now) => DemoSeed.build(now, sequentialIds('seed')),
+      seeder: (now, _) => DemoSeed.build(now, sequentialIds('seed')),
     );
     final dir = storeDirectory(store);
     final customers = LocalCustomerRepository(store);
@@ -74,7 +74,7 @@ void main() {
     // Restart: a brand-new store reading the same folder.
     final reopened = LocalStore(
       storage: DiskStoreFile(dir),
-      seeder: (_) => throw StateError('must not reseed'),
+      seeder: (_, _) => throw StateError('must not reseed'),
     );
     await reopened.load();
     expect(reopened.seededOnLoad, isFalse);

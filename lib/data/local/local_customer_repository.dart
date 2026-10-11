@@ -29,7 +29,7 @@ class LocalCustomerRepository implements CustomerRepository {
   @override
   Future<Customer> save(Customer customer) => _store.transact((data) {
     if (customer.name.trim().isEmpty) {
-      throw const ValidationException('Enter the customer name.');
+      throw const ValidationException(ErrorCode.customerNameRequired);
     }
     final saved = customer.copyWith(
       parlourId: data.parlour.id,
@@ -45,7 +45,7 @@ class LocalCustomerRepository implements CustomerRepository {
       _store.transact((data) {
         final customer = findById(data.customers, id, (c) => c.id);
         if (customer == null) {
-          throw const NotFoundException('Customer not found.');
+          throw const NotFoundException(ErrorCode.customerNotFound);
         }
         upsertById(
           data.customers,

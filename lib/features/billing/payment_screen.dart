@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/colors.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/money.dart';
@@ -96,11 +97,12 @@ class _PaymentFormState extends ConsumerState<_PaymentForm> {
   String? get _error {
     final paise = _amountPaise;
     if (paise == null) return 'Enter the amount received.';
-    return InvoiceRules.paymentError(
+    final rule = InvoiceRules.paymentError(
       amountPaise: paise,
       balancePaise: _balance,
       method: _method,
     );
+    return rule == null ? null : context.l10n.error(rule);
   }
 
   Future<void> _confirm() async {

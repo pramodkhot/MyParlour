@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import '../../core/l10n/app_language.dart';
 import 'store_data.dart';
 import 'store_file.dart';
 
-/// Builds a fresh data set, e.g. the demo seed for "now".
-typedef StoreSeeder = StoreData Function(DateTime now);
+/// Builds a fresh data set, e.g. the demo seed for "now" in a language.
+typedef StoreSeeder = StoreData Function(DateTime now, AppLanguage language);
 
 /// Keeps all app data in memory and saves it as one JSON document in
 /// [storage] (on the phone: `myparlour_demo.json`, see [DiskStoreFile]).
@@ -26,6 +27,7 @@ class LocalStore {
 
   StoreData? _data;
   bool _seededOnLoad = false;
+  bool _pristine = false;
   Future<void> _queue = Future.value();
   final _changes = StreamController<void>.broadcast();
 
@@ -36,6 +38,10 @@ class LocalStore {
   /// launch after install.
   bool get seededOnLoad => _seededOnLoad;
 
+  /// True while the data is exactly a fresh seed (nothing changed since),
+  /// so it can be re-created in another language without losing anything.
+  bool get isPristine => _pristine;
+
   StoreData get data {
     final data = _data;
     if (data == null) throw StateError('LocalStore.load() was not called.');
@@ -44,7 +50,7 @@ class LocalStore {
 
   /// Reads the saved data, or seeds and saves when there is none. Damaged
   /// data is set aside as `.broken-<time>` and the seed is used instead.
-  Future<void> load() async {
+  Future<void> load({AppLanguage language = AppLanguage.en}) async {
     final text = await storage.read();
     if (text != null) {
       try {
@@ -54,10 +60,11 @@ class LocalStore {
         await storage.setAside('broken-${clock().millisecondsSinceEpoch}');
       }
     }
-    final seeded = seeder(clock());
+    final seeded = seeder(clock(), language);
     await _write(seeded);
     _data = seeded;
     _seededOnLoad = true;
+    _pristine = true;
   }
 
   /// Runs [change] on a copy of the data, saves it, then makes it current.
@@ -68,16 +75,20 @@ class LocalStore {
         final result = change(working);
         await _write(working);
         _data = working;
+        _pristine = false;
         _changes.add(null);
         return result;
       });
 
-  /// Replaces all data (reset demo / start empty).
-  Future<void> replaceAll(StoreData next) => _serialised(() async {
-    await _write(next);
-    _data = next;
-    _changes.add(null);
-  });
+  /// Replaces all data (reset demo / start empty). [pristine] marks a fresh
+  /// seed.
+  Future<void> replaceAll(StoreData next, {bool pristine = false}) =>
+      _serialised(() async {
+        await _write(next);
+        _data = next;
+        _pristine = pristine;
+        _changes.add(null);
+      });
 
   Future<void> dispose() => _changes.close();
 

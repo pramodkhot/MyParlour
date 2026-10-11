@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../core/design/colors.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/design/spacing.dart';
 import '../../core/design/typography.dart';
 import '../../core/format/money.dart';
@@ -291,9 +292,13 @@ class _EditorState extends ConsumerState<_Editor> {
       taxEnabled: p.taxEnabled,
       pricesIncludeTax: p.pricesIncludeTax,
     );
+    final discountRule = InvoiceCalculator.discountError(
+      _billDiscount,
+      totals.subtotalPaise,
+    );
     final discountError =
         _discountInputError ??
-        InvoiceCalculator.discountError(_billDiscount, totals.subtotalPaise);
+        (discountRule == null ? null : context.l10n.error(discountRule));
 
     final clientName =
         _customer?.name ??

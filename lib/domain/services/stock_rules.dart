@@ -31,11 +31,14 @@ abstract final class StockRules {
   static Product apply(Product product, int qtyChange) {
     final next = product.stockQty + qtyChange;
     if (next < 0) {
-      throw InsufficientStockException(
-        product.stockQty == 0
-            ? '${product.name} is out of stock.'
-            : 'Only ${product.stockQty} ${product.name} left in stock.',
-      );
+      throw product.stockQty == 0
+          ? InsufficientStockException(ErrorCode.outOfStock, {
+              'name': product.name,
+            })
+          : InsufficientStockException(ErrorCode.notEnoughStock, {
+              'name': product.name,
+              'qty': product.stockQty,
+            });
     }
     return product.copyWith(stockQty: next);
   }

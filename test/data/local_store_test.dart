@@ -31,7 +31,7 @@ void main() {
 
     final reopened = LocalStore(
       storage: DiskStoreFile(storeDirectory(store)),
-      seeder: (_) => throw StateError('should not seed again'),
+      seeder: (_, _) => throw StateError('should not seed again'),
     );
     await reopened.load();
     expect(jsonEncode(reopened.data.toJson()), before);
@@ -52,7 +52,7 @@ void main() {
     await expectLater(
       store.transact((data) {
         data.customers.clear();
-        throw const ValidationException('nope');
+        throw const ValidationException(ErrorCode.billNoLines);
       }),
       throwsA(isA<ValidationException>()),
     );
@@ -82,7 +82,7 @@ void main() {
     // renames of one file can briefly hit an antivirus lock.)
     final memory = LocalStore(
       storage: MemoryStoreFile(),
-      seeder: (_) => smallData(),
+      seeder: (_, _) => smallData(),
     );
     await memory.load();
     await Future.wait([
@@ -100,7 +100,7 @@ void main() {
     await File('${dir.path}/${DiskStoreFile.fileName}').writeAsString('{oops');
     final broken = LocalStore(
       storage: DiskStoreFile(dir),
-      seeder: (_) => smallData(),
+      seeder: (_, _) => smallData(),
     );
     await broken.load();
     expect(broken.data.parlour.name, 'Test Parlour');

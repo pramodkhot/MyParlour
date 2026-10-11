@@ -22,10 +22,10 @@ class LocalExpenseRepository implements ExpenseRepository {
   @override
   Future<Expense> save(Expense expense) => _store.transact((data) {
     if (expense.amountPaise <= 0) {
-      throw const ValidationException('Enter an amount more than ₹0.');
+      throw const ValidationException(ErrorCode.expenseAmountZero);
     }
     if (expense.category.trim().isEmpty) {
-      throw const ValidationException('Choose a category.');
+      throw const ValidationException(ErrorCode.categoryRequired);
     }
     final saved = expense.copyWith(parlourId: data.parlour.id);
     upsertById(data.expenses, saved, (e) => e.id);

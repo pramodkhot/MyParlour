@@ -130,13 +130,13 @@ BillLine productLine(Product p, {int qty = 1}) => BillLine(
 
 /// A loaded [LocalStore] on a real file in a fresh temp folder.
 Future<LocalStore> openTestStore({
-  StoreData Function(DateTime now)? seeder,
+  StoreSeeder? seeder,
   DateTime Function()? clock,
 }) async {
   final dir = await Directory.systemTemp.createTemp('myparlour_test_');
   final store = LocalStore(
     storage: DiskStoreFile(dir),
-    seeder: seeder ?? (_) => smallData(),
+    seeder: seeder ?? (_, _) => smallData(),
     clock: clock ?? () => testNow,
   );
   await store.load();

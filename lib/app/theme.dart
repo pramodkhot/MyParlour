@@ -37,6 +37,7 @@ ThemeData buildAppTheme() {
     useMaterial3: true,
     colorScheme: scheme,
     fontFamily: AppText.sans,
+    fontFamilyFallback: AppText.sansFallback,
     scaffoldBackgroundColor: AppColors.blush,
     canvasColor: AppColors.blush,
     dividerColor: AppColors.divider,

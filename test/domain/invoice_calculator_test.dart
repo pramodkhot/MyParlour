@@ -126,18 +126,21 @@ void main() {
         InvoiceCalculator.discountError(
           const BillDiscount.amount(40000),
           30000,
-        ),
+        )?.message,
         'Discount cannot be more than the subtotal.',
       );
       expect(
         InvoiceCalculator.discountError(
           const BillDiscount.percent(10001),
           30000,
-        ),
+        )?.message,
         'Discount cannot be more than 100%.',
       );
       expect(
-        InvoiceCalculator.discountError(const BillDiscount.amount(-1), 30000),
+        InvoiceCalculator.discountError(
+          const BillDiscount.amount(-1),
+          30000,
+        )?.message,
         'Discount cannot be negative.',
       );
       expect(

@@ -3,7 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:myparlour/app/app.dart';
+import 'package:myparlour/core/l10n/app_language.dart';
+import 'package:myparlour/core/l10n/language_controller.dart';
+import 'package:myparlour/core/l10n/western_digits.dart';
+import 'package:myparlour/data/local/prefs_store.dart';
 import 'package:myparlour/core/widgets/app_text_field.dart';
 import 'package:myparlour/data/demo/demo_seed.dart';
 import 'package:myparlour/data/local/local_store.dart';
@@ -26,29 +31,46 @@ void usePhoneScreen(
 }
 
 /// Opens an in-memory store seeded with the demo data for [now] and pumps
-/// the whole app on the Welcome screen. Pass [storage] to start from saved
-/// data (e.g. to check something survives a restart), and [overrides] to
-/// replace other providers (e.g. contact actions).
+/// the whole app on the Welcome screen, in [language] (as if chosen
+/// earlier). Pass [storage] / [prefsStorage] to start from saved data (e.g.
+/// to check something survives a restart), and [overrides] to replace other
+/// providers (e.g. contact actions).
 Future<LocalStore> pumpDemoApp(
   WidgetTester tester, {
   DateTime? now,
+  AppLanguage language = AppLanguage.en,
   MemoryStoreFile? storage,
+  MemoryStoreFile? prefsStorage,
   List<Override> overrides = const [],
 }) async {
   final clock = now ?? testNow;
-  await initializeDateFormatting('en_IN');
+  for (final l in AppLanguage.values) {
+    await initializeDateFormatting(l.intlLocale);
+  }
+  useWesternDigits();
+  final prefs = PrefsStore(
+    prefsStorage ??
+        MemoryStoreFile(
+          language == AppLanguage.en ? null : '{"language":"${language.name}"}',
+        ),
+  );
+  await prefs.load();
   final store = LocalStore(
     storage: storage ?? MemoryStoreFile(),
-    seeder: (t) => DemoSeed.build(t, sequentialIds('demo')),
+    seeder: (t, lang) =>
+        DemoSeed.build(t, sequentialIds('demo'), language: lang),
     clock: () => clock,
   );
-  await store.load();
+  await store.load(language: AppLanguage.fromCode(prefs['language']));
   addTearDown(store.dispose);
+  // Each test starts from English formatting unless it chose a language.
+  addTearDown(() => Intl.defaultLocale = AppLanguage.en.intlLocale);
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         localStoreProvider.overrideWithValue(store),
+        prefsStoreProvider.overrideWithValue(prefs),
         clockProvider.overrideWithValue(() => clock),
         idGeneratorProvider.overrideWithValue(sequentialIds('new')),
         ...overrides,
@@ -60,11 +82,12 @@ Future<LocalStore> pumpDemoApp(
   return store;
 }
 
-/// Taps "Explore MyParlour" on the Welcome screen.
+/// Taps the Welcome screen's main button ("Explore MyParlour" in English).
 Future<void> enterApp(WidgetTester tester) async {
-  await tester.ensureVisible(find.text('Explore MyParlour'));
+  final explore = find.byKey(const Key('welcome.explore'));
+  await tester.ensureVisible(explore);
   await tester.pumpAndSettle();
-  await tester.tap(find.text('Explore MyParlour'));
+  await tester.tap(explore);
   await tester.pumpAndSettle();
 }
 

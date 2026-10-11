@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/widgets/status_chip.dart';
 import '../../domain/models/appointment.dart';
-import '../../domain/services/appointment_rules.dart';
+import '../../core/l10n/l10n.dart';
 
 /// Read-only status chip for an appointment.
 class AppointmentStatusChip extends StatelessWidget {
@@ -19,6 +19,8 @@ class AppointmentStatusChip extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) =>
-      StatusChip(label: AppointmentRules.label(status), tone: toneFor(status));
+  Widget build(BuildContext context) => StatusChip(
+    label: context.l10n.appointmentStatus(status),
+    tone: toneFor(status),
+  );
 }

@@ -12,17 +12,23 @@ abstract interface class StoreFile {
   Future<void> setAside(String suffix);
 }
 
-/// The real file: `myparlour_demo.json` in [directory]. Writes go to a
+/// A real file in [directory] (by default `myparlour_demo.json`). Writes go to a
 /// temp file which is then renamed over the real one, so a crash mid-write
 /// never leaves a half-written file.
 class DiskStoreFile implements StoreFile {
-  DiskStoreFile(this.directory);
+  DiskStoreFile(this.directory, {this.name = fileName});
 
+  /// The demo data.
   static const fileName = 'myparlour_demo.json';
 
-  final Directory directory;
+  /// Device preferences (language), kept apart so resetting the demo data
+  /// never changes them.
+  static const prefsFileName = 'myparlour_prefs.json';
 
-  File get file => File('${directory.path}${Platform.pathSeparator}$fileName');
+  final Directory directory;
+  final String name;
+
+  File get file => File('${directory.path}${Platform.pathSeparator}$name');
 
   @override
   Future<String?> read() async =>

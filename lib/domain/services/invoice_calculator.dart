@@ -1,3 +1,4 @@
+import '../errors.dart';
 import '../models/invoice.dart';
 
 /// The bill-level discount as entered: a rupee amount or a percentage.
@@ -54,19 +55,21 @@ abstract final class InvoiceCalculator {
     return net < 0 ? 0 : net;
   }
 
-  /// Plain-language problem with the discount, or null when it is fine.
-  static String? discountError(BillDiscount discount, int subtotalPaise) {
-    if (discount.value < 0) return 'Discount cannot be negative.';
+  /// The problem with the discount, or null when it is fine.
+  static DomainError? discountError(BillDiscount discount, int subtotalPaise) {
+    if (discount.value < 0) {
+      return const DomainError(ErrorCode.discountNegative);
+    }
     switch (discount.type) {
       case DiscountType.none:
         return null;
       case DiscountType.amount:
         return discount.value > subtotalPaise
-            ? 'Discount cannot be more than the subtotal.'
+            ? const DomainError(ErrorCode.discountOverSubtotal)
             : null;
       case DiscountType.percent:
         return discount.value > 10000
-            ? 'Discount cannot be more than 100%.'
+            ? const DomainError(ErrorCode.discountOverHundred)
             : null;
     }
   }
