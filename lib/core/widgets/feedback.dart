@@ -7,6 +7,12 @@ void showMessage(BuildContext context, String message) {
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 3),
+        // Float above a screen's bottom action buttons (54 high plus
+        // padding) so a message never covers "Check in" or "Save".
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 88),
+      ),
     );
 }

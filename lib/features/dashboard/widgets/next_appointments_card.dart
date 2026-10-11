@@ -33,7 +33,7 @@ class NextAppointmentsCard extends StatelessWidget {
         AppCard(
           padding: EdgeInsets.zero,
           child: next.isEmpty
-              ? _Empty(onBook: openAppointments)
+              ? _Empty(onBook: () => context.go(Routes.newAppointment()))
               : Column(
                   children: [
                     for (var i = 0; i < next.length; i++) ...[
@@ -42,7 +42,7 @@ class NextAppointmentsCard extends StatelessWidget {
                       _Row(
                         appointment: next[i],
                         data: data,
-                        onTap: openAppointments,
+                        onTap: () => context.go(Routes.appointment(next[i].id)),
                       ),
                     ],
                   ],

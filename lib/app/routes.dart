@@ -8,6 +8,24 @@ abstract final class Routes {
   static const billing = '/billing';
   static const more = '/more';
 
+  /// New appointment, optionally for a customer and/or on a date.
+  static String newAppointment({String? customerId, DateTime? date}) {
+    final query = <String, String>{
+      'customerId': ?customerId,
+      if (date != null)
+        'date':
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-'
+            '${date.day.toString().padLeft(2, '0')}',
+    };
+    return Uri(
+      path: '/appointments/new',
+      queryParameters: query.isEmpty ? null : query,
+    ).toString();
+  }
+
+  static String appointment(String id) => '/appointments/$id';
+  static String rescheduleAppointment(String id) => '/appointments/$id/edit';
+
   static const customers = '/more/customers';
   static const newCustomer = '/more/customers/new';
   static String customer(String id) => '/more/customers/$id';

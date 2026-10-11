@@ -164,7 +164,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
       if (!mounted) return;
       showMessage(context, _isEdit ? 'Customer updated' : 'Customer saved');
       if (thenBook) {
-        context.go(Routes.appointments);
+        context.go(Routes.newAppointment(customerId: saved.id));
       } else {
         Navigator.of(context).pop(saved);
       }

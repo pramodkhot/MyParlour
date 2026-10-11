@@ -13,7 +13,7 @@ class QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = [
-      (Icons.add_rounded, 'New appointment', Routes.appointments, true),
+      (Icons.add_rounded, 'New appointment', Routes.newAppointment(), true),
       (
         Icons.person_add_alt_outlined,
         'Add customer',

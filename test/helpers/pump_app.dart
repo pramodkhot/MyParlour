@@ -95,7 +95,7 @@ Finder formField(String label) => find.descendant(
 Future<void> typeInto(WidgetTester tester, String label, String text) async {
   await tester.ensureVisible(formField(label));
   await tester.enterText(formField(label), text);
-  await tester.pump();
+  await tester.pumpAndSettle();
 }
 
 Finder navItem(String label) =>

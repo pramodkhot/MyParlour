@@ -124,3 +124,29 @@ Low-cost choices made where the spec left room. Newest at the bottom of each pha
   the same folder and checks everything survived (an app restart).
 - **Contact actions** (call, SMS, WhatsApp, share) go through one `ContactActions` service, so
   tests can use a fake. If no app can open the link, a message says so.
+
+## Phase 5
+
+- **Week strip** weeks start on Monday. Dots mark days with any booking (any status). Today has a
+  rose outline when it is not the selected day.
+- **Filter icon** filters the day by stylist (inactive stylists are listed too, so past days can be
+  checked). A dot on the icon shows a filter is on.
+- **Filter chips** count the selected day only. "Upcoming" means status *booked*.
+- **Stylists offered** are active staff who work that weekday and do every chosen service. If
+  nobody does all of them, everyone working that day is offered, so the owner can still book.
+- **Next free slot**: the first slot from now (or from opening time on future days) where at least
+  one offered stylist is free for the whole duration; the first free stylist is preselected. Once
+  the user picks a time or stylist themselves, it is kept.
+- **Availability text**: "Free", "Busy until 11:30 AM" (already busy at that time) or "Busy from
+  5:30 PM" (another booking starts before this one would end).
+- **Overlap**: completed appointments also count as taking the stylist's time; cancelled and
+  no-show do not.
+- **Closed days**: booking on a day the parlour is normally closed is allowed, with a warning.
+- **Past times** are not offered for today; dates before today cannot be chosen.
+- **Reschedule** keeps the same customer; only upcoming (booked) appointments can be rescheduled.
+- **Cancel** asks for an optional reason (quick chips or typed). Cancelled and no-show
+  appointments stay in the day list and the customer's history.
+- **Create bill / View bill** on a completed appointment open the Billing tab; Phase 6 opens the
+  bill itself.
+- **Messages float above bottom action buttons**, so they never hide "Check in" or "Save".
+- **Customer history entries** open the appointment.

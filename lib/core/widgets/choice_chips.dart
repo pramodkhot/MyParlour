@@ -133,7 +133,11 @@ class _Chip extends StatelessWidget {
                     Icon(icon, size: 18, color: fg),
                     Gap.w4,
                   ],
-                  Text(label, style: AppText.chip.copyWith(color: fg)),
+                  // Flexible lets long labels wrap instead of overflowing
+                  // narrow spaces such as dialogs.
+                  Flexible(
+                    child: Text(label, style: AppText.chip.copyWith(color: fg)),
+                  ),
                 ],
               ),
             ),

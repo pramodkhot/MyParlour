@@ -256,7 +256,8 @@ class _Detail extends ConsumerWidget {
                   child: PrimaryButton(
                     label: 'New appointment',
                     icon: Icons.add_rounded,
-                    onPressed: () => context.go(Routes.appointments),
+                    onPressed: () =>
+                        context.go(Routes.newAppointment(customerId: c.id)),
                   ),
                 ),
               )

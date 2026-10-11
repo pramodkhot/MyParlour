@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/appointments/appointment_detail_screen.dart';
+import '../features/appointments/appointments_screen.dart';
+import '../features/appointments/booking_screen.dart';
 import '../features/customers/customer_detail_screen.dart';
 import '../features/customers/customer_form_screen.dart';
 import '../features/customers/customers_screen.dart';
@@ -37,11 +40,32 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.appointments,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Appointments',
-                  icon: Icons.event_note_outlined,
-                  phase: 5,
-                ),
+                builder: (_, _) => const AppointmentsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    builder: (_, state) => BookingScreen(
+                      customerId: state.uri.queryParameters['customerId'],
+                      date: DateTime.tryParse(
+                        state.uri.queryParameters['date'] ?? '',
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':id',
+                    builder: (_, state) => AppointmentDetailScreen(
+                      appointmentId: state.pathParameters['id']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        builder: (_, state) => BookingScreen(
+                          appointmentId: state.pathParameters['id'],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

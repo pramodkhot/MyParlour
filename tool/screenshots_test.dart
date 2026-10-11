@@ -128,6 +128,37 @@ void main() {
     await _shot(tester, '21_service_form');
   });
 
+  testWidgets('appointments', (tester) async {
+    usePhoneScreen(tester);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    await pumpDemoApp(tester);
+    await enterApp(tester);
+    await tapAndSettle(tester, navItem('Appointments'));
+    await _shot(tester, '40_appointments');
+    await tapAndSettle(tester, find.text('Sneha Patil'));
+    await _shot(tester, '41_appointment_detail');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byTooltip('Book appointment'));
+    await tapAndSettle(tester, find.text('Search name or phone'));
+    await tapAndSettle(tester, find.text('Kavya Nair'));
+    await tapAndSettle(tester, find.text('Add services'));
+    await tapAndSettle(tester, find.text('Haircut'));
+    await tapAndSettle(tester, find.text('Hair Spa'));
+    await tapAndSettle(tester, find.text('Add 2 services'));
+    await _shot(tester, '42_booking_top');
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -500));
+    await tester.pumpAndSettle();
+    await _shot(tester, '43_booking_bottom');
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 300));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Anita'));
+    await tapAndSettle(tester, find.text('Anita'));
+    await tapAndSettle(tester, find.text('Book appointment'));
+    await _shot(tester, '44_overlap');
+  });
+
   testWidgets('staff', (tester) async {
     await open(tester, 'Staff');
     await _shot(tester, '30_staff');

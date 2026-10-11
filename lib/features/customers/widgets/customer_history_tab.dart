@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../app/routes.dart';
 
 import '../../../core/design/spacing.dart';
 import '../../../core/design/typography.dart';
@@ -35,6 +38,7 @@ class CustomerHistoryTab extends StatelessWidget {
         final a = e.appointment;
         final bill = e.invoice;
         return AppCard(
+          onTap: a == null ? null : () => context.go(Routes.appointment(a.id)),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
